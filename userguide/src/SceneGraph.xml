@@ -1,0 +1,25 @@
+<section id="SceneGraph">
+<title>The Flex Scene Graph</title>
+
+<para>
+Multigraph uses a heirarchy of Flex objects to construct its graph.  If you are
+working with the Multigraph source code it can be helpful to understand this
+heirarchy.  (This information is only needed if you are working with the Multigraph
+source code.)
+</para>
+
+<para>
+Each graph in Multigraph consists of an instance of the Graph class, which
+extends the Flex class <code>mx.core.UIComponent</code> and
+is implemented in the source file <code>Graph.as</code>.  Each Graph object
+defines the nested heirarchy of UIComponent objects depicted in
+<xref linkend="figSceneGraph"/>.  This documentation will eventually contain
+more detail about this SceneGraph.
+</para>
+
+<figure id="figSceneGraph">
+<title>The Scene Graph</title>
+<graphic fileref="images/SceneGraph.png"/>
+</figure>
+
+</section>

@@ -1,0 +1,57 @@
+<chapter id="HTMLFiles">
+
+<title>Creating Multigraph Web Pages</title>
+
+<para>
+The first part of any web page containing
+a multigraph graph is the HTML file for the web page.
+As described in <xref linkend="QuickStart"/>, the HTML file should
+load the javascript file "Multigraph.js".  This should
+be done in a <sgmltag>script</sgmltag> tag in the <sgmltag>head</sgmltag>
+part of the page.
+</para>
+
+<para>
+There are two other things that need to happen in the HTML file.  The first
+is to create a <sgmltag>div</sgmltag> element somewhere in the page, and assign
+some value to its
+<sgmltag>id</sgmltag> attribute.  This <sgmltag>div</sgmltag> is where
+multigraph will draw the graph, and it can be anywhere in the HTML page.
+The second is to write a line of the form
+</para>
+
+<programlisting>
+new Multigraph(DIV_ID, MUGL_FILE, [WIDTH,HEIGHT]);
+</programlisting>
+
+<para>
+where DIV_ID is the value that you chose for the <sgmltag>div</sgmltag>
+containing the graph, MUGL_FILE is the name of the a &mugl; file
+describing the graph, and WIDTH and HEIGHT are the width and height
+that you want (in pixels) for the graph.  Typically this line should go
+in the page body's <sgmltag>onload</sgmltag> attribute, so that it is called
+only once, when the page is initially loaded.
+</para>
+
+<para>
+A web page may include more than one Multigraph graph.  Just create
+a separate <sgmltag>div</sgmltag> for each graph, each with its own
+unique <sgmltag>id</sgmltag>, write separate
+calls to the Multigraph constructor for each one, and create
+separate &mugl; files for each one.  If your page contains
+more than one graph, you may want to put these Multigraph constructor
+calls into a function, and then call that function in the 
+page body's <sgmltag>onload</sgmltag> attribute, in order to keep
+the <sgmltag>onload</sgmltag> value simple.
+</para>
+
+<para>
+To view your graph, just load the HTML page into a supported browser
+(Firefox or Safari).  When you publish the page to a web server, put your
+graph's &mugl; file(s) in the same folder or directory on
+the server where you put the HTML file. (Unless your HTML file refers
+to it with a relative path, in which case you should put it in the
+correct relative location.)
+</para>
+
+</chapter>

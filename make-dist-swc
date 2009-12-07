@@ -1,0 +1,10 @@
+#! /usr/bin/perl
+
+chomp($version = `./dist-version`);
+sys("cp Multigraph.swc Multigraph-$version.swc");
+
+sub sys {
+    my $cmd = shift;
+    print("$cmd\n");
+    return system($cmd);
+}

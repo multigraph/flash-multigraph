@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml"
+        showCloseButton="true"
+        styleName="noPadding"
+        close="titleWindow_close(event);">
+
+    <mx:Style>
+        .noPadding {
+            paddingBottom: 0;
+            paddingTop: 0;
+            paddingLeft: 0;
+            paddingRight: 0;
+        }
+    </mx:Style>
+
+    <mx:Script>
+        <![CDATA[
+            import mx.managers.IFocusManagerComponent;
+            import mx.controls.Alert;
+            import mx.core.IFlexDisplayObject;
+            import mx.events.CloseEvent;
+            import mx.managers.PopUpManager;
+
+            private function titleWindow_close(evt:CloseEvent):void {
+                PopUpManager.removePopUp(evt.target as IFlexDisplayObject);
+            }
+        ]]>
+    </mx:Script>
+
+</mx:TitleWindow>

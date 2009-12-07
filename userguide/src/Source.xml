@@ -1,0 +1,44 @@
+<chapter id="Source">
+<title>Working with the Multigraph Source Code</title>
+
+<para>
+Multigraph is an open source project.  Anyone is welcome to download
+the source code and modify it.  You can download the source code
+from
+<ulink url="http://www.multigraph.org/download">http://www.multigraph.org/download</ulink>.
+</para>
+
+<para>
+Multigraph is written in ActionScript, which is the language of the
+Adobe Flash player.  The Multigraph source code is organized as a
+project for the Flex Builder Eclipse
+(<ulink url="http://www.eclipse.org">http://www.eclipse.org</ulink>)
+plugin from Adobe, which is available from
+<ulink url="http://www.adobe.com/products/flex">http://www.adobe.com/products/flex</ulink>.
+The
+Multigraph source code zip file includes the Eclipse project files, so
+importing the project into your copy of Eclipse should be
+straightforward.
+The Flex Builder plugin is unfortunately not free, but you can download a free 60-day trial version
+from the above web page.  Also, it IS free for use in academic institutions
+(<ulink url="https://freeriatools.adobe.com/flex">https://freeriatools.adobe.com/flex</ulink>),
+and there is an alpha version for Linux that is free to anyone
+(<ulink url="http://labs.adobe.com/technologies/flex/flexbuilder_linux">http://labs.adobe.com/technologies/flex/flexbuilder_linux</ulink>).
+</para>
+
+<para>
+In addition to Flex Builder, it is also possible to compile Multigraph with Adobe's
+free SDK compiler, which is available from 
+<ulink url="http://www.adobe.com/products/flex/flexdownloads/index.html">http://www.adobe.com/products/flex/flexdownloads/index.html</ulink>.  If you are going to do much work with the Multigraph source code, though,
+you will probably want to get Flex Builder.
+</para>
+
+<para>
+If you have any questions about working with the Multigraph source code, send an email to
+the multigraph-users mailing list, which is described in <xref linkend="Support"/>.
+</para>
+
+&Renderers;
+&SceneGraph;
+
+</chapter>

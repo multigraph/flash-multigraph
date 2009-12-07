@@ -1,0 +1,224 @@
+<?xml version='1.0'?>
+<mugl>
+  <plotarea marginleft='40' marginright='40' marginbottom='45' margintop="30"/>
+  <title
+   base='0 1'   
+   border="0"
+   anchor='0 1'
+   color='0xffffff'
+   bordercolor="0x000000"
+   opacity="0.5"
+   padding="2"
+   cornerradius="15"
+   position='0 0'>Temperature and Forecast</title>
+  <legend
+   base='0 1'   
+   anchor='0 1'
+   position='0 0'
+   border='0'
+   color='0xFFFFFF'
+   bordercolor='0x000000'
+   rows='2'
+   opacity='0.2'>
+    <icon height='15' width='15' border='0'/>
+  </legend>
+  <horizontalaxis max='2009080622' type='datetime' min='2009080522'>
+    <labels format='%H:%i%L%n %d%L%Y' spacing='1M 7D 1D 12H 6H 4H 2H 1H 30m 10m 5m'/>
+    <grid/>
+    <title/>
+  </horizontalaxis>
+  <verticalaxis positionbase='left' max='30' id='celsius' min='0'>
+    <title position='-27 0' angle='90' anchor='0 -1'>Celsius</title>
+    <binding max='100' id='tempbinding' min='0'/>
+  </verticalaxis>
+  <verticalaxis positionbase='right' max='102.1' id='fahrenheit' min='36.1'>
+    <title angle='90' anchor='0 1'>Fahrenheit</title>
+    <grid/>
+    <binding max='212' id='tempbinding' min='32'/>
+  </verticalaxis>
+  <plot>
+    <legend label='Outdoor Forecast'/>
+    <horizontalaxis ref='datetime'>
+      <variable ref='datetime2'/>
+    </horizontalaxis>
+    <verticalaxis ref='fahrenheit'>
+      <variable ref='forecast_temp' />
+    </verticalaxis>
+    <renderer type='line'>
+      <option name='linecolor' value='green'/>
+      <option name='dotcolor' value='green'/>
+      <option name='dotsize' value='1'/>
+    </renderer>
+  </plot>
+  <plot>
+    <legend label='Indoor Temp'/>
+    <horizontalaxis ref='datetime'>
+      <variable ref='datetime'/>
+    </horizontalaxis>
+    <verticalaxis ref='celsius'>
+      <variable ref='intemp' />
+    </verticalaxis>
+    <renderer type='line'>
+      <option name='linecolor' value='black'/>
+      <option name='dotsize' value='1'/>
+    </renderer>
+  </plot>
+  <plot>
+    <legend label='Outdoor Temp'/>
+    <horizontalaxis ref='datetime'>
+      <variable ref='datetime'/>
+    </horizontalaxis>
+    <verticalaxis ref='celsius'>
+      <variable ref='outtemp' />
+    </verticalaxis>
+    <renderer type='line'>
+      <option name='linecolor' value='blue'/>
+      <option name='dotsize' value='1'/>
+    </renderer>
+  </plot>
+  <plot>
+    <horizontalaxis ref='datetime'>
+      <variable ref='fd0'/>
+    </horizontalaxis>
+    <verticalaxis ref='fahrenheit'>
+      <variable ref='ft0'/>
+    </verticalaxis>
+    <renderer type='line'>
+      <option name='linecolor' value='red'/>
+      <option name='dotsize' value='1'/>
+    </renderer>
+  </plot>
+  <plot>
+    <horizontalaxis ref='datetime'>
+      <variable ref='fd1'/>
+    </horizontalaxis>
+    <verticalaxis ref='fahrenheit'>
+      <variable ref='ft1'/>
+    </verticalaxis>
+    <renderer type='line'>
+      <option name='linecolor' value='red'/>
+      <option name='dotsize' value='1'/>
+    </renderer>
+  </plot>
+  <plot>
+    <horizontalaxis ref='datetime'>
+      <variable ref='fd2'/>
+    </horizontalaxis>
+    <verticalaxis ref='fahrenheit'>
+      <variable ref='ft2'/>
+    </verticalaxis>
+    <renderer type='line'>
+      <option name='linecolor' value='red'/>
+      <option name='dotsize' value='1'/>
+    </renderer>
+  </plot>
+  <plot>
+    <horizontalaxis ref='datetime'>
+      <variable ref='fd3'/>
+    </horizontalaxis>
+    <verticalaxis ref='fahrenheit'>
+      <variable ref='ft3'/>
+    </verticalaxis>
+    <renderer type='line'>
+      <option name='linecolor' value='red'/>
+      <option name='dotsize' value='1'/>
+    </renderer>
+  </plot>
+  <plot>
+    <horizontalaxis ref='datetime'>
+      <variable ref='fd4'/>
+    </horizontalaxis>
+    <verticalaxis ref='fahrenheit'>
+      <variable ref='ft4'/>
+    </verticalaxis>
+    <renderer type='line'>
+      <option name='linecolor' value='red'/>
+      <option name='dotsize' value='1'/>
+    </renderer>
+  </plot>
+  <data>
+    <variables>
+      <variable column='0' id='datetime' type='datetime'/>
+      <variable column='1' id='intemp'/>
+      <variable column='2' id='outtemp'/>
+    </variables>
+    <csv location='housetemps.csv'/>
+  </data>
+  <data>
+    <variables>
+      <variable column='0' id='datetime2' type='datetime'/>
+      <variable column='1' id='forecast_temp'/>
+    </variables>
+    <values>20090806140000,81
+20090806170000,81
+20090806200000,73
+20090806230000,66
+20090807020000,62
+20090807050000,60
+20090807080000,64
+20090807110000,75
+20090807140000,82
+20090807170000,82
+20090807200000,75
+20090807230000,69
+20090808020000,66
+20090808050000,64
+20090808080000,67
+20090808110000,78
+20090808140000,85
+20090808170000,85
+20090808200000,77
+20090809020000,66
+20090809080000,67
+20090809140000,86
+20090809200000,78
+20090810020000,67
+20090810080000,68
+20090810140000,86
+20090810200000,79
+20090811020000,69
+20090811080000,68
+20090811140000,82
+20090811200000,76
+20090812020000,68
+20090812080000,68
+20090812140000,80
+20090812200000,74
+</values>
+  </data>
+  <data>
+    <variables>
+      <variable column='0' id='fd0' type='datetime'/>
+      <variable column='1' id='ft0'/>
+    </variables>
+    <csv location='forecast0.csv'/>
+  </data>
+  <data>
+    <variables>
+      <variable column='0' id='fd1' type='datetime'/>
+      <variable column='1' id='ft1'/>
+    </variables>
+    <csv location='forecast1.csv'/>
+  </data>
+  <data>
+    <variables>
+      <variable column='0' id='fd2' type='datetime'/>
+      <variable column='1' id='ft2'/>
+    </variables>
+    <csv location='forecast2.csv'/>
+  </data>
+  <data>
+    <variables>
+      <variable column='0' id='fd3' type='datetime'/>
+      <variable column='1' id='ft3'/>
+    </variables>
+    <csv location='forecast3.csv'/>
+  </data>
+  <data>
+    <variables>
+      <variable column='0' id='fd4' type='datetime'/>
+      <variable column='1' id='ft4'/>
+    </variables>
+    <csv location='forecast4.csv'/>
+  </data>
+</mugl>

@@ -1,0 +1,129 @@
+_dietcode.sh_
+
+... removes all C++ style comments.
+... removes all endlines.
+... trims all whitespaces.
+... makes script light-weight.
+Note: tab space or space tab combination is not yet culled from the content
+
+_usage_
+
+input: dietcode.sh <file1> ... <filen>
+output: <file1>.new ... <filen>.new
+
+_depends on_
+
+sed
+tr
+bash
+
+===
+
+_aligncolumns.py_
+
+... aligns the words in a file into a number of columns
+
+_usage_
+
+input: aligncolumns.py <file> <nr of columns> <space between columns>
+output: <file>.new
+
+_depends on_
+
+python
+
+===
+
+_findreplace.sh_
+
+... replaces all occurences of <from> to <to> in multiple files
+Note: You may to use renamesuffix.sh to change the filename suffix
+
+_usage_
+
+input: findreplace.sh <from> <to> <file1> ... <filen>
+output: <file1>.new.RANDINT ... <filen>.new.RANDINT
+
+_depends on_
+
+sed
+bash
+
+===
+
+_renamesuffix.sh_
+
+... changes the suffix of certain files
+
+_usage_
+
+input: renamesuffix.sh <prev. suffix> <new suffix>
+output: all files with <prev. suffix> -> <new suffix>, <new suffix> possibly empty
+
+_depends on_
+
+bash
+
+===
+
+_kj.sh_
+
+... kills all java processes except for one
+
+_usage_
+
+input: kj.sh <process id>
+output: all java processes are killed except for a process with <process id>
+
+_depends on_
+
+bash
+
+===
+
+_new.sh_
+
+... moves all <file>.new to <file>, effectively removing the .new suffix
+
+_usage_
+
+new.sh
+
+_depends on_
+
+bash
+
+===
+
+_rmk.sh_
+
+... removes files with ~ suffix
+
+_usage_
+
+rmk.sh
+
+_depends on_
+
+bash
+
+==
+
+_recompile.sh_
+
+... builds the kernel and puts kernel and modules where they belong (/lib/modules and /boot)
+... also does other managerial tasks
+
+_usage_
+
+* copy recompile.sh to the path of the kernel
+* use make oldconfig or make menuconfig, make changes according to hardware specs
+* modify the kernel target local name in the recompile.sh file
+* run recompile.sh, wait for the build (use icecc, distcc and ccache)
+* modify lilo.conf or grub(?) in the meantime
+* get something to eat and drink
+
+_depends on_
+
+bash
+linux (vanilla) kernel

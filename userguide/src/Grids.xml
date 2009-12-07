@@ -1,0 +1,10 @@
+<section id="Grids">
+<title>Grids</title>
+
+<para>
+The <sgmltag>grid</sgmltag> element tells Mulitgraph to draw a grid behind the plot.
+More documentation for this
+will be written soon.
+</para>
+
+</section>

@@ -1,0 +1,284 @@
+#! /usr/bin/perl
+
+sub sys {
+    my $cmd = shift;
+    print("$cmd\n");
+    return system($cmd);
+}
+
+sub source_highlight {
+    my $infile = shift;
+    my $outfile = shift;
+    my $hitext = "";
+    open(SI, "source-highlight -i $infile |");
+    while (<SI>) { $hitext .= $_; }
+    close(SI);
+    if ($outfile) {
+        open(SO, ">$outfile");
+        print SO $hitext;
+        close(SO);
+    } else {
+        return $hitext;
+    }
+}
+
+##
+## clean out the html/examples dir by remove and recreating it
+##
+system("/bin/rm -rf html/examples");
+mkdir("html/examples");
+
+##
+## find all the directories containing an "example.txt" file in the html/tests directory tree
+##
+@testdirs = ();
+open(FIND , "find html/tests -name example.txt|");
+while (chomp($file = <FIND>)) {
+    $dir = $file;
+    $dir =~ s|html/tests/||;
+    $dir =~ s|/[^/]+$||;
+    push(@testdirs, $dir);
+}
+close(FIND);
+@testdirs = sort(@testdirs);
+
+@tests = ();
+foreach $dir (@testdirs) {
+    $test = parse_example_txt("html/tests/$dir/example.txt");
+    $test->{dir} = $dir;
+    push(@tests, $test);
+}
+
+##
+## create each example (each "test" becomes an "example"):
+##
+for ($i=0; $i<@tests; ++$i) {
+    $test = $tests[$i];
+    $dir = $test->{dir};
+    $prev_test = $i > 0 ? $tests[$i-1] : undef;
+    $next_test = $i < @tests ? $tests[$i+1] : undef;
+
+    print "creating example '$dir' ...";
+
+    if ($test->{htmlfile}) {
+        $htmlfile = $test->{htmlfile};
+        # if there's an html file specified in the example.txt file, parse it
+        $html = parse_mg_html("html/tests/$dir/$htmlfile");
+    } else {
+        # otherwise, example all html file in the dir, and use the first one found
+        # that seems to contain a multigraph graph
+        foreach $f (<html/tests/$dir/*>) {
+            if ($f =~ /\.html$/) {
+                $html = parse_mg_html($f);
+                if ($html && $html->{graphs} && @{$html->{graphs}}) {
+                    $htmlfile = $f;
+                    $htmlfile =~ s|^html/tests/$dir/||;
+                    last;
+                }
+                $html = undef;
+            }
+        }
+    }
+
+    # if we didn't find an html file for this test, skip it
+    if (!$html) { next; }
+
+    # create the dir for this test
+    system("mkdir -p html/examples/$dir");
+
+    # keep track of which files we've copied
+    $file_was_copied = {};
+
+    # copy the html file
+    #system("cp 'html/tests/$dir/$htmlfile' 'html/examples/$dir/frameless-$htmlfile'");
+    decorate_html_file("html/tests/$dir/$htmlfile", "html/examples/$dir/frameless-$htmlfile",
+                       $test, $prev_test, $next_test); 
+    $file_was_copied->{$htmlfile} = 1;
+
+    # copy the mugl file(s), and create source-highlighted version(s):
+    foreach $g (@{$html->{graphs}}) {
+        $mugl = $g->{mugl};
+        system("cp 'html/tests/$dir/$mugl' 'html/examples/$dir'");
+        $file_was_copied->{$mugl} = 1;
+        source_highlight("html/tests/$dir/$mugl", "html/examples/$dir/$mugl.html");
+    }
+
+    # create index.html file
+    create_html_frames_file("html/examples/$dir/index.html",
+                            $test,
+                            $html->{graphs}->[0]->{height}+120,
+                            "*",
+                            "frameless-$htmlfile",
+                            $html->{graphs}->[0]->{mugl}.".html");
+
+    # copy all other files
+    $excludes = "--exclude='*.svn*' --exclude='*~' "
+        . join(" ", map { "--exclude=$_" } keys(%$file_was_copied));
+    system("(cd html/tests/$dir ; tar -c -f - $excludes . ) | (cd html/examples/$dir ; tar xf -)");
+
+    print " done.\n";
+
+}
+
+##
+## create the example index file
+##
+open(OUT, ">html/examples/index.html");
+print OUT qq|<html>
+<head>
+<title>Multigraph Examples</title>
+</head>
+<body>
+<h2>Multigraph Examples</h2>
+<ul>
+|;
+foreach $test (@tests) {
+    printf(OUT qq|<li><a href="%s">%s</a>\n|,
+           $test->{dir},
+           $test->{title});
+}
+print OUT qq|
+</ul>
+</body>
+</html>
+|;
+close(OUT);
+
+exit;
+
+sub count_slashes {
+    my $x = shift;
+    my @x = split("", $x);
+    my $count = 0;
+    foreach my $c (@x) {
+        if ($c eq "/") { ++$count; }
+    }
+    return $count;
+}
+
+sub decorate_html_file {
+    my $infile     = shift;
+    my $outfile    = shift;
+    my $this_test  = shift;
+    my $prev_test  = shift;
+    my $next_test  = shift;
+    my $level = count_slashes($this_test->{dir}) + 1;
+    my $homedir = "../"x$level;
+
+    my $line;
+    open(DECORATE_HTML_FILE_IN, "<$infile");
+    open(DECORATE_HTML_FILE_OUT, ">$outfile");
+    while ($line=<DECORATE_HTML_FILE_IN>) {
+        print DECORATE_HTML_FILE_OUT $line;
+        if ($line =~ /<body/) { last; }
+    }
+    printf(DECORATE_HTML_FILE_OUT qq|<center>
+<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr>
+<td valign="top" width="20%" align="left">%s</td>
+<td valign="top" width="60%" align="center"><a target="_top" href="$homedir">Up: Example Index</a></td>
+<td valign="top" width="20%" align="right">%s</td>
+</tr></table>
+<hr>
+<b><font size="+2">%s</font></b><br>
+<table><tr><td>\n|,
+           $prev_test ? sprintf(qq|<a target="_top" href="$homedir%s">Previous: %s</a>|, $prev_test->{dir}, $prev_test->{title}) : "",
+           $next_test ? sprintf(qq|<a target="_top" href="$homedir%s">Next: %s</a>|, $next_test->{dir}, $next_test->{title}) : "",
+           $this_test->{title}
+        );
+    while ($line=<DECORATE_HTML_FILE_IN>) {
+        if ($line =~ m|</body>|) {
+            printf(DECORATE_HTML_FILE_OUT "</td><td>&nbsp;&nbsp;&nbsp;</td><td>%s</td></tr></table></center>\n",
+                   $this_test->{description});
+        }
+        print DECORATE_HTML_FILE_OUT $line;
+    }
+    close(DECORATE_HTML_FILE_OUT);
+    close(DECORATE_HTML_FILE_IN);
+}
+
+sub trim {
+    my $x = shift;
+    $x =~ s/^\s+//;
+    $x =~ s/\s+$//;
+    return $x;
+}
+
+sub parse_example_txt {
+    my $file = shift;
+    my $key = undef;
+    my $value = "";
+    my $line = undef;
+    my $x;
+    my $h = {};
+    open(IN, "<$file");
+    while ($line=<IN>) {
+        if ( ($x) = ($line =~ /^\[([^\]]+)\]/) ) {
+            $key = $x;
+            $h->{$key} = "";
+        } else {
+            if (defined($key)) {
+                $h->{$key} .= $line;
+            }
+        }
+    }
+    foreach $key (keys %{$h}) {
+        $h->{$key} = trim($h->{$key});
+    }
+    return $h;
+}
+
+sub create_html_frames_file {
+    my $outfile = shift;
+    my $test  = shift;
+    my $rows    = shift;
+    my $cols    = shift;
+    my $graph_frame_src = shift;
+    my $mugl_frame_src  = shift;
+    open(OUT, ">$outfile");
+    printf(OUT <<EOF
+           <HTML>
+           <HEAD>
+           <TITLE>Multigraph Example: %s</TITLE>
+           </HEAD>
+           <FRAMESET rows="%s,%s">
+           <FRAME src="%s">
+           <FRAME src="%s">
+           </FRAMESET>
+           </HTML>
+EOF
+           ,
+           $test->{title},
+           $rows,
+           $cols,
+           $graph_frame_src,
+           $mugl_frame_src);
+    close(OUT);
+}
+
+sub parse_mg_html {
+    my $file = shift;
+    my $mginfo = {
+        file => $file,
+        graphs => []
+    };
+    my $contents = "";
+    open(PARSE_MG_HTML_IN, "<$file");
+    my $line;
+    while ($line=<PARSE_MG_HTML_IN>) {
+        $contents .= $line;
+    }
+    close(PARSE_MG_HTML_IN);
+    $contents =~ s/(new Multigraph\(.*\))/$1\n/g;
+    my @lines = split(/\n/, $contents);
+    foreach $line (@lines) {
+        if (($div,$mugl,$x,$width,$height) = ($line =~ /new\s*Multigraph\(\s*'([^']+)'\s*,\s*'([^']+)'\s*(,\s*\[\s*(\d+)\s*,\s*(\d+)\s*\]\s*)?.*\)/)) {
+            push(@{$mginfo->{'graphs'}}, {
+                div => $div,
+                mugl => $mugl,
+                width => $width,
+                height => $height
+                 });
+        }
+    }
+    return $mginfo;
+}

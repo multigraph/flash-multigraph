@@ -1,0 +1,18 @@
+<section id="ConstantLines">
+<title>Constant Lines</title>
+
+<para>
+Sometimes it is helpful to add a horizontal line to a graph that appear at a certain place
+along the axes but that doesn't correspond to a variable in your data.  For example, on a temperature plot
+you might want to draw a horizontal line that indicates a freezing point.  You can do this 
+by creating a separate <sgmltag>plot</sgmltag> element for the line, and using the
+<sgmltag>constant</sgmltag> element inside the plot's
+<sgmltag>verticalaxis</sgmltag> element, instead of the
+<sgmltag>variable</sgmltag> element.  The <sgmltag>constant</sgmltag> element takes one attribute,
+<sgmltag>value</sgmltag>, which is the data value at which the horizontal line should appear.
+You can specify styling details for the horizontal line, such as what plot style and colors to use,
+in the normal way for all plots as described in <xref linkend="Plots"/>, by using the
+<sgmltag>renderer</sgmltag> subelement.
+</para>
+
+</section>

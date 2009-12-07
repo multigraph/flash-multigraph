@@ -1,0 +1,36 @@
+ROADMAP
+
+* highly-extensible compact light-weight library
+* cutting edge (readable, comprehensible) ecmascript/javascript techniques
+* create life-like applications using structures built on quicksand.
+
+=> light-weight widgetFactory
+
+
+TODO
+
+HI
+- image preloader
+- keyboard nudging of drag and drop objects
+- steal ideas from openrico (requires prototype)
+	* accordeon effect
+	* mouseover event popups (help pop-up or tool-container)
+	* resizeable div components (click drag to resize)
+- redo spreadsheet app
+- generic button support (dock (minimize), expand (whole screen), float bar (a la xfce4))
+- rounded corners (for tabs and whatnot)
+- collect feature requests
+- Write bash script to prepend "Copyright" to all *.js files
+	or do an echo "///Copyright" | echo file.js" trick
+
+LO
+
+- add setStyle function to css module, support multiple browsers
+- optional: cookies to save: container, order state
+- css unit converter
+- Figure out how-to work the cookie-system
+- Setup documentation system (docbooks)
+- Write decent README
+- Write TIPS (style guide, hints, knowledge, known pitfalls)
+- create factory object that creates factory objects
+- support for native mozilla drag events ondragstart, ondrag, ondragend

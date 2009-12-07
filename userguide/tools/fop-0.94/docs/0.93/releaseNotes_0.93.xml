@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V1.3//EN" "document-v13.dtd">
+<document><header><title>Release Notes for Apache FOP 0.93</title></header><body><notes>
+        <p>This is the first production grade release of the new FOP
+        codebase.</p>
+        <ul>
+          <li>It contains the new API first introduced in release 0.92
+            beta. The preceding API has been removed.
+          </li>
+          <li>
+            See the <a href="../compliance.html">compliance page</a> for an
+            overview of the compliance of this release with the XSL 1.0 and
+            1.1 recommendations.
+          </li>
+          <li>
+            This release again contains many bug fixes and new features. See
+            below for details.
+          </li>
+          <li>
+            See the <a href="../knownissues.html">known issues page</a>
+            for an overview of the known issues with this release.
+          </li>
+        </ul>
+        <p>Caveats:</p>
+        <ul>
+          <li>
+            You may experience different behaviour compared to version 0.20.5.
+            Please consult the <a href="upgrading.html">"Upgrading"</a> page for details.
+          </li>
+        </ul>
+      </notes><section id="version_0.93"><title>Major Changes in Version 0.93</title><note>This is not a complete list of changes, a 
+   full list of changes in this release
+   <a href="changes_0.93.html">is available</a>.</note><section><title>Important Changes Code Base</title><ul><li><icon alt="add" src="../images/add.jpg"/>
+        Added support for the use of Open Type fonts
+      (BD)</li><li><icon alt="add" src="../images/add.jpg"/>
+        Support for the rgb-icc() function and for a proprietary cmyk() function (for device CMYK
+        colors only through the PDF renderer so far). 
+      (JM) Thanks to Peter Coppens. Fixes <link href="http://issues.apache.org/bugzilla/buglist.cgi?bug_id=40729">40729</link>.</li><li><icon alt="add" src="../images/add.jpg"/>
+        Added support for PDF/A-1b and PDF/X-3:2003. (Note: this may still be a bit
+        incomplete. Feedback is welcome!)
+      (JM)</li><li><icon alt="add" src="../images/add.jpg"/>
+       Automatic support for all fonts available to the Java2D subsystem for all
+       Java2D-descendant renderers (TIFF, PNG, print, AWT).
+     (JM)</li><li><icon alt="update" src="../images/update.jpg"/>
+        Enabled Copy/Paste from PDF content in Acrobat Reader for text using embedded TrueType fonts.
+      (BD) Thanks to Adam Strzelecki, Victor Mote. Fixes <link href="http://issues.apache.org/bugzilla/buglist.cgi?bug_id=5535">5535</link>.</li><li><icon alt="update" src="../images/update.jpg"/>
+        The Java2DRenderer (and therefore the print and bitmap renderers) is now
+        offering the same quality as the PDF and PS renderers. Note: There can still
+        be little differences between PDF and Print/PNG/TIFF because the latter uses
+        a different font metrics source.
+      (JM)</li></ul></section></section></body></document>

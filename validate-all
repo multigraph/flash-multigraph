@@ -1,0 +1,25 @@
+#! /usr/bin/env perl
+
+my @xmlfiles = ();
+open(FILES, "find  html/tests -name '*.xml' -print|");
+while (<FILES>) {
+	chomp;
+	push(@xmlfiles, $_);
+}
+close(FILES);
+
+foreach $file (@xmlfiles) {
+	$jingcmd = "jing -c schemas/multigraph.rnc $file";
+ 	$jingout = `$jingcmd`;
+ 	if ($jingout) {
+		printf("%s:\n", $file);
+		chomp($jingout);
+		my @lines = split(/\n/, $jingout);
+		foreach my $line (@lines) {
+			$line =~ s/^[^:]+://;
+			print("    $line\n");
+		}
+ 	} else {
+		printf("%s: valid\n", $file);
+	}
+}

@@ -1,0 +1,574 @@
+<section id="Axes">
+<title>Axes</title>
+
+<para>
+A Multigraph graph has one or more horizontal axes, and one or more
+vertical axes.  The location and other display properties of the axes
+are specified with the <sgmltag>horizontalaxis</sgmltag> and
+<sgmltag>verticalaxis</sgmltag> elements in the &mugl; file.
+This includes mathematical information such as the data type
+and range of values along the axis, as well as display information such
+as how the axis should be labeled, a title to be drawn for the axis, and
+so on.
+</para>
+
+<para>
+A &mugl; file can contain any number (0 or more)  of <sgmltag>horizontalaxis</sgmltag>
+and <sgmltag>verticalaxis</sgmltag>
+elements.  Each graph always contains at least one horizontal axis and
+at least one vertical axis.
+If the <sgmltag>horizontalaxis</sgmltag> element is missing,
+multigraph creates a horizontal axis with all the default settings.
+The same is true for the the <sgmltag>verticalaxis</sgmltag> tag.
+</para>
+
+<para>
+The <sgmltag>horizontalaxis</sgmltag> and
+<sgmltag>verticalaxis</sgmltag> elements have the following
+attributes:
+</para>
+
+<variablelist>
+
+<varlistentry><term><sgmltag>id</sgmltag></term>
+<listitem>
+<para>
+An identifier that can be used to refer to this axis elsewhere in the
+&mugl; file.  If this attribute is missing, it defaults to "x"
+for the first horizontal axis, and to "x1", "x2", ... for any additional
+horizontal axes.  The default is "y" for the first
+vertical axis, and "y1", "y2", ... for any additional vertical axes.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>type</sgmltag></term>
+<listitem>
+<para>
+Indicates the data type for the axis.  Should be one of "number" or "datetime".  The default
+is "number".
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>position</sgmltag></term>
+<listitem>
+<para>
+Indicates where this axis should be drawn, as an offset, in pixels,
+from the left edge (for vertical axes) or bottom edge (for
+horizontal axes) of the plot area.  The default is 0.  Note that this
+offset is relative to the plotarea, not the padding box, so the default
+axis positions are long the left and bottom edges of the plotarea.  Negative
+offsets move the axes away from the plotarea and into the padding box.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>positionbase</sgmltag></term>
+<listitem>
+<para>
+Normally the <sgmltag>position</sgmltag> attribute indicates the position
+of an axis with respect to the left (for vertical axes) or bottom (for horizontal axes)
+edge of the plot area. The <sgmltag>positionbase</sgmltag> attribute can be used
+to change this interpretation so that the <sgmltag>position</sgmltag> value
+is relative to the right or top edge instead.  Its value should be either
+'left', 'right', 'bottom', or 'top'.  The default for <sgmltag>positionbase</sgmltag> is
+'left' for vertical axes and 'bottom' for horizontal axes.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>pregap</sgmltag></term>
+<listitem>
+<para>
+For horizontal axes: a gap size in pixels between the left edge of the plotarea
+area and the left endpoint of the axis.  For vertical axes: a gap size in pixels
+between the bottom edge of the plotarea and the bottom endpoint of the axis.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>postgap</sgmltag></term>
+<listitem>
+<para>
+For horizontal axes: a gap size in pixels between the right edge of the plotarea
+and the right endpoint of the axis.  For vertical axes: a gap size in pixels
+between the top edge of the plotarea and the top endpoint of the axis.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>min</sgmltag></term>
+<listitem>
+<para>
+The minimum data value for the axis --- i.e., the data value corresponding to the
+left (for horizontal axes) or bottom (for vertical axes) endpoint of the axis.
+If the axis is a "number" type axis, this value is a number.  If it is a "datetime" type
+axis, the value is a datetime in the format YYYYMMDDHHmmss.
+</para>
+<para>
+Alternatively "min" value may be the keyword "auto", which indicates that the minimum
+data value for the axis should be computed from the given data.  This only works
+for data sources where the entire data set is available at the outset --- it does not
+work for web-service based data sources.
+</para>
+<para>
+The default value for the "min" attribute is "auto".
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>minoffset</sgmltag></term>
+<listitem>
+<para>
+A number which determines the point on the axis that will be associated with the
+<sgmltag>min</sgmltag> value. <sgmltag>minoffset</sgmltag> defaults to 0, which means
+that the <sgmltag>min</sgmltag> value is associated with the left or bottom endpoint
+of the axis.  If <sgmltag>minoffset</sgmltag> is not 0, then the <sgmltag>min</sgmltag>
+will be associated with a point on the axis that is that many pixels away from
+the left or bottom endpoint (with positive values going towards the right or top endpoint).
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>max</sgmltag></term>
+<listitem>
+<para>
+The maximum data value for the axis --- i.e., the data value corresponding to the
+right (for horizontal axes) or top (for vertical axes) endpoint of the axis.
+If the axis is a "number" type axis, this value is a number.  If it is a "datetime" type
+axis, the value is a datetime in the format YYYYMMDDHHmmss.
+</para>
+<para>
+Alternatively "max" value may be the keyword "auto", which indicates that the maximum
+data value for the axis should be computed from the given data.  This only works
+for data sources where the entire data set is available at the outset --- it does not
+swork for web-service based data sources.
+</para>
+<para>
+The default value for the "max" attribute is "auto".
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>maxoffset</sgmltag></term>
+<listitem>
+<para>
+A number which determines the point on the axis that will be associated with the
+<sgmltag>max</sgmltag> value. <sgmltag>maxoffset</sgmltag> defaults to 0, which means
+that the <sgmltag>max</sgmltag> value is associated with the right or top endpoint
+of the axis.  If <sgmltag>maxoffset</sgmltag> is not 0, then the <sgmltag>max</sgmltag>
+will be associated with a point on the axis that is that many pixels away from
+the right or top endpoint (with positive values going towards the left or bottom endpoint).
+</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+<para>
+<xref linkend="figHorizontalAxis"/> and <xref linkend="figVerticalAxis"/>
+show how these attribute values determine the way that each kind of axis is displayed
+relative to the plot area.  Note that the position of each axis is relative to an edge
+of the plot area, but all or part of the axis may lie outside the plot area (in the padding
+box).  In particular, a negative <sgmltag>position</sgmltag> value represents a distance
+away from the plot area (into the padding box), and 
+negative
+<sgmltag>pregap</sgmltag>
+and
+<sgmltag>postgap</sgmltag>
+values cause the ends of the axis to extend into the padding box.
+</para>
+
+<figure id="figHorizontalAxis">
+<title>Horizontal Axis Specifications</title>
+<graphic fileref="images/HorizontalAxis.png"/>
+</figure>
+
+
+<figure id="figVerticalAxis">
+<title>Vertical Axis Specifications</title>
+<graphic fileref="images/VerticalAxis.png"/>
+</figure>
+
+
+<para>
+In addition to the above attributes, the <sgmltag>horizontalaxis</sgmltag>
+and <sgmltag>verticalaxis</sgmltag> elements may contain the following
+subelements:
+</para>
+
+<variablelist>
+
+<varlistentry><term><sgmltag>title</sgmltag></term>
+<listitem>
+  <para>
+The text of this element is used as a title for the axis; it is positioned and oriented according
+to the values of the
+<sgmltag>position</sgmltag>,
+<sgmltag>anchor</sgmltag>, and
+<sgmltag>angle</sgmltag>
+attributes described in <xref linkend="Positioning"/>.  The 
+title is positioned relative to the the center of the axis; the "position" is a pixel offset from this point.
+(The "base" point mentioned in <xref linkend="Positioning"/>
+
+The default anchor point depends on the choice and position of the axis. For a horizontal axis,
+the default anchor point is "0 1" if the axis is positioned at the bottom of the graph
+(positionbase="bottom"), or "0 -1" if the axis is positioned at the top of the graph (positionbase="top").
+For a vertical axis, 
+the title's default anchor point is "1 0" if the axis is positioned to the left of the graph
+(positionbase="left"), or "-1 0" if the axis is positioned to the right of the graph (positionbase="right").
+The default angle is always 0.  The default title position also depends on the axis, and has
+been chosen to look reasonable in most common situations; see the source file Config.as if you want
+to know exactly what the default position values are.
+  </para>
+
+  <para>
+  If there
+  is no <sgmltag>title</sgmltag> element, the axis's title defaults to its
+  <sgmltag>id</sgmltag>.  To prevent a title from being drawn at all, use
+  an empty <sgmltag>title</sgmltag> tag ("<sgmltag>&lt;title/&gt;</sgmltag>").
+  </para>
+
+</listitem>
+</varlistentry>
+
+<!-- *************************************************************** -->
+
+<varlistentry><term><sgmltag>labels</sgmltag></term>
+<listitem>
+  <para>
+  The <sgmltag>labels</sgmltag> element specifies how multigraph will draw
+tick marks along the axis, and text labels for the tick marks.  It has two possible forms,
+depending on whether it has a "spacing" attribute.  In the first case, when it does
+have a "spacing" attribute, it takes the following attributes:
+  </para>
+  <variablelist>
+	<varlistentry><term><sgmltag>format</sgmltag></term>
+	<listitem>
+	  <para>
+		A string describing the format to be used for tick labels.
+The syntax for this string depends on the type of the axis.  For 'number' type
+axes, it should be a C-style "printf" format string, such as '%1d', which is
+the default.  For 'datetime' type axes, it should be a string containing some combination
+of the following special format characters, each of which should be preceeded by a '%':
+	  </para>
+
+<para>
+<table border="1" cellpadding="2" cellspacing="1">
+<thead>
+<tr><td>Character</td><td>Expansion</td></tr>
+</thead>
+<tbody>
+<tr><td>Y</td><td>four digit year</td></tr>
+<tr><td>y</td><td>two digit year</td></tr>
+<tr><td>d</td><td>day of month without leading zero</td></tr>
+<tr><td>D</td><td>2-digit day of month with leading zero</td></tr>
+<tr><td>h</td><td>hour of day, 12 hour clock</td></tr>
+<tr><td>H</td><td>hour of day, 24 hour clock</td></tr>
+<tr><td>i</td><td>minutes</td></tr>
+<tr><td>m</td><td>month number without leading zero</td></tr>
+<tr><td>M</td><td>2-digit month number with leading zero</td></tr>
+<tr><td>N</td><td>month name, spelled out</td></tr>
+<tr><td>n</td><td>month name, 3 letter abbreviation</td></tr>
+<tr><td>p</td><td>AM or PM</td></tr>
+<tr><td>p</td><td>am or pm</td></tr>
+<tr><td>s</td><td>seconds</td></tr>
+<tr><td>W</td><td>weekday name, spelled out</td></tr>
+<tr><td>w</td><td>weekday name, 3-letter abbreviation</td></tr>
+<tr><td>L</td><td>newline</td></tr>
+<tr><td>%</td><td>%</td></tr>
+</tbody>
+</table>
+	</para>
+
+<para>
+Any characters in the format string that are not preceeded by a '%' are
+included verbatim in the formatted result.
+</para>
+
+
+
+	</listitem>
+	</varlistentry>
+	<varlistentry><term><sgmltag>start</sgmltag></term>
+	<listitem>
+	  <para>	
+A data value indicating where tick marks should be aligned on
+the axis.  The location of axis tick marks is determined by the
+combination of this "start" value and a "spacing" value; multigraph
+will draw tick marks (and labels for the tick marks) at locations T +
+n*S, where T is the "start" value, S is the "spacing" value, for each
+integer n such that T + n*S is visible in the graph's padding area.
+The default "start" value is 0.
+	  </para>
+	</listitem>
+	</varlistentry>
+	<varlistentry><term><sgmltag>spacing</sgmltag></term>
+	<listitem>
+	  <para>
+A list of values, separated by spaces, giving the possible spacings to be used
+between tick marks on the axis.  These numbers should be sorted in decreasing order.
+Multigraph will attempt to choose the densest tick spacing possible from amoung
+these choices that results in labels that do not overlap.
+The default value for the "spacing" attribute is "10000 5000 2000 1000 500 200 100 50 20 10 5 2 1 0.1 0.01 0.001".
+	  </para>
+	</listitem>
+	</varlistentry>
+	<varlistentry><term><sgmltag>angle</sgmltag></term></varlistentry>
+	<varlistentry><term><sgmltag>position</sgmltag></term></varlistentry>
+	<varlistentry><term><sgmltag>anchor</sgmltag></term>
+	<listitem>
+	  <para>
+These determine the location and orientation of each tick mark's label
+relative to the location of the tic mark itself.  See
+<xref linkend="AxisLabelPositioning"/>
+and
+<xref linkend="Positioning"/> for further details.
+	  </para>
+	</listitem>
+	</varlistentry>
+  </variablelist>
+
+  <para>
+The second possible form for the
+<sgmltag>labels</sgmltag> element accepts all of the above attributes except
+the <sgmltag>spacing</sgmltag> attribute;  this form takes a sequence of
+<sgmltag>label</sgmltag> subelements instead.  Each label subelement indicates
+one possible spacing for axis tick marks, along with other settings to be used
+when that spacing is chosen.  Specifically, the <sgmltag>label</sgmltag> subelement
+accepts the following attributes:
+  </para>
+
+  <itemizedlist>
+	<listitem><sgmltag>format</sgmltag></listitem>
+	<listitem><sgmltag>start</sgmltag></listitem>
+	<listitem><sgmltag>spacing</sgmltag></listitem>
+	<listitem><sgmltag>angle</sgmltag></listitem>
+	<listitem><sgmltag>position</sgmltag></listitem>
+	<listitem><sgmltag>anchor</sgmltag></listitem>
+  </itemizedlist>
+
+  <para>
+In the context of a <sgmltag>label</sgmltag> element, these attributes have the same
+meaning and form as for the <sgmltag>labels</sgmltag> element, except that the "spacing"
+attribute should be a single data value rather than a list of values.  The values specified
+by the attributes of a <sgmltag>label</sgmltag> element apply only when the spacing for
+that particular element is in effect.  The default value for each of these attributes (except
+for the "spacing" attribute, which is required), is whatever value would be in effect
+for the containing <sgmltag>labels</sgmltag> element.
+  </para>
+
+</listitem>
+</varlistentry>
+
+<!-- *************************************************************** -->
+
+<varlistentry><term><sgmltag>grid</sgmltag></term>
+<listitem>
+  <para>
+  The presence of this element causes Multigraph to draw grid lines
+  perpendicular to this axis, at the location of each tick mark.  The
+  <sgmltag>grid</sgmltag> element takes one optional attribute:
+  </para>
+
+  <variablelist>
+	<varlistentry><term><sgmltag>color</sgmltag></term>
+	<listitem>
+	  <para>
+	  A hexadecimal number giving the color to be used for the grid lines.  The default
+	  is "0xeeeeee", which is very light gray.
+	  </para>
+	</listitem>
+	</varlistentry>
+  </variablelist>
+
+  <para>
+    If a <sgmltag>horizontalaxis</sgmltag>
+    or <sgmltag>verticalaxis</sgmltag> element does not contain a
+    <sgmltag>grid</sgmltag> subelement, Multigraph does not
+    draw grid lines along that axis.  Note that
+    the <sgmltag>grid</sgmltag> element only affects the drawing of
+    grid lines associated with the axis it appears in.  If you want
+    both horizontal and vertical grid lines, be sure to include
+    a <sgmltag>grid</sgmltag> element in both
+    the <sgmltag>horizontalaxis</sgmltag>
+    and <sgmltag>verticalaxis</sgmltag> sections of the &mugl; file.
+  </para>
+
+
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>pan</sgmltag></term>
+<listitem>
+  <para>
+  This element can be used to configure the type of panning that multigraph
+  allows the user to do for this axis.  It accepts the following attributes:
+  </para>
+
+  <variablelist>
+	<varlistentry><term><sgmltag>allowed</sgmltag></term>
+	<listitem>
+	  <para>
+	  One of the words "yes" or "no"; default is "yes".
+	  </para>
+	</listitem>
+	</varlistentry>
+	<varlistentry><term><sgmltag>min</sgmltag></term>
+	<listitem>
+	  <para>
+	  The minimum data value to ever be displayed for this axis; panning is never
+      allowed to go below this number.
+	  </para>
+	</listitem>
+	</varlistentry>
+	<varlistentry><term><sgmltag>max</sgmltag></term>
+	<listitem>
+	  <para>
+	  The maximum data value to ever be displayed for this axis; panning is never
+      allowed to go above this number.
+	  </para>
+	</listitem>
+	</varlistentry>
+  </variablelist>
+
+
+</listitem>
+</varlistentry>
+
+<!-- *************************************************************** -->
+
+<varlistentry><term><sgmltag>zoom</sgmltag></term>
+<listitem>
+  <para>
+  This element can be used to configure the type of zooming that multigraph
+  allows the user to do for this axis.  It accepts the following attributes:
+  </para>
+
+  <variablelist>
+	<varlistentry><term><sgmltag>allowed</sgmltag></term>
+	<listitem>
+	  <para>
+	  One of the words "yes" or "no"; default is "yes".
+	  </para>
+	</listitem>
+	</varlistentry>
+	<varlistentry><term><sgmltag>in</sgmltag></term>
+	<listitem>
+	  <para>
+	  The maximum factor by which zooming "in" is allowed, compared to the initial
+range of the axis before the user has done any zooming.  Should be a number, or the keyword "none".  Default: "none".
+	  </para>
+	</listitem>
+	</varlistentry>
+	<varlistentry><term><sgmltag>out</sgmltag></term>
+	<listitem>
+	  <para>
+	  The maximum factor by which zooming "out" is allowed, compared to the initial
+range of the axis before the user has done any zooming.  Should be a number, or the keyword "none".  Default: "none".
+	  </para>
+	</listitem>
+	</varlistentry>
+	<varlistentry><term><sgmltag>anchor</sgmltag></term>
+	<listitem>
+	  <para>
+A data value that indicates a location on the axis about which zooming should be centered.  Should be
+either a data value, or the keyword "none".  If it is "none", then zooming is centered about 
+the location of the mouse cursor when the user first presses the mouse button to begin dragging.
+The default is "none".
+	  </para>
+	</listitem>
+	</varlistentry>
+  </variablelist>
+
+
+</listitem>
+</varlistentry>
+
+<!-- *************************************************************** -->
+
+<varlistentry><term><sgmltag>binding</sgmltag></term>
+<listitem>
+  <para>
+  This element can be used to "bind" two or more axes together with a linear mapping,
+so that interactive
+panning and/or zooming causes them to move together.  It is typically used to connect
+axes that represent the same vertical scale with different units, such as celsius and
+Fahrenheit temperature.  It can also be used to connect axes in different graphs that
+represent the same scale (for example, the horizontal time axis).
+It requires the following three attributes:
+  </para>
+
+<variablelist>
+<varlistentry><term><sgmltag>id</sgmltag></term>
+<listitem>
+<para>
+The <sgmltag>id</sgmltag> attribute should be a name that identifies the binding.  It can
+be any string, and all axes having <sgmltag>binding</sgmltag> elements with the same
+<sgmltag>id</sgmltag> value will be connected to each other.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>min</sgmltag></term>
+<listitem>
+<para>
+A "minimum" value for the binding. Axes bound together in a binding will be connected
+in such a way that their "min" values correspond to each other.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>max</sgmltag></term>
+<listitem>
+<para>
+A "maximum" value for the binding. Axes bound together in a binding will be connected
+in such a way that their "max" values correspond to each other.
+</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+
+<para>
+The  <sgmltag>min</sgmltag> and <sgmltag>max</sgmltag> attributes can be any two
+data values on the axis that determine the linear relationship between an axis
+and other axes in the same binding.  They do not need to correspond to the axis's
+own min and max values, and in general they will not.
+</para>
+
+<para>
+For example, to bind a celsius
+temperature axis to a Fahrenheit temperature axis, you could use the binding
+</para>
+
+<programlisting>
+<![CDATA[
+<binding id="tempbinding" min="0" max="100"/>
+]]>
+</programlisting>
+
+<para>
+on the celsius axis, and
+</para>
+
+<programlisting>
+<![CDATA[
+<binding id="tempbinding" min="32" max="212"/>
+]]>
+</programlisting>
+
+<para>
+on the Fahrenheit axis.
+</para>
+
+
+</listitem>
+</varlistentry>
+
+<!-- *************************************************************** -->
+
+</variablelist>
+
+</section>

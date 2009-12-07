@@ -1,0 +1,18 @@
+#! /usr/bin/perl
+
+chomp($version = `./dist-version`);
+$dist_name = "multigraph-$version-docs";
+
+sub sys {
+    my $cmd = shift;
+    print("$cmd\n");
+    return system($cmd);
+}
+
+sys("/bin/rm -f $dist_name.zip");
+sys("/bin/rm -rf $dist_name");
+sys("mkdir $dist_name");
+sys("tar cf - userguide/html userguide/pdf | (cd $dist_name ; tar xvf -)");
+sys("cp LICENSE.txt $dist_name");
+sys("zip -r $dist_name.zip $dist_name");
+sys("/bin/rm -rf $dist_name");

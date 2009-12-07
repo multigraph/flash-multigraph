@@ -1,0 +1,28 @@
+#! /usr/bin/perl
+
+open(IN, "<../LICENSE.txt");
+$license_txt = "";
+while (<IN>) { $license_txt .= $_; }
+close(INT);
+
+open(OUT, ">src/License.xml");
+print OUT <<EOF
+<chapter id="License">
+
+<title>License</title>
+
+<para>
+Multigraph is distributed under the terms of the following copyright
+and license.
+</para>
+
+<programlisting>
+<![CDATA[
+$license_txt
+]]>
+</programlisting>
+
+</chapter>
+EOF
+;
+close(OUT);

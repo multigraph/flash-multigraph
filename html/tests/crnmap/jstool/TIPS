@@ -1,0 +1,43 @@
+_coding tips_
+
+One function must do one thing. Write a new function if you want to extend the functionality. This will spare you time in 
+the end. Redesign if need be.
+
+Make it work. Make it correct. Make it cheaper/faster. In this order.
+
+
+_javascript + ecmascript pitfalls (here be dragons)_
+
+Watch out for potential closure leaks.
+
+'this' is a weird animal. Watch out if used inside an event handler.
+
+Avoid MSIE's addevent. Play safely.
+
+DO NOT RELY ON THE LANGUAGE FEATURE TO END YOUR CODE SENTENCES!
+ALWAYS FINISH WITH A SEMI-COLON!!!!!
+
+_coding style_
+
+function not_anonymous ()
+{
+	/// this is a comment left for another programmer (human or alien)
+	// var code_commented_out = function () { alert (1); };
+}
+
+var fn = function ()
+{
+	/// write anonymous functions like this
+	// not_anonymous();
+}
+
+If one has the screen real estate do this:
+function fn ()
+{
+	/// ...
+Not this:
+function fn () {
+	/// ...
+
+The latter style was used in printed books to save on space, pages and trees.
+If you're not working on a fibrous medium, why would you be so stingy with space?

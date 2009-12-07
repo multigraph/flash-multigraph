@@ -1,0 +1,34 @@
+<section id="AxisLabelPositioning">
+<title>Axis Label Positioning</title>
+
+<para>
+The <sgmltag>labels</sgmltag> subelement of the
+<sgmltag>horizontalaxis</sgmltag> and <sgmltag>verticalaxis</sgmltag>
+elements allows you to control how Multigraph places tic marks and
+labels along the axis.  The location of the label for each tic mark is
+determined by the <sgmltag>position</sgmltag>,
+<sgmltag>anchor</sgmltag>, and <sgmltag>angle</sgmltag> attributes of
+the <sgmltag>labels</sgmltag> tag.  In terms of the discussion in
+<xref linkend="Positioning"/>, the "small" rectangle that is being positioned
+is an imaginary rectangle surrounding the text label, and 
+the "base" point for each label is the
+location of the corresponding tic mark on the axis (the
+<sgmltag>labels</sgmltag> tag does not take a <sgmltag>base</sgmltag>
+attribute).
+</para>
+
+<para>
+Through various combinations of the <sgmltag>anchor</sgmltag>,
+<sgmltag>position</sgmltag>, and <sgmltag>angle</sgmltag> attributes
+it is possible to position, orient, and justify text in a graph very precisely.
+<xref linkend="figAxisLabelExamples"/> shows several examples.  Note that the rectangles drawn around
+the text in the figure are shown just for clarity; in a real graph, Multigraph does
+not draw these rectangles.
+</para>
+
+<figure id="figAxisLabelExamples">
+<title>Axis Label Placement Examples</title>
+<graphic fileref="images/AxisLabelExamples.png"/>
+</figure>
+
+</section>

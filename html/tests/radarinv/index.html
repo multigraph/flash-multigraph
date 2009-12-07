@@ -1,0 +1,610 @@
+<!--
+    Author: Devin Eldreth
+    Multigraph Development Team
+    October 27, 2008
+    
+    This file is an example of a situational use for Multigraph. The primary purpose of this file/excerise
+    was to demonstrate Multigraph's usefullness with known GIS applications such as OpenLayers. 
+    
+    This application also uses an open source draggable div API provided by the guys at jstool.googlecode.com. 
+    A big thanks to their awesome work with DHTML.
+
+    Each draggable div, in this example, houses one Multigraph (SVG) graph.
+
+    Markers are placed at known weather station positions to indicate that the user has the ability to 'pull up'
+    a graph of data from that location.
+    
+    At the moment the graphs are all the same. 
+    
+    Important Usage Information:
+        Though OpenLayers and jsTool are not browser specific, Multigraph currently only supports SVG rendering.
+	So Firefox for Safari or some other non-VML browser must be used to properly view the graph objects.
+    
+    Important links used in developing this file:
+    http://www.openlayers.org
+    http://www.multigraph.org
+    http://jstool.googlecode.com
+-->
+
+<html xmlns="http://www.w3.org/1999/xhtml" debug="true">
+  <head>
+    <style type="text/css">
+        body {
+	    margin: 0px;
+	    padding: 0px;
+	} 
+        #map {
+	    position:absolute;
+            border: 1px solid black;
+            background-color: blue;
+        }
+
+	.container
+	{
+	    background-color: #FFFFFF;
+	    border: 1px solid #222222;
+	    border-bottom: 1px solid #222222;	
+	    float: left;
+	    z-index:10000;
+	}
+
+	.handle
+	{
+	    display: block;
+	    background-color: #999999;
+	    border: 2px solid #777777;
+	    color: white;
+	    height:16px;
+	    font-size:10pt;
+	}
+	
+	.closeBox
+	{
+	    position: absolute;
+	    top: 2;
+	    right: 2;
+	    width: 14px;
+	    height: 14px;
+	    color: #000000;
+	    float: right;
+	    background-color: red;
+	    border: .5px solid #000000;
+	}
+
+	.item
+	{
+	    float: left; /** very important **/
+	    display: block; /** very important **/
+	    border: medium solid #91c7ed;
+	    background-color: #8d9ac4;
+	    width: 60px;
+	    height: 60px;
+	}
+
+	.item span
+	{
+	    margin-left: 4px;
+	    margin-right: 4px;
+	    color: white;
+	}
+
+	.description
+	{
+	    width: 600px;
+	    color: #f6b9d4;
+	    background-color: #a46b84;
+	    border: thick solid #852550;
+	    float: none !important;
+	}
+
+	.description p
+	{
+	    font-size: medium;
+	    margin-left: 1em;
+	}
+
+	.description p:first-letter
+	{
+	    font-size: 30px;
+	    font-style: oblique;
+	    color: #f9e4ed;
+	    font-variant: small-caps;
+	}
+
+	#boxDrag, #boxVerticalOnly, #boxHorizontalOnly, #boxRegionConstraint, #boxThreshold, #boxAbsolute, #map 
+	{
+	    cursor: move;
+	}
+    </style>
+
+    <script src="./openlayers/lib/OpenLayers.js"></script>
+    <script src="../../Multigraph.js"</script>
+
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAALaX1UBpenstH0b6X05a3RRSP6dTan0wbxYiw5gLCPNnvpaZkwRTmT9ZwjeO2uL-wDYd_hIagilFOAA"
+      type="text/javascript"></script>
+
+    <!-- ToolMan components -->
+    <script type="text/javascript" src="jstool/ToolMan/core.js"></script>
+    <script type="text/javascript" src="jstool/ToolMan/css.js"></script>
+    <script type="text/javascript" src="jstool/ToolMan/coordinates.js"></script>
+    <script type="text/javascript" src="jstool/ToolMan/events.js"></script>
+    <script type="text/javascript" src="jstool/ToolMan/drag.js"></script>
+    <script type="text/javascript" src="jstool/ToolMan/cookies.js"></script>
+
+    <!-- jsTool components -->
+    <script type="text/javascript" src="jstool/jsTool/core.js"></script>
+    <script type="text/javascript" src="jstool/jsTool/intersection.js"></script>
+    <script type="text/javascript" src="jstool/jsTool/raise.js"></script>
+    <script type="text/javascript" src="jstool/jsTool/container.js"></script>
+    <script type="text/javascript" src="jstool/jsTool/swap.js"></script>
+    <script type="text/javascript" src="jstool/jsTool/test.js"></script>
+
+    <script>
+        var map, layer, markers, markericon;
+	var popups = new Array();
+var stations = [
+    ["KABR",      'KABR - ABERDEEN, SD',        -98.413000,     45.456000],
+    ["KABX",      'KABX - ALBUQUERQUE, NM',     -106.824000,    35.150000],
+    ["KAKQ",      'KAKQ - NORFOLK/RICH, VA',    -77.007000,     36.984000],
+    ["KAMA",      'KAMA - AMARILLO, TX',        -101.709000,    35.233000],
+    ["KAMX",      'KAMX - MIAMI, FL',           -80.413000,     25.611000],
+    ["KAPX",      'KAPX - GAYLORD, MI',         -84.720000,     44.907000],
+    ["KARX",      'KARX - LA CROSSE, WI',       -91.191000,     43.823000],
+    ["KATX",      'KATX - SEATTLE, WA',         -122.496000,    48.194000],
+    ["KBBX",      'KBBX - BEALE AFB, CA',       -121.632000,    39.496000],
+    ["KBGM",      'KBGM - BINGHAMTON, NY',      -75.985000,     42.200000],
+    ["KBHX",      'KBHX - EUREKA, CA',          -124.292000,    40.498000],
+    ["KBIS",      'KBIS - BISMARCK, ND',        -100.761000,    46.771000],
+    ["KBLX",      'KBLX - BILLINGS, MT',        -108.607000,    45.854000],
+    ["KBMX",      'KBMX - BIRMINGHAM, AL',      -86.770000,     33.172000],
+    ["KBOX",      'KBOX - BOSTON, MA',          -71.137000,     41.956000],
+    ["KBRO",      'KBRO - BROWNSVILLE, TX',     -97.419000,     25.916000],
+    ["KBUF",      'KBUF - BUFFALO, NY',         -78.737000,     42.949000],
+    ["KBYX",      'KBYX - KEY WEST, FL',        -81.703000,     24.598000],
+    ["KCAE",      'KCAE - COLUMBIA, SC',        -81.118000,     33.949000],
+    ["KCBW",      'KCBW - HOULTON, ME',         -67.806000,     46.039000],
+    ["KCBX",      'KCBX - BOISE, ID',           -116.236000,    43.491000],
+    ["KCCX",      'KCCX - STATE COLLEGE, PA',   -78.004000,     40.923000],
+    ["KCLE",      'KCLE - CLEVELAND, OH',       -81.860000,     41.413000],
+    ["KCLX",      'KCLX - CHARLESTON, SC',      -81.042000,     32.656000],
+    ["KCRP",      'KCRP - CORP CHRISTI, TX',    -97.511000,     27.784000],
+    ["KCXX",      'KCXX - BURLINGTON, VT',      -73.167000,     44.511000],
+    ["KCYS",      'KCYS - CHEYENNE, WY',        -104.806000,    41.152000],
+    ["KDAX",      'KDAX - SACRAMENTO, CA',      -121.678000,    38.501000],
+    ["KDDC",      'KDDC - DODGE CITY, KS',      -99.969000,     37.761000],
+    ["KDFX",      'KDFX - LAUGHLIN AFB, TX',    -100.281000,    29.273000],
+    ["KDGX",      'KDGX - JACKSON/BRAN., MS',   -89.984000,     32.280000],
+    ["KDIX",      'KDIX - PHILADELPHIA, PA',    -74.411000,     39.947000],
+    ["KDLH",      'KDLH - DULUTH, MN',          -92.210000,     46.837000],
+    ["KDMX",      'KDMX - DES MOINES, IA',      -93.723000,     41.731000],
+    ["KDOX",      'KDOX - DOVER AFB, DE',       -75.440000,     38.826000],
+    ["KDTX",      'KDTX - DETROIT, MI',         -83.472000,     42.700000],
+    ["KDVN",      'KDVN - DAVENPORT, IA',       -90.581000,     41.612000],
+    ["KDYX",      'KDYX - DYESS AFB, TX',       -99.254000,     32.538000],
+    ["KEAX",      'KEAX - KANSAS CITY, MO',     -94.264000,     38.810000],
+    ["KEMX",      'KEMX - TUCSON, AZ',          -110.630000,    31.894000],
+    ["KENX",      'KENX - ALBANY, NY',          -74.064000,     42.586000],
+    ["KEOX",      'KEOX - FORT RUCKER, AL',     -85.459000,     31.461000],
+    ["KEPZ",      'KEPZ - EL PASO, TX',         -106.698000,    31.873000],
+    ["KESX",      'KESX - LAS VEGAS, NV',       -114.891000,    35.701000],
+    ["KEVX",      'KEVX - EGLIN AFB, FL',       -85.921000,     30.564000],
+    ["KEWX",      'KEWX - AUSTIN/S ANT, TX',    -98.028000,     29.704000],
+    ["KEYX",      'KEYX - EDWARDS AFB, CA',     -117.561000,    35.098000],
+    ["KFCX",      'KFCX - ROANOKE, VA',         -80.274000,     37.024000],
+    ["KFDR",      'KFDR - ALTUS AFB, OK',       -98.976000,     34.362000],
+    ["KFDX",      'KFDX - CANNON AFB, NM',      -103.630000,    34.635000],
+    ["KFFC",      'KFFC - ATLANTA, GA',         -84.566000,     33.364000],
+    ["KFSD",      'KFSD - SIOUX FALLS, SD',     -96.729000,     43.588000],
+    ["KFSX",      'KFSX - FLAGSTAFF, AZ',       -111.198000,    34.574000],
+    ["KFTG",      'KFTG - DENVER, CO',          -104.546000,    39.787000],
+    ["KFWS",      'KFWS - DALLAS/FTW, TX',      -97.303000,     32.573000],
+    ["KGGW",      'KGGW - GLASGOW, MT',         -106.625000,    48.206000],
+    ["KGJX",      'KGJX - GRAND JUNCT, CO',     -108.214000,    39.062000],
+    ["KGLD",      'KGLD - GOODLAND, KS',        -101.700000,    39.367000],
+    ["KGRB",      'KGRB - GREEN BAY, WI',       -88.111000,     44.498000],
+    ["KGRK",      'KGRK - FORT HOOD, TX',       -97.383000,     30.722000],
+    ["KGRR",      'KGRR - GRAND RAPIDS, MI',    -85.545000,     42.894000],
+    ["KGSP",      'KGSP - GREER, SC',           -82.220000,     34.883000],
+    ["KGWX",      'KGWX - COLUMBUS AFB, MS',    -88.329000,     33.897000],
+    ["KGYX",      'KGYX - PORTLAND, ME',        -70.256000,     43.891000],
+    ["KHDX",      'KHDX - HOLLOMAN AFB, NM',    -106.123000,    33.076000],
+    ["KHGX",      'KHGX - HOUSTON, TX',         -95.079000,     29.472000],
+    ["KHNX",      'KHNX - SAN JOAQUIN V, CA',   -119.632000,    36.314000],
+    ["KHPX",      'KHPX - FORT CAMPBELL, KY',   -87.285000,     36.737000],
+    ["KHTX",      'KHTX - HUNTSVILLE, AL',      -86.083000,     34.931000],
+    ["KICT",      'KICT - WICHITA, KS',         -97.443000,     37.655000],
+    ["KICX",      'KICX - CEDAR CITY, UT',      -112.862000,    37.591000],
+    ["KILN",      'KILN - CINCINNATI, OH',      -83.822000,     39.420000],
+    ["KILX",      'KILX - LINCOLN, IL',         -89.337000,     40.151000],
+    ["KIND",      'KIND - INDIANAPOLIS, IN',    -86.280000,     39.708000],
+    ["KINX",      'KINX - TULSA, OK',           -95.565000,     36.175000],
+    ["KIWA",      'KIWA - PHOENIX, AZ',         -111.670000,    33.289000],
+    ["KIWX",      'KIWX - FORT WAYNE, IN',      -85.700000,     41.359000],
+    ["KJAX",      'KJAX - JACKSONVILLE, FL',    -81.702000,     30.485000],
+    ["KJGX",      'KJGX - ROBINS AFB, GA',      -83.351000,     32.675000],
+    ["KJKL",      'KJKL - JACKSON, KY',         -83.313000,     37.591000],
+    ["KLBB",      'KLBB - LUBBOCK, TX',         -101.814000,    33.654000],
+    ["KLCH",      'KLCH - LAKE CHARLES, LA',    -93.216000,     30.125000],
+    ["KLIX",      'KLIX - NEW ORLEANS, LA',     -89.826000,     30.337000],
+    ["KLNX",      'KLNX - NORTH PLATTE, NE',    -100.576000,    41.958000],
+    ["KLOT",      'KLOT - CHICAGO, IL',         -88.085000,     41.605000],
+    ["KLRX",      'KLRX - ELKO, NV',            -116.803000,    40.740000],
+    ["KLSX",      'KLSX - ST LOUIS, MO',        -90.683000,     38.699000],
+    ["KLTX",      'KLTX - WILMINGTON, NC',      -78.429000,     33.989000],
+    ["KLVX",      'KLVX - LOUISVILLE, KY',      -85.944000,     37.975000],
+    ["KLWX",      'KLWX - STERLING, VA',        -77.478000,     38.975000],
+    ["KLZK",      'KLZK - LITTLE ROCK, AR',     -92.262000,     34.836000],
+    ["KMAF",      'KMAF - MIDLAND/ODSSA, TX',   -102.189000,    31.943000],
+    ["KMAX",      'KMAX - MEDFORD, OR',         -122.717000,    42.081000],
+    ["KMBX",      'KMBX - MINOT AFB, ND',       -100.865000,    48.393000],
+    ["KMHX",      'KMHX - MOREHEAD CITY, NC',   -76.876000,     34.776000],
+    ["KMKX",      'KMKX - MILWAUKEE, WI',       -88.551000,     42.968000],
+    ["KMLB",      'KMLB - MELBOURNE, FL',       -80.654000,     28.113000],
+    ["KMOB",      'KMOB - MOBILE, AL',          -88.240000,     30.679000],
+    ["KMPX",      'KMPX - MINNEAPOLIS, MN',     -93.566000,     44.849000],
+    ["KMQT",      'KMQT - MARQUETTE, MI',       -87.548000,     46.531000],
+    ["KMRX",      'KMRX - KNOXVILLE, TN',       -83.402000,     36.169000],
+    ["KMSX",      'KMSX - MISSOULA, MT',        -113.986000,    47.041000],
+    ["KMTX",      'KMTX - SALT LAKE CTY, UT',   -112.448000,    41.263000],
+    ["KMUX",      'KMUX - SAN FRANCISCO, CA',   -121.898000,    37.155000],
+    ["KMVX",      'KMVX - GRAND FORKS, ND',     -97.326000,     47.528000],
+    ["KMXX",      'KMXX - MAXWELL AFB, AL',     -85.790000,     32.537000],
+    ["KNKX",      'KNKX - SAN DIEGO, CA',       -117.042000,    32.919000],
+    ["KNQA",      'KNQA - MEMPHIS, TN',         -89.873000,     35.345000],
+    ["KOAX",      'KOAX - OMAHA, NE',           -96.367000,     41.320000],
+    ["KOHX",      'KOHX - NASHVILLE, TN',       -86.563000,     36.247000],
+    ["KOKX",      'KOKX - NEW YORK CITY, NY',   -72.864000,     40.866000],
+    ["KOTX",      'KOTX - SPOKANE, WA',         -117.627000,    47.680000],
+    ["KPAH",      'KPAH - PADUCAH, KY',         -88.772000,     37.068000],
+    ["KPBZ",      'KPBZ - PITTSBURGH, PA',      -80.218000,     40.532000],
+    ["KPDT",      'KPDT - PENDLETON, OR',       -118.853000,    45.691000],
+    ["KPOE",      'KPOE - FORT POLK, LA',       -92.976000,     31.156000],
+    ["KPUX",      'KPUX - PUEBLO, CO',          -104.181000,    38.459000],
+    ["KRAX",      'KRAX - RALEIGH/DUR, NC',     -78.490000,     35.666000],
+    ["KRGX",      'KRGX - RENO, NV',            -119.462000,    39.754000],
+    ["KRIW",      'KRIW - RIVERTON, WY',        -108.477000,    43.066000],
+    ["KRLX",      'KRLX - CHARLESTON, WV',      -81.723000,     38.311000],
+    ["KRTX",      'KRTX - PORTLAND, OR',        -122.965000,    45.715000],
+    ["KSFX",      'KSFX - POCATELLO, ID',       -112.686000,    43.106000],
+    ["KSGF",      'KSGF - SPRINGFIELD, MO',     -93.401000,     37.235000],
+    ["KSHV",      'KSHV - SHREVEPORT, LA',      -93.841000,     32.451000],
+    ["KSJT",      'KSJT - SAN ANGELO, TX',      -100.493000,    31.371000],
+    ["KSOX",      'KSOX - SANTA ANA MT, CA',    -117.636000,    33.818000],
+    ["KSRX",      'KSRX - FORT SMITH, AR',      -94.362000,     35.291000],
+    ["KTBW",      'KTBW - TAMPA, FL',           -82.402000,     27.706000],
+    ["KTFX",      'KTFX - GREAT FALLS, MT',     -111.385000,    47.460000],
+    ["KTLH",      'KTLH - TALLAHASSEE, FL',     -84.329000,     30.398000],
+    ["KTLX",      'KTLX - OKLAHOMA CITY, OK',   -97.278000,     35.333000],
+    ["KTWX",      'KTWX - TOPEKA, KS',          -96.233000,     38.997000],
+    ["KTYX",      'KTYX - FORT DRUM, NY',       -75.680000,     43.756000],
+    ["KUDX",      'KUDX - RAPID CITY, SD',      -102.830000,    44.125000],
+    ["KUEX",      'KUEX - HASTINGS, NE',        -98.442000,     40.321000],
+    ["KVAX",      'KVAX - MOODY AFB, GA',       -83.002000,     30.890000],
+    ["KVBX",      'KVBX - VANDENBRG AFB, CA',   -120.397000,    34.838000],
+    ["KVNX",      'KVNX - VANCE AFB, OK',       -98.128000,     36.741000],
+    ["KVTX",      'KVTX - LOS ANGELES, CA',     -119.179000,    34.412000],
+    ["KVWX",      'KVWX - EVANSVILLE, IN',      -87.716600,     38.266600],
+    ["KYUX",      'KYUX - YUMA, AZ',            -114.657000,    32.495000],
+    ["PABC",      'PABC - BETHEL, AK',          -161.876000,    60.792000],
+    ["PACG",      'PACG - SITKA, AK',           -135.529000,    56.853000],
+    ["PAEC",      'PAEC - NOME, AK',            -165.295000,    64.511000],
+    ["PAHG",      'PAHG - ANCHORAGE, AK',       -151.351000,    60.726000],
+    ["PAIH",      'PAIH - MIDDLETON IS, AK',    -146.303000,    59.461000],
+    ["PAKC",      'PAKC - KING SALMON, AK',     -156.629000,    58.679000],
+    ["PAPD",      'PAPD - FAIRBANKS, AK',       -147.502000,    65.035000],
+    ["PGUA",      'PGUA - ANDERSEN AFB, GU',    144.808000,     13.454000],
+    ["PHKI",      'PHKI - SOUTH KAUAI, HI',     -159.552000,    21.894000],
+    ["PHKM",      'PHKM - KAMUELA, HI',         -155.778000,    20.126000],
+    ["PHMO",      'PHMO - MOLOKAI, HI',         -157.180000,    21.133000],
+    ["PHWA",      'PHWA - SOUTH SHORE, HI',     -155.569000,    19.095000],
+    ["TJUA",      'TJUA - SAN JUAN, PR',        -66.078000,     18.116000],
+];
+        
+	// Default graph width and height
+	var defaultWidth  = 600;
+	var defaultHeight = 100;
+
+        AutoSizeAnchored = OpenLayers.Class(OpenLayers.Popup.Anchored, {
+            'autoSize': true,
+	    'minSize': new OpenLayers.Size(310,310)
+        });
+	
+	AutoSizeFramedCloud = OpenLayers.Class(OpenLayers.Popup.FramedCloud, {
+            'autoSize': true, 
+            'minSize': new OpenLayers.Size(320,280)
+        });
+	
+       	    var options = {
+                projection: new OpenLayers.Projection("EPSG:900913"),
+                units: "m",
+                maxResolution: 0.703125,
+                maxExtent: new OpenLayers.Bounds(-20037508.34, -20037508.34,
+                                                 20037508.34, 20037508.34)
+            };
+       var points = new Array();
+       var lineFeature = new Array();
+       var vectorLayer = new OpenLayers.Layer.Vector("Lines");
+       var style_red = {
+           strokeColor: "red",
+           strokeOpacity: 1,
+           strokeWidth: 3,
+           pointRadius: 6,
+           pointerEvents: "visiblePainted"
+       };
+       
+       function init(){
+            // Set div sizes
+	    var docHeight = document.body.clientHeight - 10;
+	    var docWidth = document.body.clientWidth - 10;
+
+	    document.getElementById("map").style.height = docHeight;
+	    document.getElementById("map").style.width = docWidth;
+	    document.getElementById("hover").style.height = docHeight;
+	    document.getElementById("hover").style.width = docWidth;
+	    
+            // Create a new map
+            map = new OpenLayers.Map('map');
+
+	    // Standard vector and satellite maps
+	    var ol_wms = new OpenLayers.Layer.WMS(
+                "OpenLayers WMS",
+                "http://labs.metacarta.com/wms/vmap0",
+                {layers: 'basic'}
+            );
+	    map.addLayer(ol_wms);
+
+            var jpl_wms = new OpenLayers.Layer.WMS( 
+	        "Satellite",
+                "http://labs.metacarta.com/wms-c/Basic.py?",
+	        {layers: 'satellite'} 
+	    );
+	    map.addLayer(jpl_wms);
+	    
+	    var goog = new OpenLayers.Layer.Google("Google Maps", options);
+	    map.addLayer(goog);
+
+	    // Add the lines vector layer
+            map.addLayer(vectorLayer);
+
+	    // Create the stations layer, add the layer to the map, and then add the stations
+	    markers = new OpenLayers.Layer.Markers("Stations");
+        map.addLayer(markers);
+
+        var markersize = new OpenLayers.Size(13,20);
+        var markeroffset = new OpenLayers.Pixel(-(markersize.w)/2, -markersize.h);
+		markericon = new OpenLayers.Icon('markers/AQUA.png', markersize, markeroffset);
+		
+        map.addControl(new OpenLayers.Control.LayerSwitcher());
+
+	    map.setCenter(new OpenLayers.LonLat(-97.0, 38.0));
+	    map.zoomTo(4);
+
+	    // Add event listeners for zoom and pan endings	    
+	    map.events.register("zoomend", map, updateLines);	    
+	    map.events.register("move", map, updateLines);
+	    
+	    addStations();
+        }
+
+	function updateLines() {
+	    for (var container in lineFeature) {
+	        if(lineFeature[container] != null) {
+	            vectorLayer.destroyFeatures([lineFeature[container]]);
+		    div = document.getElementById(container);
+		    points[container].pop();
+		    var xy = new OpenLayers.Pixel(div.style.left, div.style.top);
+		    points[container].push(new OpenLayers.Geometry.Point(map.getLonLatFromPixel(xy).lon, map.getLonLatFromPixel(xy).lat));
+		    lineFeature[container] = new OpenLayers.Feature.Vector(
+		        new OpenLayers.Geometry.LineString(points[container]),null,style_red);
+
+		    vectorLayer.addFeatures([lineFeature[container]]);
+		}
+	    }
+	}
+	
+	// Adds each marker for a station and returns the total number of stations (markers)
+	function addStations() {
+	    var c = 1;
+
+	    for(x = 0; x < stations.length; x++) {
+	        var ll = new OpenLayers.LonLat(stations[x][2], stations[x][3])
+	        addMarker([ll, stations[x][0]], stations[x][1], c);
+		c++;
+	    }
+	}	
+
+        function addMarker(/** Array */ stationIdentifier, /** String */ popupContentHTML, /** int */ container) {
+            var feature = new OpenLayers.Feature(layer, stationIdentifier[0]);
+            feature.data.icon = markericon.clone();                     
+            var marker = feature.createMarker();
+	    
+	    // Event handler for marker clicking
+            var markerClick = function (evt) {
+	        createPopupGraph(container, stationIdentifier[1], popupContentHTML);
+	        
+		// Add modality to individual div
+		var drag2cs = Tool.drag2container();
+		var	drag = ToolMan.drag();
+		var raise = Tool.raise();
+		var coordinates = ToolMan.coordinates();
+	        
+		var handle = document.getElementById("h" + container);
+		
+		var boxToConstrain = document.getElementById('c' + container);
+		var boxThatConstrains = document.getElementById("hover");
+
+	        // Setup a contraining box to keep the popups within a specific region
+	        var group = drag.createSimpleGroup(boxToConstrain, handle);
+	        var origin = coordinates.create(parseInt(boxThatConstrains.style.width) - defaultWidth, 
+					parseInt(boxThatConstrains.style.height) - defaultHeight - 16);
+		
+	        group.addTransform(function(coordinate, dragEvent) {
+	            var originalTopLeftOffset = dragEvent.topLeftOffset.minus(dragEvent.topLeftPosition);		    
+
+		    var thisElement = dragEvent.group.element.getAttribute("id");
+		    //alert(thisElement);
+		    if(points[thisElement].length > 1) {
+		        // since this is a straight line always remove the last point added
+		        points[thisElement].pop();
+			
+			// REQUIRED -- always pass arrays to this function, not doing so produces weird (but working) results
+			vectorLayer.destroyFeatures([lineFeature[thisElement]]);
+		    }
+		    
+		    points[thisElement].push(new OpenLayers.Geometry.Point(map.getLonLatFromPixel(dragEvent.topLeftPosition).lon, 
+			                                                   map.getLonLatFromPixel(dragEvent.topLeftPosition).lat));
+	    	    lineFeature[thisElement] = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.LineString(points[thisElement]),null,this.style_red);
+		    vectorLayer.addFeatures([lineFeature[thisElement]]);		    
+		    return coordinate.constrainTo(origin, originalTopLeftOffset);
+	        });
+		
+		var popup = document.getElementById('c' + container);
+		x = map.getPixelFromLonLat(stationIdentifier[0]).x;
+		y = map.getPixelFromLonLat(stationIdentifier[0]).y;
+
+		// Set the popup's position to be that of the transformed ll coordinates
+		popup.style.left = x;
+		popup.style.top = y;
+		popup.style.width = defaultWidth;
+		popup.style.height = defaultHeight;
+
+		// toggle the visibility of the popup
+		if (popup.style.visibility == 'visible') {
+		    //Multigraph.Graph.destroyInstance('g'+container);
+		    MultigraphDelete('graphdiv'+container);
+		    vectorLayer.destroyFeatures([lineFeature["c" + container]]);
+		    removeDiv(container);
+		}
+		else {
+		    // This is a hack!!
+		    popup.style.visibility = 'visible';
+		    var object = document.getElementById("object:" + container);		    
+		    var mugl = "http://www.multigraph.org/examples/radarinv/radarinvxml.php/"+ stationIdentifier[1];
+		    //var mugl = "tempgraph.xml";
+/*
+		    var embed = document.getElementById("embed:" + container);
+		    embed.setAttribute("flashVars", "muglfile="+mugl);
+		    embed.setAttribute("src","ASGraphicsTest.swf");
+*/
+            new Multigraph("graphdiv"+container, mugl, [defaultWidth,defaultHeight]);
+		    //object.appendChild(embed);
+
+		    startLine(stationIdentifier[0], container);
+		}
+            }
+	    
+            marker.events.register("mousedown", feature, markerClick);
+            markers.addMarker(marker);
+        }
+		
+	// Create a new popup div and graph
+	// name - The name of the div, this will usually be a number
+	// data - name of the linked Multigraph xml file or data
+	function createPopupGraph (container, data, title) {
+	    var popup = document.createElement("div");
+	    popup.setAttribute("id", "c" + container);
+	    popup.setAttribute("class", "container");
+	    popup.style.position = "absolute";
+	    popup.style.visibility = "hidden";
+
+	    var handle = document.createElement("div");
+	    handle.setAttribute("id", "h" + container);
+	    handle.setAttribute("class", "handle");
+	    handle.innerHTML = title;
+
+	    var button = document.createElement("div");
+		button.innerHTML = '<center><a href="#">order data</a></center>';
+	    
+	    // Create and append a box that symbolizes an X box
+	    var closeBox = document.createElement("div");
+	    closeBox.setAttribute("id", "close" + container);
+	    closeBox.setAttribute("class", "closeBox");
+	    closeBox.align = "center";
+	    closeBox.innerHTML = "X";
+	    handle.appendChild(closeBox);
+
+/*
+	    var object = document.createElement("object");
+	    object.setAttribute("id", "object:"+container);
+	    var embed  = document.createElement("embed");
+	    embed.setAttribute("quality", "high");
+	    embed.setAttribute("width", defaultWidth);
+	    embed.setAttribute("height", defaultHeight - 18);
+	    embed.setAttribute("id", "embed:" + container);
+	    object.appendChild(embed);
+*/
+	    var graphdiv = document.createElement("div");
+        graphdiv.setAttribute("id", "graphdiv"+container);
+
+	    popup.appendChild(handle);
+	    popup.appendChild(button);
+/*
+	    popup.appendChild(object);
+*/
+	    popup.appendChild(graphdiv);
+	    document.getElementById('hover').appendChild(popup);
+
+	    // Add the event listener to close the popup if the top right 'closing box' is clicked
+	    closeBox.addEventListener("mousedown", function (evt) {
+		//Multigraph.Graph.destroyInstance('g'+name);
+		MultigraphDelete('graphdiv'+container);
+		vectorLayer.destroyFeatures([lineFeature["c" + container]]);
+		removeDiv(container);
+	    }, false);
+
+	    return popup;
+	}
+	
+	function startLine(ll, container) {
+	    points["c" + container] = new Array();
+	    
+	    // Push the same point twice so if the map moves before the graph the line renders properly
+	    points["c" + container].push(new OpenLayers.Geometry.Point(ll.lon, ll.lat));
+	    points["c" + container].push(new OpenLayers.Geometry.Point(ll.lon, ll.lat));	    
+	    lineFeature["c" + container] = new OpenLayers.Feature.Vector(
+	        new OpenLayers.Geometry.LineString(points["c" + container]),null,style_red);
+
+            vectorLayer.addFeatures([lineFeature["c" + container]]);
+	}
+
+	function removeDiv(container) {
+	    var hover = document.getElementById("hover");
+	    hover.removeChild(document.getElementById("c" + container));
+	    lineFeature["c" + container] = null;
+	}	
+
+	function ModalGraph() {
+	    this.popup = null;
+	    this.line = null;
+	    this.x = 0;
+	    this.y = 0;
+	    this.lon = 0;
+	    this.lat = 0;
+	    
+	    this.init = function(div) {
+	        this.popup = div;
+		this.x = this.popup.style.left;
+		this.y = this.popup.style.top;
+	    }
+	}
+    </script>
+  </head>
+  
+  <body onload="init()">
+<table width="100%" border="1">
+<tr><td align="center">
+<b>NEXRAD Inventory Interactive Map Demo</b>
+<br>
+"F11, Ctrl-R" toggles full-screen mode.
+Click on a station to bring up graph.
+Hold shift key to zoom time axis.
+</td></tr>
+<tr><td>
+    <div id="map" style="position:absolute;"></div>
+    <div id="lines" style="position:absolute; z-index:100;"></div>
+    <div id="hover" style="position:absolute;"></div>
+    <div id="msg3" style="position:absolute; top:500px; color:#FFFFFF; background-color:#000000;"></div>
+</td></tr>
+</table>
+  </body>
+<html>

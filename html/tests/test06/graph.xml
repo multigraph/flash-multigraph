@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<mugl>
+  <window margin="2" border="2" padding="5" width="800" height="300"/>
+  <networkmonitor visible="true" fixed="true" />  
+  <plotarea marginbottom="80" marginleft="50" marginright="50" margintop="5"/>
+  <horizontalaxis id="xaxis"
+		  position="0"
+		  pregap="0"
+		  postgap="0"
+		  type="datetime"
+		  min="2008070400"
+		  minoffset="10"
+		  max="2008070500"
+		  maxoffset="10">
+    <title angle="0" position="0 -80">Date/Time</title>
+    <labels format="d n H:00" start="0" angle="45" anchor="1 1" spacing="1D 12H 6H 4H 2H 1H" />
+  </horizontalaxis>
+  
+  <verticalaxis id="yaxis"
+		position="0"
+		pregap="0"
+		postgap="0"
+ 		type="number"
+		min="0"
+		maxoffset="10"
+		max="40">
+    <title angle="90" position="-40 0" anchor="0 -1">Temperature (C)</title>
+    <labels format="%.1f" start="1" spacing="50 20 10 5 2 1 0.1 0.01"/>
+  </verticalaxis>
+  <verticalaxis id="zaxis"
+		positionbase="right"
+		pregap="0"
+		postgap="0"
+ 		type="number"
+		min="0"
+		max="2">
+    <pan min="0" />
+    <zoom anchor="0"/>
+    <title angle="-90" position="50 0" anchor="0 1">Precipitation (cm)</title>
+    <labels format="%.1f" start="0" spacing="5 2 1 0.5 0.2 0.1 0.01"/>
+  </verticalaxis>
+  <plot>
+    <horizontalaxis ref="xaxis"/>
+    <verticalaxis ref="yaxis">
+      <variable ref="yvar"/>
+    </verticalaxis>
+    <renderer type="line">
+      <option name="linecolor" value="blue"/>
+      <option name="dotcolor"  value="black"/>
+      <option name="dotsize"   value="2"/>
+      <option name="linewidth" value="2"/>
+    </renderer>
+  </plot>
+  <plot>
+    <horizontalaxis ref="xaxis"/>
+    <verticalaxis ref="zaxis">
+      <variable ref="zvar"/>
+    </verticalaxis>
+    <renderer type="bar">
+      <option name="fillcolor"  value="green"/>
+      <option name="barwidth" value="5m"/>
+      <option name="baroffset" value="0"/>
+      <option name="linecolor" value="green"/>
+    </renderer>
+  </plot>
+  <data>
+    <variables>
+      <variable id="xvar" column="0" type="datetime"/>
+      <variable id="yvar" column="1"/>
+      <variable id="zvar" column="2"/>
+    </variables>
+    <service location="http://www.multigraph.org/examples/test06/data.php"/>
+  </data>
+</mugl>

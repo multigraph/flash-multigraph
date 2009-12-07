@@ -1,0 +1,60 @@
+<chapter id="FlexComponent">
+<title>Using the Multigraph Flex Component</title>
+
+<para>
+If you are writing your own Flex application, you can use
+Multigraph as a component in your application.  To do so,
+first download the Multigraph Flex Component library file, named
+Multigraph-*.swc (where * is the version number), from
+<ulink url="http://www.multigraph.org/download">http://www.multigraph.org/download</ulink>.
+If you are using Flex Builder, add this SWC file to your project library
+path; if you are using the Flex SDK, use the relevant options to add the file
+to your mxmlc command.
+</para>
+
+<para>
+In your application, you can create a Multigraph graph using the <sgmltag>Multigraph</sgmltag>
+tag in your mxml file.  This tag takes an attribute called <sgmltag>muglfile</sgmltag>
+which is the name or URL of the &mugl; file for your graph.  For example:
+</para>
+
+<programlisting>
+<![CDATA[
+<mx:Application
+  xmlns:mx="http://www.adobe.com/2006/mxml"
+  xmlns:multigraph="multigraph.*"
+  horizontalAlign="left"
+  paddingLeft="0"
+  paddingTop="0"
+  paddingBottom="0"
+  paddingRight="0">
+  <multigraph:Multigraph muglfile="graph.xml"/>
+</mx:Application>
+]]>
+</programlisting>
+
+<para>
+Unless your &mugl; file is specified as a URL to a different server, be
+sure to deploy your mulgl file to your server along with your application's
+SWF file.
+</para>
+
+<para>
+Note that when using the Multigraph component in a Flex application you do
+not need to create the HTML file described in
+<xref linkend="QuickStart"/> or 
+<xref linkend="HTMLFiles"/>, and you do not need to deploy Multigraph
+to your web server separately from your application.  The Multigraph
+SWC file, which is compiled into your application, includes everything
+that Multigraph needs to work in your application, with the exception 
+of your &mugl; file(s).
+</para>
+
+<para>
+The <sgmltag>Multigraph</sgmltag> component extends the
+<sgmltag>mx.containers.VBox</sgmltag> object, so it inherits
+all the tag attributes of that object, which may be used
+to further control its appearance and behavior.
+</para>
+
+</chapter>

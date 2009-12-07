@@ -1,0 +1,112 @@
+<chapter id="QuickStart">
+
+<title>Quick Start</title>
+
+<para>
+Before working through the steps described here, download and install a copy of
+Multigraph as described in the previous section, <xref linkend="Obtaining"/>.  This is
+a simple process of unpacking a zip file and copying one file and one folder from
+it to your computer or web server.
+</para>
+
+<para>
+There are two steps involved in creating a web graph using Multigraph.  The first
+is to create a web page (HTML file) that loads the javascript file "Multigraph.js".
+Somewhere in the HTML page, create a "div" tag and
+assign an "id" attribute to that div tag.  The page body's "onload" function
+should create a new instance of a "Multigraph" object, giving the
+div's id attribute value, the name of a "&mugl;" file describing the graph
+(see below), and the desired width and height of the graph in pixels.
+<xref linkend="BareBonesHTML"/> shows a simple example.
+</para>
+
+<para>
+<example id="BareBonesHTML" width="40">
+<title>Simple Example Multigraph HTML File (graph.html)</title>
+<programlisting>
+<![CDATA[
+<html>
+  <head>
+    <script src="Multigraph.js"></script>
+  </head>
+  <body onload="new Multigraph('graphdiv', 'graph.xml', [400,300]);">
+    <div id="graphdiv"/>
+  </body>
+</html>
+]]>
+</programlisting>
+</example>
+</para>
+
+<para>
+In this example, we assume that the "Multigraph.js" file and "Multigraph" folder are
+in the same folder
+where you create the HTML file.  If you have installed them somewhere else, adjust
+the <sgmltag>src="Multigraph.js"</sgmltag> line accordingly.
+</para>
+
+<para>
+The second step involved in creating a graph consists of writing a 
+"&mugl;" (pronounced "muggle") file.  "&Mugl;" is short for "Multigraph XML"
+and is a type of XML file that specifies the data to be graphed,
+and any preferences you have about how to display the data, axes, and other
+elements of the graph.  The &mugl; file
+associated with the above example HTML file is called "graph.xml" (since that
+name is mentioned in the "new Multigraph(...)" line); 
+<xref linkend="BareBonesXML"/> shows a minimal example of such a file.
+</para>
+
+<para>
+<example id="BareBonesXML" width="40">
+<title>Simple Example &Mugl; File (graph.xml)</title>
+<programlisting>
+<![CDATA[
+<?xml version="1.0"?>
+<mugl>
+  <data>
+    <values>
+      0, 3
+      2, 4
+      4, 3
+      6, 10
+      9, 0
+      10,5
+    </values>
+  </data>
+</mugl>
+]]>
+</programlisting>
+</example>
+</para>
+
+<para>
+This very small &mugl; file indicates that the graph should 
+show a plot of the six points whose coordinates are specified in the body of the
+<sgmltag>values</sgmltag> element.  You can try putting this "graph.html" file
+and "graph.xml" file in the folder where you've installed "Multigraph.js"
+and the "Multigraph" folder, and then try loading "graph.xml" in your web browser.
+You should see a graph that looks like <xref linkend="BareBonesGraph"/>.
+</para>
+
+<figure id="BareBonesGraph">
+<title>Simple Example Graph</title>
+<graphic fileref="images/BareBonesGraph.png"/>
+</figure>
+
+<para>
+This simple example just scratches the surface of what is possible
+with multigraph.  In this example, which does not specify anything
+about the style of the graph or the axes or their labels, multigraph
+makes a lot of default assumptions about how to create the graph, such
+as choosing a black "line" style graph, and horizontal and vertical
+ranges to match the given data.  In general, these things and many
+more can be explicitly specified in the &mugl; file, which
+allows everything about the graph to be customized.  
+</para>
+
+<para>
+<xref linkend="MuglFiles"/>
+describes in detail how to write &mugl; files.
+</para>
+
+</chapter>

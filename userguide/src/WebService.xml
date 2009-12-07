@@ -1,0 +1,150 @@
+<chapter id="WebService">
+<title>Writing Web Service Data Sources</title>
+
+<para>
+As described in <xref linkend="Data"/>, one of the ways that
+multigraph can obtain data to be plotted is from a "web service".  A
+web service is an http-based API that can be used to request data
+from a server on the fly.  Each time multigraph needs to display a plot, it
+will construct a URL to fetch the data needed for the plot, generate
+an http request using that URL, receive the response from the server, and
+extract the needed data from the response.  It caches data received from
+the server so that the same data is never fetched more than once.
+</para>
+
+<para>
+To write a new web service data source for multigraph, you need to create a program
+(cgi script, php script, web application, etc) on your server that accepts URLs using
+a specific syntax, and generates responses in a particular format that multigraph understands.
+The syntax for the URLs is the following:
+
+<programlisting>
+<![CDATA[
+http://www.yourserver.com/path/to/script/Xmin,Xmax/Bmin,Bmax
+]]>
+</programlisting>
+
+where Xmin and Xmax are values of a horizontal axis variable corresponding to
+the region of data being requested, and Bmin and Bmax are "buffer" values, which are explained
+below.
+</para>
+
+<para>
+The response to the above request should be an xml-formatted response like the following:
+</para>
+
+<programlisting>
+<![CDATA[
+<mugl>
+  <data>
+    <values>
+       ...
+    </values>
+  </data>
+</mugl>
+]]>
+</programlisting>
+
+<para>
+In this response, the "..." should be replaced with a list of data values, with one set of
+values per line, and values on each line separated from each other by commas.
+</para>
+
+<para>
+The range of data that should be returned in the response is determined
+by the Xmin,Xmax and Bmin,Bmax values given in the request URL.  Xmin
+and Xmax determine an interval along the first variable dimension, and
+Bmin and Bmax determine an amount of "buffering" around that interval.
+This is easiest to explain first using the case where Bmin and Bmax
+are both 0.  In that case, the returned list of values should start
+with the first available value greater than or equal to Xmin, and end
+with the last available value less than or equal to Xmax.  If Bmin is
+greater than 0, then the returned list should include the next Bmin
+additional values less than Xmin, and if Bmax is greater than 0, the
+list should include Bmax additional values greater than Xmax.  (Bmin
+and Bmax will always be nonnegative integers.)
+</para>
+
+<para>
+Multigraph needs this buffering capability in its web service request syntax
+so that it can fetch a small amount of data on either side of a specified
+range.  It needs this additional data in order to be able to
+plot the left and right edges of a data plot using renderers that involve
+drawing something between consecutive data points, such as the line renderer, which
+draws line segments connecting data points.
+For example, in order to be able to draw the visible piece of the line segment between
+the last visible data point at the right edge of a plot and the next (non-visible) point
+beyond the right edge, Multigraph needs to know the value of that next data point.
+Multigraph will usually choose buffer amounts Bmin and Bmax to both be 1, because
+usually one extra data point is all that is needed.  In fact, at the time of this
+writing, Multigraph always uses Bmin and Bmax values of 1.  It is possible that
+in the future, however, there could be situations where greater buffer values
+are needed, so it is best to design any Multigraph web data services that you
+write to be able to handle arbitrary Bmin and Bmax values.
+</para>
+
+<para>
+A couple examples will hopefully clarify this.    In the first example, imagine
+a data set that consists of hourly temperature values 
+for the month of January 2009 --- one temperature
+value corresponding to the top of each hour --- and imagine that
+Multigraph is preparing to draw a plot using the line renderer for the 6
+hour period starting at 5:30am and ending at 11:30am on January 12.   There
+are 6 data points visible in that time range, corresponding to times
+6:00, 7:00, 8:00, 9:00, 10:00, and 11:00.  Multigraph will also need
+one more data point on either side of this range, though, namely the data
+for 5:00 and 12:00, in order to be able to draw the partially visible
+line segments between the 11:00 value and the right edge of the graph, and
+between the 6:00 value and the left edge of the graph.  Since the actual
+interval being displayed ranges from 5:30 to 11:30, the Xmin value in
+the request that Multigraph generates will correspond to the time 5:30, and
+the Xmax value will correspond to 11:30.  The Bmax and Bmin values will both be 1.
+The generated request URL therefore looks like the following:
+</para>
+
+<programlisting>
+<![CDATA[
+http://www.yourserver.com/path/to/script/200901120530,200901121130/1,1
+]]>
+</programlisting>
+
+<para>
+The response to the above request might look like the following
+</para>
+
+<programlisting>
+<![CDATA[
+<mugl>
+  <data>
+    <values>
+200901120500,22.1
+200901120600,23.4
+200901120700,24.2
+200901120800,23.1
+200901120900,25.8
+200901121000,27.9
+200901121100,28.2
+200901121200,29.3
+    </values>
+  </data>
+</mugl>
+]]>
+</programlisting>
+
+<para>
+In this example, Multigraph is drawing a plot that shows 6 data values, but in order to be able to
+completely draw that plot, it actually needs 2 additional data values, so the request includes
+a buffer of 1 on either side of the requested interval, and the response includes 8 values rather than 6.
+If you are wondering why the buffering can't be accomplished by simply having Multigraph request
+an 8 hour interval in the first place, and eliminate the need for the extra Bmin and Bmax request
+parameters altogether, the answer is that Multigraph does not know that the data freqency is hourly.
+When Multigraph plots data from a web service, it relies completely on the web service to provide the
+data, and makes no assumptions about how much data is present in a particular interval.  It is up to the
+web service to know that the data occurrs hourly, or every 5 minutes, or daily, or whatever.
+</para>
+
+
+
+
+
+</chapter>

@@ -1,0 +1,46 @@
+<preface><title>Introduction</title>
+
+<para>
+Multigraph is a software system that allows you to create
+2-dimensional scientific data graphs in web pages.  It allows you to
+customize the appearance of the graph to your liking very easily, and
+can plot data from a variety of formats.  Multigraph graphs are
+interactive --- they allow the user to change the scale(s) on the
+horizontal and/or vertical axes in the graph on the fly.  Multigraph
+also has the ability to read data from a web service, which allows it
+to be used to "surf" through large datasets, downloading only those
+the parts of the data that are needed for display.
+</para>
+
+<para>
+A graph is created in Multigraph by writing an XML file that describes
+the details of the graph, including which axes to draw, how to label
+them, where to find the data to be plotted, and the styles and colors
+to be used in plotting the data.  No programming is required; to
+publish a web page containing a Multigraph graph, you simply create
+the XML file describing the graph, and an HTML file that invokes
+Multigrah with that XML file, and place both of these files on a web
+server.
+</para>
+
+<para>
+Multigraph uses the Adobe Flash browser plugin, which is supported
+(and usually installed) in almost all desktop web browsers.  In
+particular, it works in Firefox, Internet Explorer, and Safari.
+Knowledge of Flash programming is not required for creating 
+or using Multigraph graphs, however.
+</para>
+
+<para>
+For those who are programmers, though, Multigraph is also available
+as an Adobe Flex library component, so that it may be used in
+other Flex applications.
+</para>
+
+<para>
+Multigraph is distributed free of charge
+under the terms of the RENCI Open Source Software License v. 1.0.
+For details, see <xref linkend="License"/>.
+</para>
+
+</preface>

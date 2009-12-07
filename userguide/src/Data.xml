@@ -1,0 +1,132 @@
+<section id="Data">
+<title>Data</title>
+
+<para>
+The <sgmltag>data</sgmltag> element in the &mugl; file specifies
+the data to be plotted, either
+by listing the data itself in the &mugl; file, or by describing where
+multigraph can find the data.  The <sgmltag>data</sgmltag> element is
+the only element that is absolutely required in a
+&mugl; file.  (Multigraph can make reasonable default decisions about
+everything else, but it has to be given some data to graph!)
+</para>
+
+<para>
+There are three ways that you can specify the data.  The simplest is to
+include the data directly in the &mugl; file, in a list of commma-separated
+values.  The second way is for the &mugl; file to refer to data that is
+contained in a separate comma-separated value (csv) file.  The third way
+is for the data to be provided via a web service, in which case the
+&mugl; file indicates the address of that service, and multigraph will use
+the service to fetch the data as needed.
+</para>
+
+<para>
+Regardless of which
+of the above forms the data is in, it is helpful to think of the data as
+consisting of a table of values, where each column in the table
+corresponds to a particular variable, and each row corresponds to a
+set of values for those variables.  For example, a data set containing
+temperature and precipitation values measured every hour for one day
+might correspond to a table with 3 columns and 24 rows: one column
+each for the time of measurement, temperature, and precipitation, and
+one row for each of the 24 hours in the day.
+</para>
+
+<para>
+A &mugl; file's <sgmltag>data</sgmltag> element should
+begin with a <sgmltag>variables</sgmltag> subelement that indicates
+some basic information about the columns in this "table" of data.
+The <sgmltag>variables</sgmltag>
+element contains a sequence of <sgmltag>variable</sgmltag> subelements, each of
+which has the following attributes that give information about a data variable:
+</para>
+
+
+  <variablelist>
+
+  <varlistentry><term><sgmltag>id</sgmltag></term>
+  <listitem>
+  <para>
+An identifier to be used to refer to this variable elsewhere in the &mugl; file.
+The default is "x" for the first variable, "y" for the second variable, and
+"y1", "y2", ... for any additional variables.
+  </para>
+  </listitem>
+  </varlistentry>
+
+  <varlistentry><term><sgmltag>column</sgmltag></term>
+  <listitem>
+  <para>
+A number indicating which "column" the variable is in.
+The default is 0 for the variable, 1 for the second, and so on.
+  </para>
+  </listitem>
+  </varlistentry>
+
+  <varlistentry><term><sgmltag>type</sgmltag></term>
+  <listitem>
+  <para>
+The data type of the variable.  Should be either 'number' or 'datetime'; the
+default is 'number'.
+  </para>
+  </listitem>
+  </varlistentry>
+
+</variablelist>
+
+
+<para>
+After the <sgmltag>values</sgmltag> subelement in the
+<sgmltag>data</sgmltag> section, exactly one of the following three subelements should
+occur:
+</para>
+
+
+<variablelist>
+
+<varlistentry><term><sgmltag>values</sgmltag></term>
+<listitem>
+<para>
+The <sgmltag>values</sgmltag> subelement should be used when the data
+is to be included directly in the &mugl; file.  The data should appear
+between the &lt;values&gt; and &lt;/values&gt; tags, with one set of
+values per line, and individual values on each line separated by
+commas.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>csv</sgmltag></term>
+<listitem>
+<para>
+The <sgmltag>csv</sgmltag> subelement should be used when the data is
+in a separate comma-separated values file.  The <sgmltag>csv</sgmltag>
+subelement has a single attribute named <sgmltag>location</sgmltag>,
+whose value should be the name of the csv file.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>service</sgmltag></term>
+<listitem>
+<para>
+The <sgmltag>service</sgmltag> subelement indicates that multigraph should
+fetch data from a REST web service.  It has one attriubute named
+<sgmltag>location</sgmltag> which should give the address of the web service.
+Because of JavaScript security restrictions, this address must be on the same
+server where the HTML page containing the graph is.  The value of the
+<sgmltag>location</sgmltag> attribute should be either a root-relative (i.e., starting with '/')
+path, or a relative path that is relative to the location of the HTML file.  In particular,
+the REST service URL should not include the "http://" prefix or the server name.
+</para>
+</listitem>
+</varlistentry>
+
+
+
+</variablelist>
+
+
+
+</section>

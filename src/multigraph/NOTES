@@ -1,0 +1,27 @@
+divSprite:MultigraphUIComponent
+    paddingBoxMask:Shape
+    paddingBoxSprite:MultigraphUIComponent
+        axisSprite:MultigraphUIComponent
+        plotBoxMask:Shape
+        _plotBoxSprite:MultigraphUIComponent
+eventSprite:MultigraphUIComponent
+axisControlSprite:MultigraphUIComponent
+
+========================================================================
+all sprites have coords that are pixels
+
+divSprite:MultigraphUIComponent: inverts y axis to increase up
+    paddingBoxMask:Shape
+    paddingBoxSprite:MultigraphUIComponent: inset inside divSprite by window margin + border + padding
+        axisSprite:MultigraphUIComponent: inset inside paddingBoxSprite by plot margin
+        plotBoxMask:Shape
+        _plotBoxSprite:MultigraphUIComponent: inset inside paddingBoxSprite by plot margin
+eventSprite:MultigraphUIComponent: same coord system as divSprite
+axisControlSprite:MultigraphUIComponent: same coord system as divSprite
+
+========================================================================
+
+paint cycle:
+
+1. clear the divSprite
+2. draw the border, if any, in the divSprite

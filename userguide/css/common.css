@@ -1,0 +1,29 @@
+body {
+	font-family: arial, helvetica;
+}
+
+.revhistory {
+	display: none;
+}
+
+.code {
+	font-weight: bold;
+}
+
+.programlisting {
+	width: 70%;
+	padding: 5px;
+	background-color: #FFFFEE;
+	border: 1px solid gray;
+}
+
+.informaltable table {
+	border-collapse: collapse;
+	width: 30%;
+	background-color: #FFFFEE;
+}
+
+.informaltable table td{
+	text-align: center;
+	padding: 2px;
+}

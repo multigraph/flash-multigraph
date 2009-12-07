@@ -1,0 +1,41 @@
+<chapter id="Obtaining">
+
+<title>Obtaining and Installing Multigraph</title>
+
+<para>
+To get started creating graphs with Mulitgraph, download the file
+main distribution zip file from
+<ulink url="http://www.multigraph.org/download">http://www.multigraph.org/download</ulink>
+and unpack it.  The zip files contains two things: a file named
+"Multigraph.js", and a folder named "Multigraph".  Put both of these
+somewhere on your web server; they should both be in the same folder.
+If you just want to create graphs using local files that you view
+on your computer, without
+using a web server, you can put "Multigraph.js" and "Multigraph" in a
+folder on your computer.
+</para>
+
+<para>
+Creating a graph with Multigraph involves writing two files: an XML
+file that describes the graph, and an HTML file that displays the
+graph.  The next section of this user guide,
+<xref linkend="QuickStart"/>, will walk you through a simple example
+of each of these files.  In the simplest situation, the Multigraph
+installation (i.e. the "Multigraph.js" file and "Multigraph" folder)
+can be in the same folder with the XML file and HTML file.  In
+general, however, a single Multigraph installation can be used to
+support many HTML files that display a variety of graphs described in
+different XML files; you do not need a separate copy of the Multigraph
+installation for each graph.  In this situation, it makes sense to
+install the "Multigraph.js" file and the "Multigraph" folder in some
+centralized place on your web server, and write your HTML files to
+reference Multigraph.js in that location.
+</para>
+
+<para>
+If you are a programmer interested in including Multigraph in
+your own custom Flex application, see <xref linkend="FlexComponent"/>.
+</para>
+
+
+</chapter>

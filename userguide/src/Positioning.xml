@@ -1,0 +1,158 @@
+<section id="Positioning">
+<title>Positioning</title>
+
+<para>
+Many visual components of a graph are positioned relative to something
+else in the graph.  For example, a graph title or legend is typically
+positioned (centered, left justified, right justified, etc) relative
+to the entire graph window.  A title for an axis is usually positioned
+relative to the axis, and labels along the axis are positioned
+relative to the tic marks on the axis.  Multigraph uses a common
+collection of attributes and conventions for relative positioning of
+various components; this section describes these conventions and
+attributes.
+</para>
+
+<para>
+Relative positioning can be thought of, in general, as the task of
+placing a small rectangle relative to a large rectangle.  (It may help
+to think in terms of placing the small rectangle "inside" the large
+one, but in some cases the small rectangle will be positioned so that
+it extends beyond the edges of the large one, or lies outside it
+completely.)  The small rectangle might represent a legend or a text
+string, for example, and the large rectangle represents some
+rectangular region of the graph window --- for example, the plot box
+where the data is plotted (see <xref linkend="BordersMarginsPlotArea"/>).
+Each of these rectangles has a width and height in pixels, and
+locations in the rectangle can be specified by giving pixel
+coordinates.  Since it is sometimes awkward to specify locations in
+pixels, though, Multigraph also makes use of a "relative" coordinate
+system for each rectangle, in which the lower left corner has the
+coordinates (-1,-1), and the upper right corner has coordinates (1,1).
+The center of the rectangle has coordinate (0,0).
+</para>
+
+<figure id="figPositioning">
+<title>Positioning</title>
+<graphic fileref="images/Positioning800.png"/>
+</figure>
+
+<para>
+The top part of <xref linkend="figPositioning"/> shows an example in which the large
+rectangle is blue and the small rectangle is green, and
+the "relative" coordinates of several key points in each rectangle
+are marked.
+We want to specify a location of the green rectangle relative to the
+blue one.  We do so by choosing a "base" point in the blue rectangle,
+and an "anchor" point in the green rectangle.  We then position the
+green rectangle in the blue one so that its anchor point lines up with
+the base point in the blue rectangle, but possibly offset by a
+vector which is called the "position", and possibly at a given
+"angle" to the horizontal.  The bottom part of
+<xref linkend="figPositioning"/> shows the result.
+</para>
+
+<para>
+In <xref linkend="figPositioning"/>, the base point is (1,0) and the anchor
+point is (1,-1).  The base point is specified in the relative coordinates
+of the large rectangle, and the anchor point is in the relative coordinates
+of the small rectangle.  The "position" is a vector that indicates an offset
+of the anchor point away from the base point in the final positioning; it is specified
+in pixels rather than relative coordinates.  In the figure, the position vector
+looks like it might be something like (-30,-20).  The "angle" is specified in
+degrees, with positive angles pointing counterclockwise, so in the figure the
+angle appears to be roughly -45.
+</para>
+
+<para>
+These four quantities, the base, anchor, position, and angle, 
+are available for several tags in &mugl; files using the
+<sgmltag>base</sgmltag>,
+<sgmltag>anchor</sgmltag>,
+<sgmltag>position</sgmltag>,
+and
+<sgmltag>angle</sgmltag>
+attributes.
+Values for the
+<sgmltag>base</sgmltag>,
+<sgmltag>anchor</sgmltag>,
+and
+<sgmltag>position</sgmltag>
+attributes are specified as a pair of numbers separated by a space,
+without parentheses.  These attributes allow for any arbitrary
+positioning of the small rectangle relative to the large one in a way
+that makes many common alignment possibilities easy to specify.  For
+example, to center a text string (think of the green rectangle as
+representing a text string) just under the top edge of the blue rectangle,
+use
+base="0 1",
+anchor="0 1",
+position="0 0",
+angle="0".
+If you want to add a few pixels of vertical space between the top
+of the text and the top edge of the blue rectangle, use something
+like
+position="0 -5",
+which shifts the text down by 5 pixels.
+To center
+a text string just ABOVE the top edge of the blue rectangle, use
+base="0 1",
+anchor="0 -1",
+position="0 0",
+angle="0".
+To right justify a legend
+(now think of the green rectangle as a legend) along the middle of the
+right edge of the blue rectangle, use 
+base="1 0",
+anchor="1 0",
+position="0 0",
+angle="0".
+</para>
+
+<para>
+Having the base and anchor points specified in relative coordinates
+but the position vector in pixels might seem odd at first, but this 
+turns out to be a powerful combintation that allows you to specify locations that do not
+depend on the exact pixel size of the graph, and that continue to work
+correctly if and when the size of the graph is changed.  Think of
+<sgmltag>base</sgmltag>, <sgmltag>anchor</sgmltag>,
+<sgmltag>and</sgmltag> angle as the main way that an object is
+positioned, and <sgmltag>position</sgmltag> as an offset to allow for
+a small amount of padding.  Often the amount of padding that looks best
+depends on the font size being used, or on the pixel size of an object,
+so <sgmltag>position</sgmltag> is given in pixels.  The
+<sgmltag>base</sgmltag> and <sgmltag>anchor</sgmltag> points, though,
+specify relative location and alignment and do not depend on specific pixel
+measurements.
+</para>
+
+<para>
+Some &mugl; tags that use these attributes do not allow all of them; for example, the
+<sgmltag>legend</sgmltag> tag does now allow the
+<sgmltag>angle</sgmltag> attribute, because legends cannot be rotated (legends are always
+displayed with an angle of 0).  Most 
+&mugl; tags that use these attributes have default values for them, so that you only
+need to specify attributes that differ from the defaults.  The default values vary depending
+on the tag; see the documentation for each tag to find out what its default attribute values are.
+</para>
+
+<para>
+In some situations the base point is determined by context and there
+is no need (or it doesn't make sense) to think in terms of a base
+rectangle.  For example, when positioning an axis title, the base
+point is the center point of the axis, so the <sgmltag>title</sgmltag>
+subelement of the axis elements takes <sgmltag>position</sgmltag>,
+<sgmltag>anchor</sgmltag>, and <sgmltag>angle</sgmltag> attributes
+that position the title relative to the axis center point, and the
+<sgmltag>base</sgmltag> attributes is not needed (or allowed).
+</para>
+
+<para>
+There is one more attribute that is sometimes used in connection with positioning.
+Some &mugl; tags accept the <sgmltag>frame</sgmltag> attribute as a way of identifying
+the base ("large") rectangle.  It typically takes values like "plot" or "padding", to
+indicate that the base rectangle is the plot box or the padding box, respectively; see
+<xref linkend="BordersMarginsPlotArea"/> for a description of these boxes.
+</para>
+
+</section>

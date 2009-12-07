@@ -1,0 +1,95 @@
+<section id="Renderers">
+<title>Adding New Renderers</title>
+
+<para>
+"Renderers" are objects in the multigraph source code that are
+responsible for drawing data plots.  As described in <xref
+linkend="Plots"/>, the <sgmltag>renderer</sgmltag> element for each
+plot in a &mugl; file indicates which renderer multigraph should use for
+drawing that plot.  New renderers that implement new plot styles can
+be added to multigraph by creating a new ActionScript class.  This
+section describes how to do that.
+</para>
+
+<para>
+Multigraph's renderer objects are located in the "renderer"
+package in the "src" folder.  The "Renderer" class is an abstract
+base class from which all renderers descend.  To create a
+renderer to implement a new plot style, you need to create a new
+subclass of the "Renderer" class.
+The easiest way to do that is to copy one of the existing renderer
+subclasses and modify it.  Or at least use and existing one as
+a guide.
+</para>
+
+
+<para>
+The general idea behind the "Renderer" class design is that each
+subclass should:
+</para>
+
+<orderedlist>
+
+<listitem>
+Define a constructor that takes two Axis arguments, calls the
+superclass constructor with these arguments, and does whatever else is
+needed in the subclass constructor.
+</listitem>
+
+<listitem>
+Define the 3 public static string variables "keyword", "description",
+and "options"; these are used to autogenerate the documentation for
+the renderer; they are described below.
+</listitem>
+
+<listitem>
+Define private variables corresponding to the options for this
+renderer, and corresponding getter/setter methods for those variables.
+</listitem>
+
+<listitem>
+Override the 3 methods "begin()", "dataPoint()", and "end()".  These are the
+methods that do the actual plotting; they are described below.
+</listitem>
+
+<listitem>
+Add the name of the new subclass to the list of renderer subclasses
+in the "rendererList()" function definition in the file "Renderer.as".
+</listitem>
+
+</orderedlist>
+
+<para>
+The variables "keyword", "description", and "options" are used to
+autogenerate documentation for the renderer.  The "keyword"
+variable is used by Multigraph's XML parser as the keyword for
+the renderer --- it is the word that should appear as the value
+of the <sgmltag>type</sgmltag> attribute of the <sgmltag>renderer</sgmltag>
+element when you want to use this renderer in a plot.  The "description"
+string should be a short phrase that describes what this
+renderer does, and the "options" string should be an HTML-formatted
+list giving each option for the renderer, and its meaning.
+</para>
+
+<para>
+The methods "begin()", "dataPoint()", and "end()" contain the code
+that does the actual plotting.  When Multigraph is preparing to draw a
+plot using a renderer, it calls the renderer's "begin()" method once.
+It then calls the "dataPoint()" method once for each data point to be
+plotted.  After all the data points to be plotted have been given by
+calls to "dataPoint()", Multigraph calls the "end()" method once.  The
+"begin()" method is where the renderer can do any prep work that is
+needed before drawing a plot, and the "end()" method is where any
+needed cleanup work happens.  In a simple renderer, the "dataPoint()"
+method might just plot the specified point, and the "begin()" and "end()"
+methods might not do anything (in which case they can be omitted from
+the renderer subclass).  In general, however, the actual plotting can
+happen in any combintation of the "begin()", "dataPoint()", and
+"end()" methods.  For example, in a more sophisticated renderer, the
+"begin()" method might initialize an array of points to be empty, the
+"dataPoint()" method could append each given point to that array, and
+the "end()" method could then loop through the points in the array,
+making some kind of plot that encorporates all the points at once.
+</para>
+
+</section>

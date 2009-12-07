@@ -1,0 +1,5 @@
+[title]
+Renderers/Bar
+
+[description]
+Description for Renderers/Bar yet to be written.

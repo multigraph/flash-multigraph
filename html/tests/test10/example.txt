@@ -1,0 +1,8 @@
+[title]
+network monitor and debugger window
+
+[description]
+This example shows how to enable Multigraph's network monitor and debugger
+windows, both of which can be useful for debugging Multigraph graphs and/or
+data sources.
+

@@ -1,0 +1,78 @@
+<section id="GeneralStructure">
+
+<title>General Structure</title>
+
+<para>
+"&Mugl;" files are the way that you specify to multigraph what data should be
+plotted, how it should be plotted, and any other settings that determine the way
+the graph looks. &Mugl; (pronounced "muggle") is short for "Multigraph XML", and
+is a type of XML file.  Each &mugl; file should
+begin with the standard <computeroutput><![CDATA[<?xml version="1.0"?>]]></computeroutput>
+declaration, followed by the <computeroutput><![CDATA[<mugl>]]></computeroutput> tag.
+The general structure of a &mugl; file is shown in <xref linkend="exGeneralStructure"/>.
+</para>
+
+<para>
+<example id="exGeneralStructure" width="40">
+<title>General Structure of a &Mugl; File</title>
+<programlisting>
+<![CDATA[
+<?xml version="1.0"?>
+<mugl>
+  <window .../>
+  <plotarea .../>
+  <horizontalaxis .../>
+  <verticalaxis .../>
+  <plot ...>
+    ...
+  </plot>
+  <data ...>
+    ...
+  </data>
+</mugl>
+]]>
+</programlisting>
+</example>
+</para>
+
+<para>
+The <sgmltag>window</sgmltag> element gives the size of the graph, the size of the border
+to be drawn around it, and the margin amounts inside the border.  There can be at most
+one <sgmltag>window</sgmltag> element; if it is omitted, multigraph chooses default values
+for the border and margins, and relies on the window size given in the Multigraph.Graph
+constructor.
+</para>
+
+<para>
+The <sgmltag>plotarea</sgmltag> element indicates the region inside
+the graph window where the data will be plotted.  There can be at most
+one <sgmltag>plotarea</sgmltag> element; if it is omitted, multigraph
+chooses a reasonable default.
+</para>
+
+<para>
+The <sgmltag>horizontalaxis</sgmltag> and
+<sgmltag>verticalaxis</sgmltag> elements give properties related to
+the display and function of the graph's axes.  There can be at most
+one <sgmltag>horizontalaxis</sgmltag> element, but any number of
+<sgmltag>verticalaxis</sgmltag> elements are allowed.
+</para>
+
+<para>
+The <sgmltag>plot</sgmltag> element indicates properties of the data plot
+itself, such as style, color, which data variables to plot, and which
+axes to plot them against.  There can be any number of <sgmltag>plot</sgmltag>
+elements.
+</para>
+
+<para>
+The <sgmltag>data</sgmltag> element gives the data to be plotted, either
+by providing the data in a <sgmltag>data</sgmltag> subelement, or by giving
+the location of a file or web service from which the data can be read.
+</para>
+
+<para>
+The following sections describe these elements in more detail.
+</para>
+
+</section>

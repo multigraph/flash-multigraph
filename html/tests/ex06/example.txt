@@ -1,0 +1,7 @@
+[title]
+tutorial example 6: datetime axis
+
+[description]
+This examples shows a plot in which the horizontal
+axis represents a date/time variable.
+

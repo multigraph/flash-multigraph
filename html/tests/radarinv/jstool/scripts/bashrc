@@ -1,0 +1,29 @@
+#!/bin/bash
+
+PS1="\u\[@\H\w\[$ "
+PATH="$PATH:~/bin"
+INPUTRC=/etc/inputrc
+TERM=xterm-color
+
+### distcc
+export DISTCC_DIR="~/.distcc"
+export DISTCC_HOSTS="localhost 192.168.1.103"
+
+### svn
+export SVN_EDITOR=nano
+
+### apps
+alias ls='ls --color=auto'
+alias rm='rm -i'
+
+### keyboard layout
+# dvorak
+alias aoeu='setxkbmap -layout dvorak'
+alias dvorak='setxkbmap -layout dvorak'
+
+# qwerty
+alias asdf='setxkbmap -layout us'
+alias qwerty='setxkbmap -layout us'
+
+# global variables
+TMPDIR=~/.distcc/tmp

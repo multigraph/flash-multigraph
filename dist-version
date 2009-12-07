@@ -1,0 +1,14 @@
+#! /usr/bin/perl
+
+open(SVN, "svn info .|");
+$revision = "0";
+while (<SVN>) {
+    chomp;
+    if ( ($r) = /^Revision: (\d+)$/ ) {
+	$revision = $r;
+	last;
+    }
+}
+close(SVN);
+chomp($VERSION = `cat VERSION`);
+printf("%s-%s", $VERSION, $revision);

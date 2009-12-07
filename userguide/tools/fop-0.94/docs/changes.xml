@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V1.3//EN" "document-v13.dtd">
+<document><header><title>History of Changes </title></header><body>
+    <section id="version_FOP Trunk"><title>Version FOP Trunk ()</title></section>    
+    <section id="version_0.94"><title>Version 0.94 (XX August 2007)</title><section><title>Code</title><ul><li><icon alt="add" src="images/add.jpg"/>
+        Support for keep-together.within-line="always".
+      (MM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Add support for conditional spaces in table-cells.
+      (VH)</li><li><icon alt="add" src="images/add.jpg"/>
+        Support alignment-adjust for images.
+      (AD) Thanks to Max Berger. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=42785">42785</link>.</li><li><icon alt="add" src="images/add.jpg"/>
+        Partial application of the patch in Bugzilla 41044:
+          * addition of a generic PropertyCache to be used by all Property
+            types that can be safely canonicalized
+          * modified EnumProperty, StringProperty, NumberProperty, EnumNumber
+            and FixedLength to make use of the cache infrastructure
+      (AD) Thanks to Richard Wheeldon. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41044">41044</link>.</li><li><icon alt="add" src="images/add.jpg"/>
+        Slight improvement of relative font-weight handling in the properties
+        package.
+      (AD)</li><li><icon alt="add" src="images/add.jpg"/>
+        Add support for font auto-detection (easier font configuration).
+      (JM) Thanks to Adrian Cumiskey. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41831">41831</link>.</li><li><icon alt="add" src="images/add.jpg"/>
+        Add support for exact positioning of internal PDF links.
+      (JM) Thanks to Paul Vinkenoog. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=42067">42067</link>.</li><li><icon alt="add" src="images/add.jpg"/>
+        Add support for the collapsing-border model in tables.
+      (VH, JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=36934">36934</link>.</li><li><icon alt="add" src="images/add.jpg"/>
+        Add support for named destinations in PDF.
+      (JB)</li><li><icon alt="add" src="images/add.jpg"/>
+        Add support for a two-pass production for PostScript output to minimize file size. This
+        adds images only once and adds only the fonts that are really used.
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Support for GIF images in RTF output (RTF handler, only. Does not affect the RTF library.)
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Support for soft masks (transparency) with ImageIO image adapter.
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Added support for the soft hyphen (SHY) character.
+      (MM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Added support for line-height-shift-adjustment property.
+      (MM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Added support for the system property fop.home to
+        cli.Main.getJARList().
+      (SP)</li><li><icon alt="add" src="images/add.jpg"/>
+        Added support for display-align for table-cell in RTF output.
+      (JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=40930">40930</link>.</li><li><icon alt="add" src="images/add.jpg"/>
+        Added support for UAX#14 type line breaking. Support does not extend across nested fo:inline elements.
+      (MM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        AFP Renderer: Bugfix for 1 bit images where the width is not a multiple of 8.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fixed incomplete support for Unicode Word Joiner characters (U+2060 and U+FEFF).
+      (MM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fixed the rendering of zero-width spaces for certain fonts by not generating them into
+        the area tree.
+      (JM) Thanks to Paul Vinkenoog. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=42109">42109</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fixed a problem with disappearing footnotes inside hyphenated inlines (and footnotes with hyphenated inline child).
+      (LF)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fix PDF Genaration for non-ASCII compatible locales.
+      (JM) Thanks to Martin Kögler. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41434">41434</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fix several exceptions when break-before/after is set on the first/last row of a table.
+      (VH)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fix extra page break when break-before is set on both a table and its first row.
+      (VH)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Make keep-with-next and keep-with-previous work on fo:table.
+      (VH)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fixed a problem with keep-with-next on table-rows. Once a keep-with-next was set
+        inside a table, the FO following the table would always be glued to the previous table.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fixed a problem with the auto-rotate-landscape setting in the PostScript renderer.
+        It didn't generate the right setpagedevice command.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fixed an IllegalArgumentException for absolutely positioned block-containers with a
+        border and no height/bpd set.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        If a line contained nothing but a linefeed, this didn't produce empty lines.
+        Replaced the auxiliary zero-width box with a glue the width of a line,
+        and shrinkable to zero-width.
+      (AD) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41652">41652</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Stricter FOP user configuration checking
+      (VH) Thanks to Adrian Cumiskey. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=40120">40120</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fix parsing 'url(...)' when the URL itself contains a bracketed part.
+      (AD) Thanks to Erwin Tratar. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41572">41572</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fix for NPE with PNG images for RTF output.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fix for properly parsing font-family names containing spaces.
+      (AD)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fix incorrect behaviour of the BreakingAlgorithm when some inline content is wider than
+        the available ipd, causing a restart.
+      (LF) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41019">41019</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fix for PDF corruption when a TrueType font with spaces in its name is embedded and no 
+        XML font metrics file for that font is used.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fix for ClassCastException when fo:wrapper was used as direct child of fo:flow.
+        Note: "id" attributes are still not handled properly on fo:wrapper!
+      (JM) Thanks to Adrian Cumiskey. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41426">41426</link>.</li><li><icon alt="update" src="images/update.jpg"/>
+        Refactoring in the fo package:
+        -&gt; removal of the childNodes instance member in fop.fo.FObj
+        -&gt; addition of a firstChild instance member in fop.fo.FObj
+        -&gt; addition of a siblings instance member in fop.fo.FONode
+        -&gt; addition of a FONodeIterator interface in FONode + corresponding implementation in FObj
+        -&gt; changed implementations of FObj.addChildNode(), .removeChild() and .getChildNodes()
+      (AD) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41656">41656</link>.</li><li><icon alt="update" src="images/update.jpg"/>
+        Code cleanup and restructuring: 
+        Refactoring of PageSequenceLayoutManager and provide common FObj id property use
+      (AD) Thanks to Adrian Cumiskey. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=42089">42089</link>.</li><li><icon alt="update" src="images/update.jpg"/>
+        Updated PDF/A-1b support according to ISO-19005-1:2005/Cor.1:2007.
+      (JM)</li><li><icon alt="update" src="images/update.jpg"/>
+        Use source resolution setting for bitmap images which don't provide their own
+        resolution.
+      (JM) Thanks to Hussein Shafie. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=42406">42406</link>.</li></ul></section></section>    
+    <section id="version_0.93"><title>Version 0.93 (9 January 2007)</title><section><title>Code</title><ul><li><icon alt="add" src="images/add.jpg"/>
+        Added support for the use of Open Type fonts
+      (BD)</li><li><icon alt="add" src="images/add.jpg"/>
+        Added initial support for loading fonts without a pre-created XML font metric
+        file.
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Support for the rgb-icc() function and for a proprietary cmyk() function (for device CMYK
+        colors only through the PDF renderer so far). 
+      (JM) Thanks to Peter Coppens. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=40729">40729</link>.</li><li><icon alt="add" src="images/add.jpg"/>
+        Added support for SVG in fo:instream-foreign objects for RTF output.
+      (JM) Thanks to Dominic Brügger. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=40849">40849</link>.</li><li><icon alt="add" src="images/add.jpg"/>
+        Added support for CCITT compression in the TIFFRenderer by switching to the ImageWriter
+        abstraction from XML Graphics Commons.
+      (JM) Thanks to Oliver Hernàndez Valls. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=40519">40519</link>.</li><li><icon alt="add" src="images/add.jpg"/>
+        Extension properties fox:orphan-content-limit and fox:widow-content-limit which
+        help with list-block and table layout. See the documentation for details.
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Configuration option in the Java2D-based renderers that allows to disable the default
+        white background in order to produce bitmap output with transparency.
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Added support for PDF/A-1b and PDF/X-3:2003. (Note: this may still be a bit
+        incomplete. Feedback is welcome!)
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        The CIDSet object is now generated for CID fonts which are embedded in PDFs.
+        (Required by PDF/A).
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+       Automatic support for all fonts available to the Java2D subsystem for all
+       Java2D-descendant renderers (TIFF, PNG, print, AWT).
+     (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Initial support for page-number-citation-last (XSL 1.1). Works without problems 
+        only for page-sequence so far.
+      (JM) Thanks to Pierre-Henri Kraus. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=39118">39118</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Fixed bug when the sum of column widths of a table is larger than the
+        specified widths. The table width was not adjusted.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Nested tables with headers and footers were not handled correctly and could
+        overlap with the region-after.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Split up FOText instances larger than 32K characters to avoid 
+        integer overflow during layout.
+      (AD) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=39414">39414</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Corrected painting of shading patterns and position of links for SVG images
+        inside FO documents.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Deferred property resolution for markers until they are actually retrieved,
+        which leads to percentages and relative font-sizes now getting the correct
+        values. Also deferred white-space-handling for markers.
+      (AD)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fixed a memory-leak: The FO tree part of a page-sequence was not released when a
+        page-sequence was finished.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Table headers and footers were swallowed when a table was nested in a list-block.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fixed a bug with indent handling when margins are used on a surrounding block and 
+        not start/end-indent.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Compatibility fix for GCJ (GNU Classpath): Using "UTF-16BE" instead of "UnicodeBigUnmarked"
+        encoding.
+      (JM) Thanks to Jeroen Meijer. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=40106">40106</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fixed handling for CCITT Group 4 TIFF images with fill order 2.
+      (JM) Thanks to Gilles Beaugeais. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=40062">40062</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fixed setting of page margins in AWT Renderer like it was done in the print renderer.
+      (JM) Thanks to Igor Istomin. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=40048">40048</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fixed two memory-leaks in image handling. The image cache is finally working
+        properly.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Let numeric property values without a unit be treated as pixels like in HTML.
+        This fixes certain NullPointerException when no units are specified.
+        (Note: the use of pixels in XSL-FO is discouraged!)
+      (JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=39608">39608</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Potential multi-threading issue (ConcurrentModificationException) 
+        eliminated for ElementMapping classes.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        No more System.exit() and look &amp; feel setting calls inside the reusable
+        parts of the AWT viewer.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Proper escaping of characters in list-items labels for RTF output.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: FOUserAgent specific configuration parameters specified in config file
+        were not set when FOP was invoked from command line.
+      (MM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: components of the border-separation property weren't set when
+        in shorthand-mode, leading to a NPE being thrown.
+      (AD) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=39712">39712</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Table headers were omitted when a table is a child of a block-container.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Bookmarks in PDF will be generated even if some bookmarks cannot be
+        resolved.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: the interaction between the table FOs and properties package in
+        determining initial values for column-number should be a one-time process,
+        not repeated when the table is in a marker that is retrieved.
+      (AD) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=39560">39560</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: All fonts names were converted unnecessarily to lower case in RTF output.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: The combination of hyphenation and kerning resulted in slightly ragged 
+        right ends for right-aligned and justified text.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: NullPointerException in AreaAdditionUtil in a table-cell spanning
+        multiple pages and with a marker.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: NullPointerException in RTF output when a table does not contain
+        table-columns.
+      (JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=39533">39533</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: NullPointerException in RTF library when there are no borders on 
+        the parent table.
+      (JM) Thanks to Julien Aymé. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=39607">39607</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Improved baseline detection in TTFReader for TrueType fonts.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: tables nested in inline elements caused a NullPointerException.
+      (JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=39443">39443</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Sections with span="all" lead to overlapping text if spanning multiple pages.
+      (JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=39443">39443</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Percentages in vertical-align property values were not correctly handled.
+      (MM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Gaps in table-columns cause a NullPointerException.
+      (JM) Thanks to Gerhard Oettl. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38243">38243</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: TABs were not correctly replaced by spaces in some circumstances.
+      (MM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: basic-links with internal destinations in documents with multiple 
+        page-sequences sometimes pointed at the wrong page.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Fixed ClassCastException when retrieve-marker is used as a direct child
+        if static-content in which case leading and trailing white space is not properly
+        removed.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Fixed OutOfMemoryException with long data URLs (RFC 2397).
+      (JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=39285">39285</link>.</li><li><icon alt="update" src="images/update.jpg"/>
+        Enabled Copy/Paste from PDF content in Acrobat Reader for text using embedded TrueType fonts.
+      (BD) Thanks to Adam Strzelecki, Victor Mote. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=5535">5535</link>.</li><li><icon alt="update" src="images/update.jpg"/>
+        Commented out unused properties, in order to minimize memory usage. 
+      (SP) Thanks to Richard Wheeldon. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41044">41044</link>.</li><li><icon alt="update" src="images/update.jpg"/>
+        Removed unused attributes from TableCell. 
+      (SP) Thanks to Richard Wheeldon. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=41009">41009</link>.</li><li><icon alt="update" src="images/update.jpg"/>
+        Minor fixes and improvements for the AWT Preview (keyboard shortcuts, scrolling, windows
+        setup).
+      (JM) Thanks to Richard Wheeldon. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=40813">40813</link>.</li><li><icon alt="update" src="images/update.jpg"/>
+        Minor fix: correctly set negative values for ipd/bpd to zero.
+      (AD)</li><li><icon alt="update" src="images/update.jpg"/>
+        Rework of default column-creation / column-width setting from
+        cells in the first row.
+      (AD) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=35656">35656</link>.</li><li><icon alt="update" src="images/update.jpg"/>
+        Added relaxed validation for empty list-item-*, as suggested by Gary Reed.
+      (AD) Thanks to Gary Reed. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=40270">40270</link>.</li><li><icon alt="update" src="images/update.jpg"/>
+        Modified proportional-column-width() function to log an error if used 
+        with table-layout=auto
+      (AD)</li><li><icon alt="update" src="images/update.jpg"/>
+        Changed the way overflowing pages are handled. The overflow property on region-body
+        is now used to define the behaviour.
+      (JM)</li><li><icon alt="update" src="images/update.jpg"/>
+        The Java2DRenderer (and therefore the print and bitmap renderers) is now
+        offering the same quality as the PDF and PS renderers. Note: There can still
+        be little differences between PDF and Print/PNG/TIFF because the latter uses
+        a different font metrics source.
+      (JM)</li><li><icon alt="update" src="images/update.jpg"/>
+        The default sRGB color profile provided by the Java class library is no longer
+        embedded if it is encountered. This should reduce the PDF size considerably.
+      (JM)</li><li><icon alt="update" src="images/update.jpg"/>
+        Changed the internal representation of colors to use Java's own color infrastructure
+        instead of FOP's home-grown classes.
+      (JM) Thanks to Max Berger. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38946">38946</link>.</li><li><icon alt="update" src="images/update.jpg"/>
+        Content in block-containers makes better use of shrink to fit content vertically
+        into the available area. This can be used indirectly to justify content vertically
+        in a block-container.
+      (JM)</li></ul></section></section>
+    <section id="version_0.92beta"><title>Version 0.92beta (18 Apr 2006)</title><section><title>Code</title><ul><li><icon alt="add" src="images/add.jpg"/>
+        Initial support for page-position="last" added.
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Reenabled loading of user-supplied hyphenation patterns that was available in
+        FOP 0.20.5. (See "hyphenation-base" option in the user configuration)
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Added support for fixed-width spaces.
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Added support for kerning.
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Support for "userconfig" attribute in FOP Ant Task.
+      (JM) Thanks to Jirí Mare&#353;.</li><li><icon alt="add" src="images/add.jpg"/>
+        Initial support for XMP metadata (PDF 1.4) under fo:declarations.
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Added support for the background-position shorthand property.
+      (AD)</li><li><icon alt="add" src="images/add.jpg"/>
+        Added support for the font shorthand property.
+      (AD)</li><li><icon alt="add" src="images/add.jpg"/>
+        Added support for system-color() function.
+      (JM) Thanks to Max Berger. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38618">38618</link>.</li><li><icon alt="add" src="images/add.jpg"/>
+        Added support for the from-table-column() function.
+      (AD) Thanks to Gerhard Oettl (gerhard.oettl.at.oesoft.at). Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38282">38282</link>.</li><li><icon alt="add" src="images/add.jpg"/>
+        New feature: "Intermediate format" (IF). The IF is basically the XML dialect
+        written by the area tree renderer (XMLRenderer). A new parser for this format
+        allows reparsing a serialized and possibly modified area tree and rendering it
+        to the final target format.
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Relative URLs for the font configuration attributes metrics-url and embed-url
+        are now supported. A new configuration property font-base has been added. It
+        sets the base URL against which relative font URLs are resolved. If font-base is
+        not set base is used.
+      (MM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=36729">36729</link>.</li><li><icon alt="add" src="images/add.jpg"/>
+        Added support for RFC2397 "data" URLs.
+      (JM) Thanks to Richard Wheeldon. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38132">38132</link>.</li><li><icon alt="add" src="images/add.jpg"/>
+        The font loading code now reads the encoding value from the XML font metrics file
+        so that fonts like Symbol and ZapfDingbats can be embedded explicitely (Required by PDF/A).
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Added feature: support for white-space shorthand
+      (AD)</li><li><icon alt="add" src="images/add.jpg"/>
+        Added feature: support for page-break-* shorthands
+      (AD)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: The generation of the PDF "d" (setdash) command was assuming that
+        only integer values can be used but that isn't the case. Dash patterns 
+        PDFGraphics2D would be wrong in the process.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Fixed a division by zero problem in TTFReader and improved the detection
+        of the capHeight and xHeight font metric values for TrueType fonts.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Allow URLs in basic-link's external-destination to be wrapped in "url()".
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Corrected enumerated property value for white-space property
+        from "no-wrap" to "nowrap".
+      (MM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Added support for white-space-treatment="preserve" in particular to
+        support the white-space="pre" short hand property.
+      (MM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38457">38457</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Corrected expectation and behaviour for the text-indent property to only apply
+        to the first line area generated by a block.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix for invalid handling of ICC color profiles in JPEG images and for
+        dealing with CMYK JPEG images with the Adobe APPE marker.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Certain filter combinations in PDF could lead to invalid PDFs. 
+        DecodeParams were not properly handled.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: CCITT Group 4 encoded TIFF images with multiple strips are now properly
+        embedded in PDF files.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Fixed a copy/paste error in the table layout code that caused wrong page
+        break decisions when table-headers and/or table-footers are used.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Fixed an NPE that was thrown when a table was used inside a footnote-body.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Fixed a problem with certain TrueType fonts which are missing the "PCLT"
+        table, where a baseline-shift="sub" had no effect due to a missing x-height value.
+        (Note: This only affects TTFReader, so the font metric file has to be regenerated.)
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: When the base URL was specified as a file system path, the constructed
+        URL was wrong.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Fixed two causes for ClassCastExceptions in BlockContainerLayoutManager.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: padding-top and padding-bottom on list-items could lead to wrong page
+        break decisions and thus to overlapping text.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: break-before and break-after were ignored on list-items.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: The elements representing a non-breaking space weren't always correct.
+      (LF) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38507">38507</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Text-decoration was not promoted if no text-decoration attribute was
+        specified on a nested element.
+      (JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38453">38453</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Spanned cells could lead to an false error message about overlapping 
+        cells and ultimately a NullPointerException.
+      (JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38397">38397</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Regions with non-standard names got ignored in RTF output leading to 
+        missing headers and footers.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        The RTF output now properly generates the "\landscape" flag for documents in 
+        landscape orientation.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Following a clarification by the XSL FO SG, space traits are only set on the 
+        first and last area generated by an FO, and not on every area anymore.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Floating point numbers were not properly formatted in the PDF renderer
+        which could lead to error messages while opening a PDF in Acrobat Reader.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Spans that end up with a negative height don't get swallowed anymore.
+      (JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38054">38054</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Certain border styles could lead to a NullPointerException.
+      (JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38132">38132</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Space was not adjusted if the space was on a nested block. This could
+        lead to content overflowing the bottom of a page.
+      (JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38102">38102</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: TableCell did not properly report that it generates reference-areas
+        which could lead to wrong inherited values for start-indent and end-indent.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Image height for BMP images was incorrectly calculated
+      (MM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38089">38089</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: NullPointerException on certain fo:inline within lists.
+      (MM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38053">38053</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: ClassCastException on certain fo:inline with border combinations.
+      (MM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=37743">37743</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Changed a method name in LineArea from finalize to finalise because it was
+        never intended for the method to be an override of the Java Object finalize
+        method. If invoked by the Java garbage collector it may cause a NPE.
+      (MM)</li><li><icon alt="update" src="images/update.jpg"/>
+        Implement property name as default argument on some xsl-function calls.
+      (SP) Thanks to Gerhard Oettl. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38098">38098</link>.</li><li><icon alt="update" src="images/update.jpg"/>
+        Implement force-page-count property of page-sequence.
+      (SP) Thanks to Gerhard Oettl. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38087">38087</link>.</li><li><icon alt="update" src="images/update.jpg"/>
+        Improvements to the code for inline block content.
+      (SP)</li><li><icon alt="update" src="images/update.jpg"/>
+        Revision of refinement white-space handling.
+      (AD)</li></ul></section></section>
+    <section id="version_0.91beta"><title>Version 0.91beta (23 Dec 2005)</title><section><title>Code</title><ul><li><icon alt="add" src="images/add.jpg"/>
+        Added checks that warn about tables and block-containers that are wider than
+        the available content area.
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        First attempt at SVG support in RTF output. SVG images are converted to 300dpi JPEG
+        images internally.
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        The command-line now automatically sets two parameters for any XSLT transformation:
+        "fop-output-format" contains the MIME type of the currently selected output format,
+        "fop-version" contains FOP's version number.
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Added an alternative set of rules for calculating text indents which tries to mimic
+        the behaviour of many commercial FO implementations that chose to break the rules
+        in the FO specification in order to better meet the natural expectations of 
+        inexperienced FO users.
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        font-family list still not fully supported but a comma-separated list is now properly tokenized.
+        FOP will now go through all fonts in the list to find one that is available, but it doesn't 
+        do so per character, yet. 
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Implemented "Overconstrained Geometry" rules (5.3.4, XSL 1.0) for the most important cases.
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Support for leader painting in PostScript output.
+      (JM)</li><li><icon alt="add" src="images/add.jpg"/>
+        Support for hyphenation-ladder-count.
+      (LF, MM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fixed a bug where the linefeed-treatment property value "preserve" was not
+        honoured when used in conjunction with text-align="center".
+      (MM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: hard breaks with even-page or odd-page were not handled correctly
+        when spaces were surrounding the break.
+      (JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=37964">37964</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fixed a bug where SVG content could be clipped when rendered to PostScript.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Changed the way resolutions are handled. The single resolution in the user
+        agent got split up into source and target resolutions. For more info, see
+        the updated documentation. Note: backwards-incompatible change!
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Some content inside a table-header may not have been renderered on
+        pages n &gt; 1 in certain conditions.
+      (JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=37875">37875</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fixed a bug where an empty line, i.e. a block containing only a &amp;nbsp;,
+        was not rendered at all.
+      (MM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fixed a bug where the area for a finished cell that is broken over pages was 
+        created once for each row it was spanned over instead of only once.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Footnotes were lost if the footnote appeared in centered text.
+      (JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=37880">37880</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Fix to correct image sizes in RTF output.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        The output file is now deleted when an exception occurs when calling FOP from
+        the command-line.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Areas for table-cells that are broken over more than one page are now
+        generated even if all its content is already painted on a previous page. This
+        fixes strange effects like a table grid that is not completely painted.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Column balancing produced strange break decisions in certain multi-column
+        documents with large amounts of text.
+      (JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=37828">37828</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: The combination of content-width="scale-to-fit" and content-height="100%"
+        did not work as expected due to a datatype conversion bug.
+      (JM) Thanks to Tom Craddock. Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=37815">37815</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: A span="all" on the first block cause a subsequent page break and the first block
+        didn't span all columns.
+      (JM) Fixes <link href="http://issues.apache.org/bugzilla/show_bug.cgi?id=37813">37813</link>.</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Self-created OutputStreams in PNG Renderer were not properly closed.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Relatively positioned BlockViewports (from block-containers) caused the paint 
+        cursor not be be properly advanced when space-before or space-after were present.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix: Space resolution was incomplete for content in table-cells. Conditional elements
+        didn't get removed.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        The validation check for non-zero borders and padding on a region-* and for empty static-content 
+        elements is now turned off when relaxed validation is active to improve compatibility with 
+        FO documents written for other FO implementations.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix for "/ by zero" ArithmeticExceptions when an URL to a non-existing image is used 
+        and content-width and/or content-height is used.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix for a multi-threading problem:
+        propertyListTable initialization moved from the constructor to a static block in FONode.
+        This fixes NullPointerExceptions in PropertyList.
+      (JM)</li><li><icon alt="fix" src="images/fix.jpg"/>
+        Bugfix for placement of text inside a text area when borders are present in PostScript output.
+      (JM)</li><li><icon alt="update" src="images/update.jpg"/>
+        Deprecated Fop constructors that use integer constants to select the
+        output format have been removed in favor or the constructors that use
+        MIME types.
+      (JM)</li><li><icon alt="update" src="images/update.jpg"/>
+        Changed the XMLHandler interface so it doesn't report the MIME type it
+        supports but instead can report whether it supports a particular Renderer
+        implementation. XMLHandlers are now configurable.
+      (JM)</li><li><icon alt="update" src="images/update.jpg"/>
+        Improved log and error messages in a number of places by adding additional
+        context information that should make it easier to find the location in the
+        source files.
+      (JM)</li><li><icon alt="update" src="images/update.jpg"/>
+        Additional checks to detect text overflows. The overflow property is now properly
+        handled where applicable.
+      (JM)</li><li><icon alt="update" src="images/update.jpg"/>
+        Source location information improved. If location information is not available,
+        the context information is provided based on text content.
+      (JM)</li><li><icon alt="update" src="images/update.jpg"/>
+        The border-collapse property on fo:table is now forced to the value "separate" until the collapsing
+        border has been implemented.
+      (JM)</li><li><icon alt="update" src="images/update.jpg"/>
+        Improvements on leader painting in PDF output.
+      (JM)</li></ul></section></section>
+    <section id="version_0.90alpha1"><title>Version 0.90alpha1 (22 Nov 2005)</title><section><title>Code</title><ul><li><icon alt="update" src="images/update.jpg"/>
+        <strong>Complete redesign of the FOP codebase</strong> in the period between Dec 2001 and Nov 2005. 
+        There are just too many changes to list here. If you like to know details, run 
+        <code>"svn log --verbose http://svn.apache.org/repos/asf/xmlgraphics/fop/trunk/"</code>.
+      (all)</li></ul></section></section>
+    <section id="version_0.20.5"><title>Version 0.20.5 (18 July 2003)</title><section><title>Code</title><ul><li><icon alt="update" src="images/update.jpg"/>
+        For the change log for the maintenance branch 
+        (where FOP 0.20.5 came from), please see the "CHANGES" file in the distribution, or 
+        <a href="http://svn.apache.org/viewcvs.cgi/xmlgraphics/fop/branches/fop-0_20_2-maintain/CHANGES?view=markup">the CHANGES file in the SVN repository</a>.
+      (all)</li></ul></section></section>
+  </body></document>

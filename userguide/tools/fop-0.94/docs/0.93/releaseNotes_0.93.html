@@ -1,0 +1,325 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="Apache Forrest" name="Generator">
+<meta name="Forrest-version" content="0.7">
+<meta name="Forrest-skin-name" content="pelt">
+<title>Release Notes for Apache FOP 0.93</title>
+<link type="text/css" href="../skin/basic.css" rel="stylesheet">
+<link media="screen" type="text/css" href="../skin/screen.css" rel="stylesheet">
+<link media="print" type="text/css" href="../skin/print.css" rel="stylesheet">
+<link type="text/css" href="../skin/profile.css" rel="stylesheet">
+<script src="../skin/getBlank.js" language="javascript" type="text/javascript"></script><script src="../skin/getMenu.js" language="javascript" type="text/javascript"></script><script src="../skin/fontsize.js" language="javascript" type="text/javascript"></script>
+<link rel="shortcut icon" href="../">
+</head>
+<body onload="init()">
+<script type="text/javascript">ndeSetTextSize();</script>
+<div id="top">
+<!--+
+    |header
+    +-->
+<div class="header">
+<!--+
+    |start group logo
+    +-->
+<div class="grouplogo">
+<a href="http://xmlgraphics.apache.org/"><img class="logoImage" alt="Apache XML Graphics" src="../images/group-logo.gif" title="Apache XML Graphics is responsible for the creation and maintenance of software for managing the conversion of XML formats to graphical output, and the creation and maintenance of related software components, based on software licensed to the Foundation"></a>
+</div>
+<!--+
+    |end group logo
+    +-->
+<!--+
+    |start Project Logo
+    +-->
+<div class="projectlogo">
+<a href="http://xmlgraphics.apache.org/fop/"><img class="logoImage" alt="Apache FOP" src="../images/logo.jpg" title="Apache FOP (Formatting Objects Processor) is the world's first output independent formatter. Output formats currently supported include PDF, PCL, PS, SVG, XML (area tree representation), Print, AWT, MIF and TXT. The primary output target is PDF."></a>
+</div>
+<!--+
+    |end Project Logo
+    +-->
+<!--+
+    |start Search
+    +-->
+<div class="searchbox">
+<form action="http://www.google.com/search" method="get" class="roundtopsmall">
+<input value="xmlgraphics.apache.org" name="sitesearch" type="hidden"><input onFocus="getBlank (this, 'Search the site with google');" size="25" name="q" id="query" type="text" value="Search the site with google">&nbsp; 
+                    <input attr="value" name="Search" value="Search" type="submit">
+</form>
+</div>
+<!--+
+    |end search
+    +-->
+<!--+
+    |start Tabs
+    +-->
+<ul id="tabs">
+<li>
+<a class="base-not-selected" href="../index.html">Home</a>
+</li>
+<li class="current">
+<a class="base-selected" href="../0.93/index.html">Version 0.93</a>
+</li>
+<li>
+<a class="base-not-selected" href="../0.94/index.html">Version 0.94</a>
+</li>
+<li>
+<a class="base-not-selected" href="../trunk/index.html">FOP Trunk</a>
+</li>
+<li>
+<a class="base-not-selected" href="../dev/index.html">Development</a>
+</li>
+</ul>
+<!--+
+    |end Tabs
+    +-->
+</div>
+</div>
+<div id="main">
+<div id="publishedStrip">
+<!--+
+    |start Subtabs
+    +-->
+<div id="level2tabs"></div>
+<!--+
+    |end Endtabs
+    +-->
+<script type="text/javascript"><!--
+document.write("<text>Last Published:</text> " + document.lastModified);
+//  --></script>
+</div>
+<!--+
+    |breadtrail
+    +-->
+<div class="breadtrail">
+<a href="http://www.apache.org/">apache.org</a> &gt; <a href="http://xml.apache.org/">XML Federation</a> &gt; <a href="http://xmlgraphics.apache.org/">xmlgraphics.apache.org</a><script src="../skin/breadcrumbs.js" language="JavaScript" type="text/javascript"></script>
+</div>
+<!--+
+    |start Menu, mainarea
+    +-->
+<!--+
+    |start Menu
+    +-->
+<div id="menu">
+<div onclick="SwitchMenu('menu_selected_1.1', '../skin/')" id="menu_selected_1.1Title" class="menutitle" style="background-image: url('../skin/images/chapter_open.gif');">FOP 0.93</div>
+<div id="menu_selected_1.1" class="selectedmenuitemgroup" style="display: block;">
+<div class="menuitem">
+<a href="../0.93/index.html">About</a>
+</div>
+<div class="menupage">
+<div class="menupagetitle">Release Notes</div>
+</div>
+<div class="menuitem">
+<a href="../0.93/changes_0.93.html">Changes</a>
+</div>
+<div class="menuitem">
+<a href="../0.93/knownissues_overview.html">Known Issues</a>
+</div>
+<div class="menuitem">
+<a href="../0.93/upgrading.html">Upgrading</a>
+</div>
+<div onclick="SwitchMenu('menu_1.1.6', '../skin/')" id="menu_1.1.6Title" class="menutitle">Using FOP</div>
+<div id="menu_1.1.6" class="menuitemgroup">
+<div class="menuitem">
+<a href="../0.93/compiling.html">Build</a>
+</div>
+<div class="menuitem">
+<a href="../0.93/configuration.html">Configure</a>
+</div>
+<div class="menuitem">
+<a href="../0.93/running.html">Run</a>
+</div>
+<div class="menuitem">
+<a href="../0.93/embedding.html">Embed</a>
+</div>
+<div class="menuitem">
+<a href="../0.93/servlets.html">Servlets</a>
+</div>
+<div class="menuitem">
+<a href="../0.93/anttask.html">Ant Task</a>
+</div>
+</div>
+<div onclick="SwitchMenu('menu_1.1.7', '../skin/')" id="menu_1.1.7Title" class="menutitle">Features</div>
+<div id="menu_1.1.7" class="menuitemgroup">
+<div class="menuitem">
+<a href="../0.93/output.html">Output Targets</a>
+</div>
+<div class="menuitem">
+<a href="../0.93/intermediate.html">Intermediate Format</a>
+</div>
+<div class="menuitem">
+<a href="../0.93/pdfencryption.html">PDF Encryption</a>
+</div>
+<div class="menuitem">
+<a href="../0.93/pdfa.html">PDF/A</a>
+</div>
+<div class="menuitem">
+<a href="../0.93/pdfx.html">PDF/X</a>
+</div>
+<div class="menuitem">
+<a href="../0.93/graphics.html">Graphics</a>
+</div>
+<div class="menuitem">
+<a href="../0.93/fonts.html">Fonts</a>
+</div>
+<div class="menuitem">
+<a href="../0.93/hyphenation.html">Hyphenation</a>
+</div>
+<div class="menuitem">
+<a href="../0.93/extensions.html">Extensions</a>
+</div>
+</div>
+</div>
+<div id="credit"></div>
+<div id="roundbottom">
+<img style="display: none" class="corner" height="15" width="15" alt="" src="../skin/images/rc-b-l-15-1body-2menu-3menu.png"></div>
+<!--+
+  |alternative credits
+  +-->
+<div id="credit2">
+<a href="http://apachecon.com/2007/US/"><img border="0" title="ApacheCon US 2007 (Atlanta)" alt="ApacheCon US 2007 (Atlanta) - logo" src="http://www.apache.org/ads/ApacheCon/2007-usa-125x125.png" style="width: 125px;height: 125px;"></a>
+</div>
+</div>
+<!--+
+    |end Menu
+    +-->
+<!--+
+    |start content
+    +-->
+<div id="content">
+<div title="raw XML" class="xmllink">
+<a class="dida" href="releaseNotes_0.93.xml"><img alt="XML - icon" src="../skin/images/xmldoc.gif" class="skin"><br>
+        XML</a>
+</div>
+<div title="Portable Document Format" class="pdflink">
+<a class="dida" href="releaseNotes_0.93.pdf"><img alt="PDF -icon" src="../skin/images/pdfdoc.gif" class="skin"><br>
+        PDF</a>
+</div>
+<div class="trail">
+<text>Font size:</text> 
+	          &nbsp;<input value="Reset" class="resetfont" title="Reset text" onclick="ndeSetTextSize('reset'); return false;" type="button">      
+	          &nbsp;<input value="-a" class="smallerfont" title="Shrink text" onclick="ndeSetTextSize('decr'); return false;" type="button">
+	          &nbsp;<input value="+a" class="biggerfont" title="Enlarge text" onclick="ndeSetTextSize('incr'); return false;" type="button">
+</div>
+<h1>Release Notes for Apache FOP 0.93</h1>
+<div id="minitoc-area">
+<ul class="minitoc">
+<li>
+<a href="#version_0.93">Major Changes in Version 0.93</a>
+<ul class="minitoc">
+<li>
+<a href="#Important+Changes+Code+Base">Important Changes Code Base</a>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<notes>
+        
+<p>This is the first production grade release of the new FOP
+        codebase.</p>
+        
+<ul>
+          
+<li>It contains the new API first introduced in release 0.92
+            beta. The preceding API has been removed.
+          </li>
+          
+<li>
+            See the <a href="../compliance.html">compliance page</a> for an
+            overview of the compliance of this release with the XSL 1.0 and
+            1.1 recommendations.
+          </li>
+          
+<li>
+            This release again contains many bug fixes and new features. See
+            below for details.
+          </li>
+          
+<li>
+            See the <a href="../knownissues.html">known issues page</a>
+            for an overview of the known issues with this release.
+          </li>
+        
+</ul>
+        
+<p>Caveats:</p>
+        
+<ul>
+          
+<li>
+            You may experience different behaviour compared to version 0.20.5.
+            Please consult the <a href="upgrading.html">"Upgrading"</a> page for details.
+          </li>
+        
+</ul>
+      
+</notes>
+<a name="N10030"></a><a name="version_0.93"></a>
+<h2 class="underlined_10">Major Changes in Version 0.93</h2>
+<div class="section">
+<div class="note">
+<div class="label">Note</div>
+<div class="content">This is not a complete list of changes, a 
+   full list of changes in this release
+   <a href="changes_0.93.html">is available</a>.</div>
+</div>
+<a name="N1003A"></a><a name="Important+Changes+Code+Base"></a>
+<h3 class="underlined_5">Important Changes Code Base</h3>
+<ul>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Added support for the use of Open Type fonts
+      (BD)</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Support for the rgb-icc() function and for a proprietary cmyk() function (for device CMYK
+        colors only through the PDF renderer so far). 
+      (JM) Thanks to Peter Coppens. Fixes <a class="external" href="http://issues.apache.org/bugzilla/buglist.cgi?bug_id=40729">40729</a>.</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+        Added support for PDF/A-1b and PDF/X-3:2003. (Note: this may still be a bit
+        incomplete. Feedback is welcome!)
+      (JM)</li>
+<li>
+<img class="icon" alt="add" src="../images/add.jpg">
+       Automatic support for all fonts available to the Java2D subsystem for all
+       Java2D-descendant renderers (TIFF, PNG, print, AWT).
+     (JM)</li>
+<li>
+<img class="icon" alt="update" src="../images/update.jpg">
+        Enabled Copy/Paste from PDF content in Acrobat Reader for text using embedded TrueType fonts.
+      (BD) Thanks to Adam Strzelecki, Victor Mote. Fixes <a class="external" href="http://issues.apache.org/bugzilla/buglist.cgi?bug_id=5535">5535</a>.</li>
+<li>
+<img class="icon" alt="update" src="../images/update.jpg">
+        The Java2DRenderer (and therefore the print and bitmap renderers) is now
+        offering the same quality as the PDF and PS renderers. Note: There can still
+        be little differences between PDF and Print/PNG/TIFF because the latter uses
+        a different font metrics source.
+      (JM)</li>
+</ul>
+</div>
+</div>
+<!--+
+    |end content
+    +-->
+<div class="clearboth">&nbsp;</div>
+</div>
+<div id="footer">
+<!--+
+    |start bottomstrip
+    +-->
+<div class="lastmodified">
+<script type="text/javascript"><!--
+document.write("<text>Last Published:</text> " + document.lastModified);
+//  --></script>
+</div>
+<div class="copyright">
+        Copyright &copy;
+         1999-2007 The Apache Software Foundation.</div>
+<!--+
+    |end bottomstrip
+    +-->
+</div>
+</body>
+</html>

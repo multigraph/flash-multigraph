@@ -1,0 +1,233 @@
+<section id="Plots">
+<title>Plots</title>
+
+<para>
+The data that multigraph draws into the plot area is organized
+into one or more "plots".  A plot consists of a selection (usually two)
+of variables to be plotted, along with information about which axes to plot
+them along, and the style, color, and other visual attributes of the plot.
+</para>
+
+<para>
+A plot is described with the <sgmltag>plot</sgmltag> element in
+the &mugl; file.
+There can be any number (zero or more)
+of <sgmltag>plot</sgmltag> elements in the file.  Multigraph will draw the plots
+in the order they appear in the &mugl; file.
+If no <sgmltag>plot</sgmltag> element is present at all, multigraph
+creates a single line plot 
+of the data section's first variable on the horizontal axis against
+the second variable on the vertical axis (or first vertical axis, if there
+is more than one).
+</para>
+
+<para>
+The <sgmltag>plot</sgmltag> element takes no attributes, and the following
+subelements:
+</para>
+
+<variablelist>
+
+<varlistentry><term><sgmltag>horizontalaxis</sgmltag></term>
+<listitem>
+<para>
+The <sgmltag>horizontalaxis</sgmltag> element indicates which variable should be mapped to the horizontal
+axis in the plot.  It has no attributes, and takes a sequence of <sgmltag>variable</sgmltag> subelements.
+Each <sgmltag>variable</sgmltag> subelements has a single attribute named <sgmltag>ref</sgmltag> whose
+value should be the id of a variable from the <sgmltag>data</sgmltag> section.  Most plots
+have just one variable corresponding to the horizontal axis.  If 
+a <sgmltag>plot</sgmltag> has no
+<sgmltag>horizontalaxis</sgmltag> element, it defaults to using the first variable from
+the <sgmltag>data</sgmltag> along the horizontal axis.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>verticalaxis</sgmltag></term>
+<listitem>
+<para>
+The <sgmltag>verticalaxis</sgmltag> subelement indicates which variable(s) should be mapped to the vertical
+axis in the plot.  It has a single attribute named <sgmltag>ref</sgmltag> whose value is the id of
+one of the <sgmltag>verticalaxis</sgmltag> elements specified earlier in the file.  If this attribute
+is missing, or if
+The <sgmltag>verticalaxis</sgmltag> subelement is missing altogether, the plot will use the first
+vertical axis mentioned in the file (or a default one if none is mentioned).
+The <sgmltag>verticalaxis</sgmltag> subelement takes a sequence of <sgmltag>variable</sgmltag> subelements.
+Each <sgmltag>variable</sgmltag> subelement has a single attribute named <sgmltag>ref</sgmltag> whose
+value should be the id of a variable from the <sgmltag>data</sgmltag> section.  Most plots
+have just one variable corresponding to the vertical axis, but some may have more than one.  For example,
+a plot with error bars would have two "vertical axis" variables: one for the value, and another for the error
+amount. If 
+a <sgmltag>plot</sgmltag> has no
+<sgmltag>verticalaxis</sgmltag> element, or a
+<sgmltag>verticalaxis</sgmltag> with no
+<sgmltag>variable</sgmltag> subelements, it defaults to using the second variable from
+the <sgmltag>data</sgmltag> along the vertical axis.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>renderer</sgmltag></term>
+<listitem>
+<para>
+The <sgmltag>renderer</sgmltag> subelement specifies the graph style to be used for the plot.
+"Renderers" are objects in the multigraph software that are responsible for drawing data
+plots.  Each renderer corresponds to a specific plot style, such as points, lines, bars, 
+and so on.  The <sgmltag>renderer</sgmltag> subelement has one attribute named <sgmltag>type</sgmltag>,
+whose value indicates the choice of renderer.  New renderers that implement new plot styles
+can easily be added to multigraph; <xref linkend="Renderers"/> describes how to do this.
+</para>
+
+<para>
+Each renderer may have options that can be specified to customize its behavior.
+Options control things like color, line thickness, and other visual aspects of the plot.
+Each option is given with a
+<sgmltag>option</sgmltag> subelement of the <sgmltag>renderer</sgmltag> element.
+Each <sgmltag>option</sgmltag> takes two attributes:
+<sgmltag>name</sgmltag> and <sgmltag>value</sgmltag>, which give
+the name and value for that option.
+</para>
+
+<para>
+At the time of this writing the supported renderers are:
+</para>
+
+<para>
+<table border="1" cellpadding="2" cellspacing="1">
+<thead>
+<tr><td>Keyword</td><td>Description</td><td>Options</td></tr>
+</thead>
+<tbody>
+<!-- *************************************************************************** -->
+
+
+<tr>
+<td valign="top"><sgmltag>line</sgmltag></td>
+<td valign="top">Standard line plot with optional dots at data points</td>
+<td valign="top">
+<itemizedlist>
+<listitem><sgmltag>linecolor</sgmltag>: color to be used for the lines</listitem>
+<listitem><sgmltag>linewidth</sgmltag>: width for lines</listitem>
+<listitem><sgmltag>dotcolor</sgmltag>: color to be used for the dots</listitem>
+<listitem><sgmltag>dotsize</sgmltag>: size for dots; default is 0, which means draw no dots</listitem>
+</itemizedlist>
+</td>
+</tr>
+
+
+<tr>
+<td valign="top"><sgmltag>bar</sgmltag></td>
+<td valign="top">Standard bar graph</td>
+<td valign="top">
+<itemizedlist>
+<listitem><sgmltag>barwidth</sgmltag>: the width of each bar, in pixels</listitem>
+<listitem><sgmltag>baroffset</sgmltag>: the offset of the left edge of each bar from the corresponding data value</listitem>
+<listitem><sgmltag>fillcolor</sgmltag>: the color to be used for the fill inside each bar</listitem>
+<listitem><sgmltag>linecolor</sgmltag>: the color to be used for the outline around each bar</listitem>
+</itemizedlist>
+</td>
+</tr>
+
+
+<tr>
+<td valign="top"><sgmltag>fill</sgmltag></td>
+<td valign="top">Plot lines connecting data points, with a solid fill between the lines and the horizontal axis</td>
+<td valign="top">
+<itemizedlist>
+<listitem><sgmltag>linecolor</sgmltag>: the color to be used for the lines</listitem>
+<listitem><sgmltag>linethickness</sgmltag>: the thickness of the lines, in pixels</listitem>
+<listitem><sgmltag>fillcolor</sgmltag>: the color to be used for the fill area</listitem>
+<listitem><sgmltag>fillopacity</sgmltag>: the opacity to be used for the fill area</listitem>
+</itemizedlist>
+</td>
+</tr>
+
+
+<tr>
+<td valign="top"><sgmltag>point</sgmltag></td>
+<td valign="top">Standard point plot with optional shapes (circle, square, triangle)</td>
+<td valign="top">
+<itemizedlist>
+<listitem><sgmltag>shape</sgmltag>: shape of the point (circle, square, triangle)</listitem>
+<listitem><sgmltag>linecolor</sgmltag>: color to be used for the lines</listitem>
+<listitem><sgmltag>linethickness</sgmltag>: the thickness of the line around the drawn point</listitem>
+<listitem><sgmltag>color</sgmltag>: color to be used for filling the points</listitem>
+<listitem><sgmltag>size</sgmltag>: size of the points (radius or width)</listitem>
+<listitem><sgmltag>fillopacity</sgmltag>: the opacity of the filled color (0-1)</listitem>
+</itemizedlist>
+</td>
+</tr>
+
+
+
+<tr>
+<td valign="top"><sgmltag>lineerror</sgmltag></td>
+<td valign="top">Standard line plot with optional dots at data points</td>
+<td valign="top">
+<itemizedlist>
+<listitem><sgmltag>linecolor</sgmltag>: color to be used for the lines</listitem>
+<listitem><sgmltag>linewidth</sgmltag>: width for lines</listitem>
+<listitem><sgmltag>dotcolor</sgmltag>: color to be used for the dots</listitem>
+<listitem><sgmltag>dotsize</sgmltag>: size for dots; default is 0, which means draw no dots</listitem>
+</itemizedlist>
+</td>
+</tr>
+
+
+
+<tr>
+<td valign="top"><sgmltag>barerror</sgmltag></td>
+<td valign="top">Standard bar graph</td>
+<td valign="top">
+<itemizedlist>
+<listitem><sgmltag>barwidth</sgmltag>: the width of each bar, in pixels</listitem>
+<listitem><sgmltag>baroffset</sgmltag>: the offset of the left edge of each bar from the corresponding data value</listitem>
+<listitem><sgmltag>fillcolor</sgmltag>: the color to be used for the fill inside each bar</listitem>
+<listitem><sgmltag>linecolor</sgmltag>: the color to be used for the outline around each bar</listitem>
+</itemizedlist>
+</td>
+</tr>
+
+<!-- *************************************************************************** -->
+</tbody>
+</table>
+</para>
+
+<para>
+It is possible that new renderers will have been added to multigraph
+since this documentation was written.  You can generate a list
+of the current renderers that your copy of multigraph knows about, and the options they support, by 
+writing an HTML file that creates
+a MultigraphRendererList instance as follows:
+</para>
+
+<para>
+<example id="exGenerateRendererList" width="40">
+<title>Generating a List of Currently Supported Renderers</title>
+<programlisting>
+<![CDATA[
+<html>
+  <head>
+    <script src="Multigraph.js"></script>
+  </head>
+  <body onload="new MultigraphRendererList('mydiv');">
+    <div id="mydiv"/>
+  </body>
+</html>
+]]>
+</programlisting>
+</example>
+</para>
+
+<para>
+To see the list of renderers available for the current copy of multigraph that is
+available from www.multigraph.org, visit the web page
+<ulink url="http://www.multigraph.org/renderers">http://www.multigraph.org/renderers</ulink>.
+</para>
+
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</section>

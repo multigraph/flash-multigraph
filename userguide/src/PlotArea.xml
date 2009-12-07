@@ -1,0 +1,77 @@
+<section id="PlotArea">
+<title>The Plot Area</title>
+<para>
+The <sgmltag>plotarea</sgmltag> element 
+indicates a rectangular region inside the graph window where the data will be
+plotted.  This region is used as another clipping rectangle --- all data plots
+shown in the graph are clipped to this rectangle.
+Things other than data plots that multigraph draws, such as axes, labels,
+titles, legends, etc., can appear outside (or inside) the plotarea (these
+other things are clipped to the padding box as described in
+<xref linkend="BordersAndMargins"/>.
+</para>
+
+<para>
+It accepts the following attributes, which represent offsets relative
+to the padding area defined in the <sgmltag>window</sgmltag> element:
+</para>
+
+<variablelist>
+
+<varlistentry><term><sgmltag>marginbottom</sgmltag></term>
+<listitem>
+<para>
+Offset from the bottom side. Default: 30.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>marginleft</sgmltag></term>
+<listitem>
+<para>
+Offset from the left side. Default: 30.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>margintop</sgmltag></term>
+<listitem>
+<para>
+Offset from the top side. Default: 10.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><sgmltag>marginright</sgmltag></term>
+<listitem>
+<para>
+Offset from the right side. Default: 30.
+</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+<para>
+The padding box and plotarea both serve as clipping regions for
+various parts of the picture that multigraph draws.  The relationship
+between these two regions, and how they relate to the window (the
+"div" region in the containing HTML page), is shown in <xref
+linkend="figPlotarea"/>; in this figure the padding box is white and
+the plotarea is green.  The padding box serves as the clipping region
+for everything that multigraph draws, other than the border.  This
+includes axes, labels, legends, etc.  The plotarea, which is inside
+the padding box, is the clipping region for data plots.
+</para>
+
+<figure id="figPlotarea">
+<title>Plotarea</title>
+<graphic fileref="images/MarginBorderPlotarea.png"/>
+</figure>
+
+<para>
+There can be at most one <sgmltag>plotarea</sgmltag> element in a &mugl; file.  If it
+is absent, all attributes assume their default values.
+</para>
+
+</section>

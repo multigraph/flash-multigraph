@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+               "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd" [
+<!ENTITY mugl                "mugl">
+<!ENTITY Mugl                "Mugl">
+
+<!ENTITY Introduction           SYSTEM "Introduction.xml">
+<!ENTITY Obtaining              SYSTEM "Obtaining.xml">
+<!ENTITY QuickStart             SYSTEM "QuickStart.xml">
+<!ENTITY HTMLFiles              SYSTEM "HTMLFiles.xml">
+<!ENTITY GeneralStructure       SYSTEM "GeneralStructure.xml">
+<!ENTITY BordersMarginsPlotarea SYSTEM "BordersMarginsPlotarea.xml">
+<!ENTITY PlotArea               SYSTEM "PlotArea.xml">
+<!ENTITY Axes                   SYSTEM "Axes.xml">
+<!ENTITY Plots                  SYSTEM "Plots.xml">
+<!ENTITY Data                   SYSTEM "Data.xml">
+<!-- Styling subsections: -->
+  <!ENTITY Positioning          SYSTEM "Positioning.xml">
+  <!ENTITY AxisLabelPositioning SYSTEM "AxisLabelPositioning.xml">
+  <!ENTITY Titles               SYSTEM "Titles.xml">
+  <!ENTITY Legends              SYSTEM "Legends.xml">
+  <!ENTITY Grids                SYSTEM "Grids.xml">
+  <!ENTITY ConstantLines        SYSTEM "ConstantLines.xml">
+<!-- -->
+<!ENTITY Source                 SYSTEM "Source.xml">
+<!ENTITY Renderers              SYSTEM "Renderers.xml">
+<!ENTITY SceneGraph             SYSTEM "SceneGraph.xml">
+<!ENTITY WebService             SYSTEM "WebService.xml">
+<!ENTITY FlexComponent          SYSTEM "FlexComponent.xml">
+<!ENTITY Support                SYSTEM "Support.xml">
+<!ENTITY Credits                SYSTEM "Credits.xml">
+<!ENTITY License                SYSTEM "License.xml">
+]>
+
+<book>
+<bookinfo>
+  <title>Multigraph Users' Guide</title>
+  <author><firstname>Mark</firstname><surname>Phillips</surname></author>
+</bookinfo>
+
+&Introduction;
+&Obtaining;
+&QuickStart;
+&HTMLFiles;
+<chapter id="MuglFiles">
+  <title>&Mugl; Files</title>
+  &GeneralStructure;
+  &BordersMarginsPlotarea;
+  &Axes;
+  &Plots;
+  &Data;
+  <section id="Styling">
+    <title>Styling</title>
+    <para>
+Although Multigraph constructs much of a graph automatically,
+some of the most important aspects of a graph cannot be completely
+determined automatically.  These include things like titles, legends,
+plot styles, color choices, special annotations, and font sizes.  A
+well-designed graph that easily conveys the intended information to
+its audience will have a carefully chosen combination of these things
+that fits the data and the context in which it is being presented.
+This section describes how to control these aspects of a graph.
+    </para>
+    &Positioning;
+    &AxisLabelPositioning;
+    &Titles;
+    &Legends;
+    &Grids;
+    &ConstantLines;
+  </section>
+</chapter> 
+&Source;
+&WebService;
+&FlexComponent;
+&Support;
+&Credits;
+&License;
+
+</book>

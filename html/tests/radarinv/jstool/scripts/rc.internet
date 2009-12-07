@@ -1,0 +1,30 @@
+#!/bin/bash
+
+
+
+###
+### scripts which take a "start, stop, restart" parameter
+###
+
+FILES_START="/etc/rc.d/rc.inet1 \
+/etc/rc.d/rc.inet2 \
+/etc/rc.d/rc.inetd \
+/etc/rc.d/rc.httpd \
+"
+
+for file in $FILES_START
+do
+  echo $file
+  if [ ! -x $file ]; then
+    echo $file does not exist or cannot run
+    continue
+  fi
+  $file $1
+  echo
+done
+
+### synch local time
+netdate ntp.xs4all.nl ntp2.xs4all.nl ntp.dynamixs.net
+
+exit 0
+

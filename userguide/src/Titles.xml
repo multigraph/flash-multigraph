@@ -1,0 +1,9 @@
+<section id="Titles">
+<title>Graph Titles</title>
+
+<para>
+The <sgmltag>title</sgmltag> element allows you to add a title, or caption, to a graph.  More documentation for this
+will be written soon.
+</para>
+
+</section>
