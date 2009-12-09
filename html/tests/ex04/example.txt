@@ -1,7 +1,0 @@
-[title]
-tutorial example 4: bar plot style
-
-[description]
-Here is the same data from the previous example, but plotted
-with bars instead of lines and dots.
-

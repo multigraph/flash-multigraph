@@ -1,8 +1,0 @@
-[title]
-Multiple Graphs with Bound Axes
-
-[description]
-This example shows 3 graphs in one Multigraph application.
-The horizontal axes of the 3 graphs are bound to each other
-so that they move together when the user pans or zooms.
-

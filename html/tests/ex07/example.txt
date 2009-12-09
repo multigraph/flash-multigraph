@@ -1,5 +1,0 @@
-[title]
-tutorial example 7: data from a REST web service
-
-[description]
-This graph displays data that is read from a REST web service.

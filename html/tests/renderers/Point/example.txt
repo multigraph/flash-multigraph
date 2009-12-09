@@ -1,5 +1,0 @@
-[title]
-Renderers/Point
-
-[description]
-Description for Renderers/Point yet to be written.

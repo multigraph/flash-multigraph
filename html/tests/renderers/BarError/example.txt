@@ -1,5 +1,0 @@
-[title]
-Renderers/BarError
-
-[description]
-Description for Renderers/BarError yet to be written.

@@ -1,5 +1,0 @@
-[title]
-Renderers/LineError
-
-[description]
-Description for Renderers/LineError yet to be written.

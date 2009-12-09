@@ -1,8 +1,0 @@
-[title]
-tutorial example 1: simplest possible
-
-[description]
-This is an example of the simplest possible Multigraph configuration:
-the mugl file simply contains a list of pairs of data values,
-which Multigraph treats as (x,y) points and plots with a line style.
-

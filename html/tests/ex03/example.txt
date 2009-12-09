@@ -1,7 +1,0 @@
-[title]
-tutorial example 3: line plot style
-
-[description]
-This example adds an explicit plot style (renderer) to the previous example:
-blue lines with black dots.
-
