@@ -1,0 +1,9 @@
+[title]
+Bar/Line Graph with Constrained Axes
+
+[description]
+This example shows a bar graph combined with a line graph.  The bar
+graph uses two fill colors --- one for positive values, and one for
+negative values.  The horizontal axis in this graph is constrained so
+that the user cannot pan or zoom beyond the extent of the data (1880
+to 2010).  Note: the data in this graph is ficticious.

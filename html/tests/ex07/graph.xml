@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<mugl>
+  <horizontalaxis type="datetime" min="2008070400" max="2008070500">
+    <labels format="%d %n %H:00" spacing="1D 12H 6H 4H 2H 1H" />
+    <title>Date/Time</title>
+  </horizontalaxis>
+  <verticalaxis   min="20" max="80">
+    <title angle="90">Temperature</title>
+  </verticalaxis>
+  <plot>
+    <renderer type="line">
+      <option name="linecolor" value="black"/>
+      <option name="dotcolor"  value="blue"/>
+    </renderer>
+  </plot>
+  <data>
+	<variables>
+	  <variable id="xvar" column="0" type="datetime"/>
+	  <variable id="yvar" column="1"/>
+	</variables>
+    <service location="http://www.multigraph.org/examples/ex07/data.php"/>
+  </data>
+</mugl>

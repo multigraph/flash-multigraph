@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="mugl">
+    <xs:complexType>
+      <xs:choice>
+        <xs:group ref="graphcontents"/>
+        <xs:element maxOccurs="unbounded" ref="graph"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="graph">
+    <xs:complexType>
+      <xs:group ref="graphcontents"/>
+      <xs:attribute name="x" type="xs:integer"/>
+      <xs:attribute name="y" type="xs:integer"/>
+      <xs:attribute name="width" type="xs:integer"/>
+      <xs:attribute name="height" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:group name="graphcontents">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="window"/>
+        <xs:element ref="legend"/>
+        <xs:element ref="networkmonitor"/>
+        <xs:element ref="debugger"/>
+        <xs:element ref="plotarea"/>
+        <xs:choice>
+          <xs:element ref="horizontalaxis"/>
+          <xs:element ref="verticalaxis"/>
+        </xs:choice>
+        <xs:element ref="plot"/>
+        <xs:element ref="data"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  <xs:element name="window">
+    <xs:complexType>
+      <xs:attribute name="width" type="xs:integer"/>
+      <xs:attribute name="height" type="xs:integer"/>
+      <xs:attribute name="margin" type="xs:integer"/>
+      <xs:attribute name="border" type="xs:integer"/>
+      <xs:attribute name="padding" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="legend">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="icon"/>
+      </xs:sequence>
+      <xs:attribute name="visible"/>
+      <xs:attribute name="base"/>
+      <xs:attribute name="anchor"/>
+      <xs:attribute name="position"/>
+      <xs:attribute name="color"/>
+      <xs:attribute name="bordercolor"/>
+      <xs:attribute name="opacity"/>
+      <xs:attribute name="border" type="xs:integer"/>
+      <xs:attribute name="rows" type="xs:integer"/>
+      <xs:attribute name="columns" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="icon">
+    <xs:complexType>
+      <xs:attribute name="height" type="xs:integer"/>
+      <xs:attribute name="width" type="xs:integer"/>
+      <xs:attribute name="border" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="networkmonitor">
+    <xs:complexType>
+      <xs:attribute name="visible"/>
+      <xs:attribute name="fixed"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="debugger">
+    <xs:complexType>
+      <xs:attribute name="visible"/>
+      <xs:attribute name="fixed"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plotarea">
+    <xs:complexType>
+      <xs:attribute name="marginbottom" type="xs:integer"/>
+      <xs:attribute name="marginleft" type="xs:integer"/>
+      <xs:attribute name="marginright" type="xs:integer"/>
+      <xs:attribute name="margintop" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="horizontalaxis" type="axis"/>
+  <xs:element name="verticalaxis" type="axis"/>
+  <xs:complexType name="axis">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="title"/>
+      <xs:element ref="axiscontrols"/>
+      <xs:element ref="grid"/>
+      <xs:element ref="labels"/>
+      <xs:element ref="pan"/>
+      <xs:element ref="zoom"/>
+      <xs:element ref="binding"/>
+    </xs:choice>
+    <xs:attribute name="id"/>
+    <xs:attribute name="type"/>
+    <xs:attribute name="position" type="xs:integer"/>
+    <xs:attribute name="positionbase"/>
+    <xs:attribute name="pregap" type="xs:integer"/>
+    <xs:attribute name="postgap" type="xs:integer"/>
+    <xs:attribute name="min"/>
+    <xs:attribute name="max"/>
+    <xs:attribute name="minoffset"/>
+    <xs:attribute name="maxoffset"/>
+  </xs:complexType>
+  <xs:element name="title">
+    <xs:complexType mixed="true">
+      <xs:attribute name="position"/>
+      <xs:attribute name="anchor"/>
+      <xs:attribute name="angle" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="axiscontrols">
+    <xs:complexType>
+      <xs:attribute name="visible" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="grid">
+    <xs:complexType>
+      <xs:attribute name="visible"/>
+      <xs:attribute name="color"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="labels">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="label"/>
+      </xs:sequence>
+      <xs:attribute name="format"/>
+      <xs:attribute name="start"/>
+      <xs:attribute name="angle"/>
+      <xs:attribute name="position"/>
+      <xs:attribute name="anchor"/>
+      <xs:attribute name="spacing"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="label">
+    <xs:complexType>
+      <xs:attribute name="format"/>
+      <xs:attribute name="start"/>
+      <xs:attribute name="angle"/>
+      <xs:attribute name="position"/>
+      <xs:attribute name="anchor"/>
+      <xs:attribute name="spacing" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="pan">
+    <xs:complexType>
+      <xs:attribute name="allowed"/>
+      <xs:attribute name="min"/>
+      <xs:attribute name="max"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="zoom">
+    <xs:complexType>
+      <xs:attribute name="allowed"/>
+      <xs:attribute name="in"/>
+      <xs:attribute name="out"/>
+      <xs:attribute name="anchor"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="binding">
+    <xs:complexType>
+      <xs:attribute name="id" use="required"/>
+      <xs:attribute name="min" use="required"/>
+      <xs:attribute name="max" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plot">
+    <xs:complexType>
+      <xs:all>
+        <xs:element minOccurs="0" name="legend">
+          <xs:complexType>
+            <xs:attribute name="label"/>
+            <xs:attribute name="visible"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="horizontalaxis" type="plotaxis"/>
+        <xs:element minOccurs="0" name="verticalaxis" type="plotaxis"/>
+        <xs:element ref="renderer"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="renderer">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="option"/>
+      </xs:sequence>
+      <xs:attribute name="type" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="option">
+    <xs:complexType>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="value" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="plotaxis">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="variable"/>
+    </xs:sequence>
+    <xs:attribute name="ref" use="required"/>
+  </xs:complexType>
+  <xs:element name="variable">
+    <xs:complexType>
+      <xs:attribute name="ref" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="data">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="variables"/>
+        <xs:choice>
+          <xs:element ref="values"/>
+          <xs:element ref="csv"/>
+          <xs:element ref="service"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="variables">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="variable">
+          <xs:complexType>
+            <xs:attribute name="id" use="required"/>
+            <xs:attribute name="column"/>
+            <xs:attribute name="type"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="values" type="xs:string"/>
+  <xs:element name="csv">
+    <xs:complexType>
+      <xs:attribute name="location" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="service">
+    <xs:complexType>
+      <xs:attribute name="location" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

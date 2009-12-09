@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<mugl>
+	<plotarea marginleft="50" marginbottom="45"/>
+    <horizontalaxis id="xaxis" min="1" max="10">
+    	<title>Location Identifier</title>
+    </horizontalaxis> 
+    <legend base="0 1" anchor="0 1" rows="1" opacity="0.8" border="1" position="0 10">
+    	<icon width="25" height="25" />
+    </legend>
+    <verticalaxis   id="yaxis" min="0"   max="400">
+      <title position="-50 0" anchor="0 1" angle="90">Popluation Density (in thousands)</title>
+      <pan min="0" max="500"/>
+      <zoom anchor="0"/>
+      <grid visible="true"/>
+    </verticalaxis>
+    <plot>
+      <legend label="Total Population"/>
+      <horizontalaxis ref="xaxis"/>
+      <verticalaxis ref="yaxis">
+      	<variable ref="population" />
+      </verticalaxis>
+      <renderer type="bar">
+        <option name="linecolor" value="black"/>
+        <option name="fillcolor" value="0x2B60DE"/>
+        <option name="barwidth"  value="0.5"/>
+        <option name="baroffset" value="0.5"/>
+        <option name="fillopacity" value="0.4"/>
+      </renderer>
+    </plot>
+    
+    <plot>
+      <legend label="Urban"/>
+      <horizontalaxis ref="xaxis"/>
+      <verticalaxis ref="yaxis">
+      	<variable ref="urban" />
+      </verticalaxis>
+      <renderer type="bar">
+        <option name="linecolor" value="black"/>
+        <option name="fillcolor" value="0x4AA02C"/>
+        <option name="barwidth"  value="0.2"/>
+        <option name="baroffset" value="1.0"/>
+      </renderer>
+    </plot>
+    
+    <plot>
+      <legend label="Rural"/>
+      <horizontalaxis ref="xaxis"/>
+      <verticalaxis ref="yaxis">
+      	<variable ref="rural" />
+      </verticalaxis>
+      <renderer type="bar">
+        <option name="linecolor" value="black"/>
+        <option name="fillcolor" value="0xEAC117"/>
+        <option name="barwidth"  value="0.2"/>
+        <option name="baroffset" value="0.0"/>
+      </renderer>
+    </plot>
+
+    <data>
+      <variables>
+        <variable id="counter" column="0" type="number"/>
+        <variable id="population" column="1"/>
+        <variable id="urban" column="2"/>
+        <variable id="rural" column="3"/>
+      </variables>
+      <csv location="randomdata.csv"/>
+    </data>
+</mugl>

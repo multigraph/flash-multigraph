@@ -1,0 +1,6 @@
+[title]
+20th Century Temperature Anomalies
+
+[description]
+This example shows a simple line graph of temperature anomalies
+for the 20th century.

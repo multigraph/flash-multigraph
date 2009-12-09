@@ -1,0 +1,9 @@
+[title]
+CRN Station Data
+
+[description]
+This example shows five weather variables from the Climate
+Reference Network weather station at the North Carolina Arboretum in
+Asheville, NC.  It combines multiple plot styles in a single graph,
+using several parallel vertical axes.  It uses a REST web service to
+pull real data from NOAA's National Climatic Data Center.

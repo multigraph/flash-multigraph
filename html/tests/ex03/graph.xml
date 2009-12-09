@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<mugl>
+  <horizontalaxis min="0" max="10"/>
+  <verticalaxis   min="0" max="10"/>
+  <plot>
+    <renderer type="line">
+      <option name="linecolor" value="blue"/>
+      <option name="dotcolor"  value="black"/>
+      <option name="dotsize"   value="2"/>
+    </renderer>
+  </plot>
+  <data>
+    <values>
+      0, 3
+      1, 2
+      2, 4
+      3, 5
+      4, 3
+      5, 6
+      6, 7
+      7, 8
+      8, 5
+    </values>
+  </data>
+</mugl>

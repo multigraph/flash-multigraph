@@ -1,0 +1,66 @@
+#! /usr/bin/perl
+
+chomp($version = `./dist-version`);
+$dist_name = "multigraph-$version";
+
+sub sys {
+    my $cmd = shift;
+    print("$cmd\n");
+    return system($cmd);
+}
+
+sys("/bin/rm -f $dist_name.zip");
+sys("/bin/rm -rf $dist_name");
+sys("mkdir $dist_name");
+sys("mkdir $dist_name/Multigraph");
+open(IN, "<html/Multigraph.js");
+open(OUT, ">$dist_name/Multigraph.js");
+while (<IN>) {
+#    s|^var\s+multigraphSwfRelPath\s*=\s*.*$|var multigraphSwfRelPath = "";|;
+    s|^var\s+multigraphSwf\s*=\s*.*$|var multigraphSwf = "Multigraph.swf";|;
+    s|return scriptLocation|return scriptLocation+'Multigraph/'|;
+    #s|this\.scriptLocation\+\'Multigraph.swf\"|this\.scriptLocation\+\'Multigraph/Multigraph.swf\"|;
+    print OUT;
+}
+close(IN);
+close(OUT);
+sys("cp Multigraph.swf $dist_name/Multigraph");
+sys("cp html/swfobject.js $dist_name/Multigraph");
+sys("cp html/expressInstall.swf $dist_name/Multigraph");
+sys("cp LICENSE.txt $dist_name");
+open(OUT, ">$dist_name/README");
+print OUT <<EOF
+This directory contains the Multigraph distribution.  To publish html
+pages containing Multigraph graphs on a web server, put the file
+"Multigraph.js", and the folder "Multigraph" (including everything it
+contains), in some directory that is visible to the web server.  To
+create a graph, make an html file containing something like the
+following:
+
+    <html>
+    <head>
+    <script src="Multigraph.js"></script>
+    </head>
+    <body onload="new Multigraph('graphdiv', 'graph.xml', [400,300]);">
+    <div id="graphdiv"/>
+    </body>
+    </html>
+
+where "Multigraph.js" is replaced with whatever pathname is needed to
+load Multigraph.js based on where you put it, and "graph.xml" is the
+name of a mugl file describing a graph.
+
+For more information, see http://www.multigraph.org.
+
+----------------------------------------------------------------------
+
+Copyright (c) 2009  University of North Carolina at Asheville
+
+Multigraph is distributed under the terms of the RENCI Open Source
+Software License v. 1.0.  For details, see the file LICENSE.txt, or
+http://www.multigraph.org/LICENSE.txt.
+EOF
+    ;
+close(OUT);
+sys("zip -r $dist_name.zip $dist_name");
+sys("/bin/rm -rf $dist_name");

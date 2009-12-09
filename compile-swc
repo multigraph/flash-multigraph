@@ -1,0 +1,55 @@
+#! /usr/bin/perl
+
+# This script creates bin-debug/Multigraph.swc, by looking for all .as and .mxml files in the "src"
+# directory, except src/Multigraph.mxml, and compiling them using "compc".
+
+@asfiles = src_files("as");
+@mxmlfiles = src_files("mxml");
+
+@classes = ();
+foreach $file (@mxmlfiles, @asfiles) {
+    if ($file eq "MultigraphApp.mxml") { next; }
+    $file =~ s|.mxml$||;
+    $file =~ s|.as$||;
+    $file =~ s|/|\.|g;
+    push(@classes, $file);
+}
+
+$classes = join(" ", @classes);
+
+$cmd = "compc"
+    . " -use-network=false"
+    . " -compiler.show-actionscript-warnings=false"
+    . " -source-path src"
+    . " -output='bin-debug/Multigraph.swc'"
+    . " -include-classes $classes"
+    ;
+
+sys($cmd);
+
+########################################################################
+
+sub src_files {
+    my $suffix = shift;
+    @files = ();
+    open(FIND, "find src -name '*.$suffix' -print |");
+    while (my $file = <FIND>) {
+        chomp($file);
+        if ($file =~ m|/generated/|) { next; }
+        if ($file =~ m|/edu/|) { next; }
+        if ($file =~ m|WeatherForecasts|) { next; }
+        if ($file =~ /\.$suffix$/) {
+            $file =~ s|^src/||;
+            push(@files, $file);
+        }
+    }
+    close(FIND);
+    return @files;
+}
+
+sub sys {
+    my $cmd = shift;
+    print("$cmd\n");
+    return system($cmd);
+}
+

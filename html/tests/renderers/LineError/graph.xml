@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<mugl>
+  <window margin="2" border="2" padding="5"/>
+  <horizontalaxis id="xaxis"
+                  min="0"
+                  max="10">
+  </horizontalaxis>
+  
+  <verticalaxis id="yaxis"
+                min="0"
+                max="10">
+  </verticalaxis>
+
+  <plot>
+    <horizontalaxis ref="xaxis"/>
+    <verticalaxis ref="yaxis">
+      <variable ref="yvar"/>
+      <variable ref="error"/>
+    </verticalaxis>
+    <renderer type="lineerror">
+      <option name="linecolor" value="blue"/>
+      <option name="dotcolor"  value="black"/>
+      <option name="dotsize"   value="3"/>
+      <option name="linewidth" value="2"/>
+    </renderer>
+  </plot>
+  
+  <data>
+    <variables>
+      <variable id="xvar" column="0" type="number"/>
+      <variable id="yvar" column="1"/>
+      <variable id="error" column="2"/>
+    </variables>
+    <values>
+      0, 3, 1
+      1, 2, 2
+      2, 4, 2
+      3, 5, 1
+      4, 3, 2
+      5, 6, 3
+      6, 7, 2
+      7, 8, 3
+      8, 5, 2
+      9, 4, 1
+      10,5, 1
+    </values>
+  </data>
+</mugl>
