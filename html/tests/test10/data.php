@@ -72,9 +72,6 @@ fprintf($fp, "[start,end] = [%s,%s]\n", $start, $end);
 // print "\n\n";
 
 ?>
-<mugl>
-  <data>
-    <values>
 <?
 
 $handle = fopen("fdata.csv", "r") or die("Can't open file.");
@@ -95,10 +92,6 @@ while (!feof($handle) && !$done) {
 fclose($handle);
 
 ?>
-    </values>
-  </data>
-</mugl>
-
 <?
 
 fputs($fp, "data.php done\n");
