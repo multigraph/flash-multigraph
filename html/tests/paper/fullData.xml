@@ -1,0 +1,172 @@
+<?xml version="1.0"?>
+<mugl>
+  <window margin="2" border="2" padding="5"/>
+
+  <plotarea marginright="120" marginleft="200" marginbottom="100" margintop="20"/>
+  
+  <legend position="-40 -60" base="0 -1" anchor="0 1" rows="1" border="1" color="0xFFFFFF" bordercolor="0x000000" opacity="1">
+    <icon width="25" height="25"/>
+  </legend>
+  <title border="1" bordercolor="0x000000"> American Meteorological Society Demo </title>
+
+  <horizontalaxis id="xaxis"
+		  position="0"
+		  pregap="0"
+		  postgap="0"
+		  type="datetime"
+		  min="2009050500"
+		  max="2009051200">
+    <title angle="0" position="0 -35">Date/Time</title>
+    <labels format="    h:00 p
+d n Y" start="0" angle="0" anchor="0 1" spacing="1D 12H 6H 4H 2H 1H" />
+    <grid />
+  </horizontalaxis>
+  
+  <verticalaxis id="solar_radiation"
+		position="0"
+		pregap="0"
+		postgap="0"
+		min="0"
+		max="1300"
+		type="number">
+    <title angle="90" position="-45 0" anchor="0 -1">Solar Radiation</title>
+    <labels format="%.1f" start="0" spacing="500 200 100 50 20 10 5"/>
+  </verticalaxis>
+
+  <verticalaxis id="wind_speed"
+		position="-68"
+		pregap="0"
+		postgap="0"
+		min="0"
+		max="5"
+		type="number">
+    <title angle="90" position="-30 0" anchor="0 -1">Wind Speed</title>
+    <labels format="%.1f" start="0" spacing="50 20 10 5 2 1 0.1 0.01"/>
+  </verticalaxis>
+
+  <verticalaxis id="surface_temp"
+		position="-120"
+		pregap="0"
+		postgap="0"
+		min="0"
+		max="40"
+		type="number">
+    <title angle="90" position="-40 0" anchor="0 -1">Surface Temperature</title>
+    <labels format="%.1f" start="0" spacing="50 20 10 5 2 1 0.1 0.01"/>
+  </verticalaxis>
+
+  <verticalaxis id="temperature"
+		position="0"
+		pregap="0"
+		postgap="0"
+		positionbase="right"
+		min="0"
+		max="40"
+		type="number">
+    <title angle="-90" position="40 0" anchor="0 -1">Temperature</title>
+    <labels format="%.1f" start="0" spacing="50 20 10 5 2 1 0.1 0.01"/>
+  </verticalaxis>
+
+  <verticalaxis id="precipitation"
+		position="50"
+		pregap="0"
+		postgap="0"
+		positionbase="right"
+		min="0"
+		max="10"
+		type="number">
+    <title angle="-90" position="40 0" anchor="0 -1">Precipitation</title>
+    <labels format="%.1f" start="0" spacing="50 20 10 5 2 1 0.1 0.01"/>
+  </verticalaxis>
+
+
+  <plot>
+    <legend label="Solar Radiation"/>
+    <horizontalaxis ref="xaxis"/>
+    <verticalaxis ref="solar_radiation">
+      <variable ref="SR"/>
+    </verticalaxis>
+    <renderer type="fill">
+      <option name="linecolor" value="0x4ab7cf"/>
+      <option name="linethickness" value="3"/>
+      <option name="fillcolor" value="0x51c9e3"/>
+      <option name="fillopacity" value="1"/>
+    </renderer>
+  </plot>
+
+  <plot>
+    <legend label="Wind Speed"/>
+    <horizontalaxis ref="xaxis"/>
+    <verticalaxis ref="wind_speed">
+      <variable ref="WS"/>
+    </verticalaxis>
+    <renderer type="fill">
+      <option name="linecolor" value="0xcf624a"/>
+      <option name="linethickness" value="3"/>
+      <option name="fillcolor" value="0xe36c51"/>
+      <option name="fillopacity" value="0.4"/>
+    </renderer>
+  </plot>
+
+  <plot>
+    <legend label="Surface Temperature"/>
+    <horizontalaxis ref="xaxis"/>
+    <verticalaxis ref="surface_temp">
+      <variable ref="ST"/>
+    </verticalaxis>
+    <renderer type="line">
+      <option name="linecolor" value="0x74cf4a"/>
+      <option name="linewidth" value="2"/>
+    </renderer>
+  </plot>
+
+  <plot>
+    <legend label="Temperature"/>
+    <horizontalaxis ref="xaxis">
+      <variable ref="xvari"/>
+    </horizontalaxis>
+    <verticalaxis ref="temperature">
+      <variable ref="T"/>
+    </verticalaxis>
+    <renderer type="line">
+      <option name="linecolor" value="0xf0c92d"/>
+      <option name="linewidth" value="3"/>
+    </renderer>
+  </plot>
+
+  <plot>
+    <legend label="Precipitation"/>
+    <horizontalaxis ref="xaxis">
+      <variable ref="xvari"/>
+    </horizontalaxis>
+    <verticalaxis ref="precipitation">
+      <variable ref="P"/>
+    </verticalaxis>
+    <renderer type="bar">
+      <option name="barwidth" value="5m"/>
+      <option name="baroffset" value="0.5"/>
+      <option name="fillcolor" value="0xb62df0"/>
+      <option name="linecolor" value="0x9124c0"/>
+
+    </renderer>
+  </plot>
+
+  <data>
+    <variables>
+      <variable id="xvar" column="0" type="datetime"/>
+      <variable id="SR" column="1"/>
+      <variable id="WS" column="2"/>
+      <variable id="ST" column="3"/>
+    </variables>
+    <csv location="1026-SWS.csv"/>
+  </data>
+
+  <data>
+    <variables>
+      <variable id="xvari" column="0" type="datetime"/>
+      <variable id="T" column="1"/>
+      <variable id="P" column="2"/>
+    </variables>
+    <csv location="1026-T5-P5.csv"/>
+  </data>
+</mugl>
