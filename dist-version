@@ -1,6 +1,17 @@
 #! /usr/bin/perl
 
 open(SVN, "svn info .|");
+$url = "";
+while (<SVN>) {
+    chomp;
+    if ( ($u) = /^URL: (\S+)$/ ) {
+	$url = $u;
+	last;
+    }
+}
+close(SVN);
+
+open(SVN, "svn info $url|");
 $revision = "0";
 while (<SVN>) {
     chomp;
@@ -10,5 +21,6 @@ while (<SVN>) {
     }
 }
 close(SVN);
+
 chomp($VERSION = `cat VERSION`);
 printf("%s-%s", $VERSION, $revision);
