@@ -48,6 +48,11 @@ package multigraph.format
 		        case "H": // 24 hours
 		        	return (date.getUTCHours() < 10) ? "0" + date.getUTCHours() + '' : date.getUTCHours() + '';
 		        case "h": // 12 hours
+		        	if (date.getUTCHours() > 12) {
+		        		return date.getUTCHours() - 12 + '';
+		        	}
+					return date.getUTCHours() + '';
+		        /*
 		            if(date.getUTCHours() == 23) {
 		                return "0";
 		            }
@@ -57,6 +62,7 @@ package multigraph.format
 		            else {
 		                return date.getUTCHours() + 1 + '';
 		            }
+		        */
 		        case "i": // Minutes
 		            return (date.getUTCMinutes() < 10) ? "0" + date.getUTCMinutes() + '' : date.getUTCMinutes() + '';
 		        case "s": // Seconds
@@ -119,7 +125,7 @@ package multigraph.format
     		@returns The millisecond numerial value of an arbitrary string representing a date
     	*/
     	override public function parse(string:String):Number {
-			var YYYY:Number = 0;
+ 			var YYYY:Number = 0;
             var   MM:Number = 1;
             var   DD:Number = 1;
             var   HH:Number = 0;

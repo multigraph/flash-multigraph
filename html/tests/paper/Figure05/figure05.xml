@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<mugl>
+
+  <graph x="0" y="0" width="480" height="160">
+    <window margin="0" border="0" padding="0"/>
+    <plotarea marginbottom="20" margintop="5" marginleft="25" marginright="15"/>
+    <horizontalaxis id="year"
+                    min="1965"
+                    max="1995"
+                    type="number">
+      <title/>
+      <grid/>
+      <labels format="%04d" spacing="100 50 20 10 5 2 1" />
+      <pan min="1870" max="2010"/>
+      <binding id="yearbinding" min="0" max="1"/>
+    </horizontalaxis>
+    
+    <verticalaxis id="ice"
+                  min="-0.65"
+                  max="0.65">
+      <title/>
+      <grid/>
+      <labels format="%.1f" spacing="0.5"/>
+      <zoom allowed="no"/>
+      <pan  allowed="no"/>
+    </verticalaxis>
+    <plot>
+      <horizontalaxis ref="year">
+        <variable ref="year"/>
+      </horizontalaxis>
+      <verticalaxis ref="ice">
+        <variable ref="ice"/>
+      </verticalaxis>
+      <renderer type="bar">
+        <option name="linecolor" value="black"/>
+        <option name="linethickness" value="1"/>
+        <option name="fillcolor" value="red"/>
+        <option name="downfillcolor" value="blue"/>
+        <option name="barwidth"  value="1.0"/>
+        <option name="baroffset" value="0.5"/>
+        <option name="barbase"   value="0.0"/>
+      </renderer>
+    </plot>
+    <data>
+      <variables>
+        <variable id="year"        column="0"/>
+        <variable id="ice" column="1"/>
+      </variables>
+      <csv location="YearlyArticIce.csv"/>
+    </data>
+  </graph>
+
+  <graph x="0" y="160" width="480" height="160">
+    <window margin="0" border="0" padding="0"/>
+    <plotarea marginbottom="20" margintop="5" marginleft="25" marginright="15"/>
+    <horizontalaxis id="year"
+                    min="1965"
+                    max="1995"
+                    type="number">
+      <title/>
+      <grid/>
+      <labels format="%04d" spacing="100 50 20 10 5 2 1" />
+      <pan min="1870" max="2010"/>
+      <binding id="yearbinding" min="0" max="1"/>
+    </horizontalaxis>
+    
+    <verticalaxis id="co2"
+                  min="-0.65"
+                  max="0.65">
+      <title/>
+      <grid/>
+      <labels format="%.1f" spacing="0.5"/>
+      <zoom allowed="no"/>
+      <pan  allowed="no"/>
+    </verticalaxis>
+    <plot>
+      <horizontalaxis ref="year">
+        <variable ref="year"/>
+      </horizontalaxis>
+      <verticalaxis ref="co2">
+        <variable ref="co2"/>
+      </verticalaxis>
+      <renderer type="line">
+        <option name="linecolor" value="red"/>
+        <option name="linewidth" value="2"/>
+      </renderer>
+    </plot>
+    <data>
+      <variables>
+        <variable id="year"  column="0"/>
+        <variable id="co2"   column="1"/>
+      </variables>
+      <csv location="YearlyCO2.csv"/>
+    </data>
+  </graph>
+</mugl>

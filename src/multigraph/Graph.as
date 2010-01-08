@@ -772,7 +772,7 @@ package multigraph {
             labeler = new labelerType(spacingAndUnit.number,
                                       spacingAndUnit.unit,
                                       _config.value(axistag, i, 'labels', '@format'),
-                                      parseFloat(_config.value(axistag, i, 'labels', '@start')),
+                                      _config.value(axistag, i, 'labels', '@start'),  //parseFloat(_config.value(axistag, i, 'labels', '@start')),
                                       labelPosition.x,
                                       labelPosition.y,
                                       parseFloat(_config.value(axistag, i, 'labels','@angle')),

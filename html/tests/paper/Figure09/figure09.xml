@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<mugl> 
+  <horizontalaxis type="datetime" > 
+    <labels format="%d %n %H:00"
+     spacing="1D 12H 6H 4H 2H 1H"/> 
+    <title/> 
+  </horizontalaxis> 
+  <verticalaxis type="number"
+   min="17.0" max="20.5"> 
+    <title angle="90">temp</title> 
+  </verticalaxis> 
+ <plot> 
+    <renderer type="line"> 
+      <option name="linecolor"
+       value="blue"/> 
+      <option name="dotcolor" 
+       value="blue"/> 
+      <option name="dotsize"  
+       value="2"/> 
+    </renderer> 
+ </plot> 
+ <data> 
+    <variables> 
+      <variable id="time"
+       type="datetime"/> 
+      <variable id="temp"/> 
+    </variables> 
+    <values> 
+      200905280000,20.0 
+      200905280100,19.0 
+      200905280200,18.9 
+      200905280300,18.5 
+      200905280400,18.2 
+      200905280500,17.9 
+      200905280600,17.5 
+      200905280700,17.5 
+      200905280800,17.7 
+      200905280900,17.8 
+      200905281000,17.6 
+      200905281100,17.5 
+      200905281200,17.7 
+    </values> 
+ </data> 
+</mugl> 

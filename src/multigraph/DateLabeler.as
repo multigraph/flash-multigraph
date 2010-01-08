@@ -28,14 +28,19 @@ package multigraph
 		private var _lastTextLabelWidth:Number = 25;
 		private var _lastTextLabelHeight:Number = 25;
 				
-		public function DateLabeler(spacing:Number, unit:String, formatString:String, start:Number, 
+		public function DateLabeler(spacing:Number, unit:String, formatString:String, start:String, 
 									px:Number, py:Number, angle:Number, ax:Number, ay:Number)
 		{
-			super(spacing, unit, formatString, start, px, py, angle, ax, ay);
+			_formatter 			 = new DateFormatter(formatString);
+
+var tt:Number = _formatter.parse(start);
+var f:String = _formatter.format(tt);			
+trace('DateLabeler: start='+start+' = '+tt+' = '+f);
+			
+			super(spacing, unit, formatString, _formatter.parse(start), px, py, angle, ax, ay);
 			_fontSize 			 = 12;
 			_current 			 = null;
 			_end 				 = null;
-			_formatter 			 = new DateFormatter(formatString);
 			_msSpacing 			 = null;
 			_spacingPixels 		 = 0;
 			_labelWidthPixels 	 = 0;

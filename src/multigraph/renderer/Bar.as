@@ -169,7 +169,7 @@ package multigraph.renderer
     override public function end(sprite:MultigraphUIComponent):void {
 	  var g:Graphics = sprite.graphics;
 	           
-      if (_barpixelWidth < 10) { 
+      if (_barpixelWidth < _linethickness) { 
       	g.lineStyle(_linethickness, _fillcolor, _fillopacity);
       } else {
       	g.lineStyle(_linethickness, _linecolor, 1);
@@ -241,10 +241,10 @@ package multigraph.renderer
     	g.endFill();
     	
     	// Draw the icon border    	
-    	g.lineStyle(1, 0x000000, 1);
-    	g.beginFill(0xFFFFFF, 0);
-    	g.drawRect(0, 0, sprite.width, sprite.height);
-    	g.endFill();
+    	//g.lineStyle(1, 0x000000, 1);
+    	//g.beginFill(0xFFFFFF, 0);
+    	//g.drawRect(0, 0, sprite.width, sprite.height);
+    	//g.endFill();
     }
   }
 }

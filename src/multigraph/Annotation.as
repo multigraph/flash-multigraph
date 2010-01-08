@@ -139,13 +139,13 @@ package multigraph
     }
 
     public function render(paddingBoxSprite:MultigraphUIComponent, plotBoxSprite:MultigraphUIComponent):void {
-      var shadow:DropShadowFilter = new DropShadowFilter();
-      shadow.alpha = 0.5;
-      shadow.distance = 1;
+      //var shadow:DropShadowFilter = new DropShadowFilter();
+      //shadow.alpha = 0.5;
+      //shadow.distance = 1;
       
       _annotationSprite.x = _spritePosX + (_frameIsPlot ? plotBoxSprite.x : 0);
       _annotationSprite.y = _spritePosY + (_frameIsPlot ? plotBoxSprite.y : 0);
-      _annotationSprite.filters = [shadow];
+      //_annotationSprite.filters = [shadow];
       paddingBoxSprite.addChild(_annotationSprite);
     } 
   }
