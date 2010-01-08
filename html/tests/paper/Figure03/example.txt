@@ -1,6 +1,0 @@
-[title]
-AMS Paper: Figure 2
-
-[description]
-
-
