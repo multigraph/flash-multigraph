@@ -23,7 +23,6 @@ package multigraph {
   
   import mx.controls.*;
   import mx.core.UIComponent;
-  import mx.graphics.ImageSnapshot;
   import mx.managers.CursorManager;
   import mx.managers.PopUpManager;
     
@@ -92,6 +91,7 @@ package multigraph {
     private var _pathname:String;
     public function get pathname():String { return _pathname; }
     private var _port:String;
+    private var _proxy:String;
     public function get port():String { return _port; }
 
     // icon asset
@@ -117,12 +117,13 @@ package multigraph {
       //_app.displayMessage(msg);
     }
 
-    public function Graph(xml:XML, swfname:String, hostname:String, pathname:String, port:String, width:int=-1, height:int=-1) {
+    public function Graph(xml:XML, swfname:String, hostname:String, pathname:String, port:String, proxy:String, width:int=-1, height:int=-1) {
       this._xml = xml;
       this._swfname  = swfname;
       this._hostname = hostname; 
       this._pathname = pathname; 
       this._port= port; 
+      this._proxy = proxy;
       init_wrapper(width, height);
 
     }       
@@ -365,7 +366,7 @@ package multigraph {
           // in a Multigraph.ArrayData object.
           vars = buildDataVariableArrayFromConfig(j);
           var url:String = _config.value('data', j, 'csv','@location');
-          _data[j] = new CSVFileArrayData( vars, url, this );
+          _data[j] = new CSVFileArrayData( vars, Multigraph.proxiedUrl(_proxy, url), this );
 
         } else if (_config.value('data', j, 'service') != null) {
           // The <data> section contains a <service> element, so the data is to be fetched
@@ -373,7 +374,7 @@ package multigraph {
           vars = buildDataVariableArrayFromConfig(j);
           var url:String = _config.value('data', j, 'service','@location');
           diagnosticOutput('creating a web service data object with service location "'+url+'"');
-          _data[j] = new WebServiceData( url, vars, this );
+          _data[j] = new WebServiceData( Multigraph.proxiedUrl(_proxy, url), vars, this );
         } else {
           trace("unknown data section type!");
         }

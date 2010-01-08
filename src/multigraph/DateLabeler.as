@@ -32,11 +32,6 @@ package multigraph
 									px:Number, py:Number, angle:Number, ax:Number, ay:Number)
 		{
 			_formatter 			 = new DateFormatter(formatString);
-
-var tt:Number = _formatter.parse(start);
-var f:String = _formatter.format(tt);			
-trace('DateLabeler: start='+start+' = '+tt+' = '+f);
-			
 			super(spacing, unit, formatString, _formatter.parse(start), px, py, angle, ax, ay);
 			_fontSize 			 = 12;
 			_current 			 = null;

@@ -45,6 +45,7 @@
      hostname="{parameters['hostname']}"
      pathname="{parameters['pathname']}"
      port="{parameters['port']}"
+     proxy="{parameters['proxy']}"
      muglfile="{parameters['muglfile']}"
    >
    </multigraph:Multigraph>

@@ -48,6 +48,9 @@
     public var port:String = "";
 
     [Bindable]
+    public var proxy:String = "";
+    
+    [Bindable]
     public var muglfile:String = "";
 
     public static function create(muglfile:String):Multigraph {
@@ -68,10 +71,10 @@
     		loader.addEventListener( Event.COMPLETE, 
 				function(event:Event):void {
                     createGraphs(event.target.data, 
-                                 swfname, hostname, pathname, port);
+                                 swfname, hostname, pathname, port, proxy);
 				}
 			);
-    		loader.load( new URLRequest( muglfile ) ); 
+    		loader.load( new URLRequest( proxiedUrl( proxy, muglfile ) ) ); 
 		}
 //		stage.scaleMode = StageScaleMode.NO_SCALE;
 //    	stage.align = StageAlign.TOP_LEFT;
@@ -79,7 +82,7 @@
 
 
     private function createGraphs(xmlText:String, 
-                                  swfname:String, hostname:String, pathname:String, port:String):void {
+                                  swfname:String, hostname:String, pathname:String, port:String, proxy:String):void {
       var graph:Graph;
       try {
 
@@ -120,7 +123,7 @@
              }
           }
 
-          graph = new Graph(xml, swfname, hostname, pathname, port, graphWidth, graphHeight);
+          graph = new Graph(xml, swfname, hostname, pathname, port, proxy, graphWidth, graphHeight);
           multigraphContainer.addChild(graph);
 
         // There is at least one <graph> element in the mugl file, so loop over each one,
@@ -128,7 +131,7 @@
         } else {
           for (var i:int = 0; i<xml.graph.length(); ++i) {
             graph = new Graph(xml.graph[i],
-                              swfname, hostname, pathname, port,
+                              swfname, hostname, pathname, port, proxy,
                               xml.graph[i]['@width'], xml.graph[i]['@height']
                               );
             graph.x = xml.graph[i]['@x'];
@@ -143,17 +146,30 @@
       }    
     }
 
-    public static function createPopUp(mugl:String, width:int, height:int, title:String, parent:DisplayObject, modal:Boolean=false) {
+    public static function createPopUp(mugl:String, width:int, height:int, title:String, parent:DisplayObject, proxy:String=null, modal:Boolean=false) {
         var titleWindow:ClosableTitleWindow = new ClosableTitleWindow();
         titleWindow.title = title;
 
         var mGraph:Multigraph = new Multigraph();
         mGraph.muglfile = mugl;
-		mGraph.width  = width;
-		mGraph.height = height;
+		mGraph.width    = width;
+		mGraph.height   = height;
+		mGraph.proxy    = proxy;
 
         titleWindow.addChild(mGraph);
         PopUpManager.addPopUp(titleWindow, parent, modal);
+   }
+   
+   public static function proxiedUrl(proxy:String, url:String):String {
+   	if (proxy != null && proxy!="" && url.substr(0, 7)=="http://") {
+   		url = url.substring(7, url.length-1);
+   		if (proxy.charAt(proxy.length-1)=="/") {
+   			return proxy + url;
+   		} else { 
+   			return proxy + "/" + url;
+   		}
+   	}
+   	return url;
    }
 
   ]]></mx:Script>
