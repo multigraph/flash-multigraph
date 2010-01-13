@@ -9,12 +9,12 @@
 package multigraph.data
 {
   import flash.events.*;
-  import flash.external.ExternalInterface;
   import flash.net.*;
-  import mx.managers.CursorManager;
   
   import multigraph.Graph;
   import multigraph.format.DateFormatter;
+  
+  import mx.managers.CursorManager;
 	
   public class WebServiceData extends Data
   {
@@ -77,8 +77,17 @@ package multigraph.data
     private function insertData(block:WebServiceDataCacheBlock,
                                 dataText:String):void {
 
-      var xml = new XML( dataText );
-      var valuesText:String = xml.data.values;
+	  var valuesText:String;
+	  
+	  if (dataText.indexOf("<mugl>") >= 0) {
+		// If the response contains the string "<mugl>", assume it's a valid XML response of the form
+	  	// <data><values>...</values></data>, and pull out the text of the <values> tag.
+      	var xml = new XML( dataText );
+        valuesText = xml.data.values;
+      } else {
+      	// Otherwise, assume that the response is the list of values without any surrounding XML
+      	valuesText = dataText;
+      }
 
       // Find the max value in the cache prior to this block (maxPrevValue), if any, and
       // the min value in the cache after this block (minNextValue)
