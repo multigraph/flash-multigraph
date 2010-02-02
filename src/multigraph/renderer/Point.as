@@ -18,7 +18,7 @@ package multigraph.renderer {
     static public var description:String = 'Draw a marker at the location of each data point';
     static public var options:String = '<ul>\
 <li><b>pointsize</b> radius of the markers, in pixels; default is 1\
-<li><b>pointshape</b> shape to use for the markers; must be one of "circle", "square", "triangle", or "diamond"; default is "circle"\
+<li><b>pointshape</b> shape to use for the markers; must be one of "circle", "square", "triangle", "diamond", or "star"; default is "circle"\
 <li><b>pointcolor</b> color to use for the markers; default is 0x000000 (black)\
 <li><b>pointopacity</b> opacity of points, in range 0.0 (completely transparent) to 1.0 (completely opaque); default is 1.0\
 <li><b>pointoutlinewidth</b> width, in pixels, of outline to draw around markers; default is 0, which means draw no outline\
