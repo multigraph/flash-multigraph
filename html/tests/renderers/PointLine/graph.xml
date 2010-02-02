@@ -23,10 +23,10 @@
     </verticalaxis>
     <renderer type="pointline">
       <option name="linewidth" value="1"/>
-      <option name="pointshape" value="diamond"/>
+      <option name="pointshape" value="star"/>
       <option name="pointsize" value="4"/>
       <option name="pointcolor" value="0x00DD00"/>
-      <option name="pointoutlinewidth" value="2"/>
+      <option name="pointoutlinewidth" value="1"/>
       <option name="pointoutlinecolor" value="0x000000"/>
     </renderer>
   </plot>

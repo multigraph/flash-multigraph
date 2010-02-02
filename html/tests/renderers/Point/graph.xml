@@ -68,7 +68,22 @@
       <option name="pointoutlinecolor" value="black"/>
       <option name="linethickness" value="2"/>
       <option name="pointcolor"  value="violet"/>
-      <option name="pointsize"   value="3"/>
+      <option name="pointsize"   value="4"/>
+    </renderer>
+  </plot>
+
+  <plot>
+    <legend label="star"/>
+    <horizontalaxis ref="xaxis"/>
+    <verticalaxis ref="yaxis">
+      <variable ref="fvar"/>
+    </verticalaxis>
+    <renderer type="point">
+      <option name="pointshape" value="star"/>
+      <option name="pointoutlinecolor" value="black"/>
+      <option name="linethickness" value="1"/>
+      <option name="pointcolor"  value="orange"/>
+      <option name="pointsize"   value="4"/>
     </renderer>
   </plot>
 
@@ -79,19 +94,20 @@
       <variable id="zvar" column="2"/>
       <variable id="tvar" column="3"/>
       <variable id="dvar" column="4"/>
+      <variable id="fvar" column="5"/>
     </variables>
     <values>
-      0, 3, 4, 5, 6
-      1, 2, 3, 4, 5
-      2, 4, 5, 6, 7
-      3, 5, 6, 7, 8
-      4, 3, 4, 5, 6
-      5, 6, 7, 8, 9
-      6, 7, 8, 9, 10
-      7, 8, 9, 10, 11
-      8, 5, 6, 7, 8
-      9, 4, 5, 6, 7
-      10,5, 6, 7, 8
+      0, 3, 4, 5, 6, 7
+      1, 2, 3, 4, 5, 6
+      2, 4, 5, 6, 7, 8
+      3, 5, 6, 7, 8, 9
+      4, 3, 4, 5, 6, 7
+      5, 6, 7, 8, 9, 10
+      6, 7, 8, 9, 10, 11
+      7, 8, 9, 10, 11, 12
+      8, 5, 6, 7, 8, 9
+      9, 4, 5, 6, 7, 8
+      10,5, 6, 7, 8, 9
     </values>
   </data>
 </mugl>

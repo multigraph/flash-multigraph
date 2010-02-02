@@ -22,7 +22,7 @@ package multigraph.renderer {
 <li><b>linecolor</b> color to use for the lines; default is 0x000000 (black)\
 <li><b>linewidth</b> width, in pixels, to use for the lines; default is 1\
 <li><b>pointsize</b> radius of the markers, in pixels; default is 0, which means do not draw markers\
-<li><b>pointshape</b> shape to use for the markers; must be one of "circle", "square", "triangle", or "diamond"; default is "circle"\
+<li><b>pointshape</b> shape to use for the markers; must be one of "circle", "square", "triangle", "diamond", or "star"; default is "circle"\
 <li><b>pointcolor</b> color to use for the markers; default is 0x000000 (black)\
 <li><b>pointopacity</b> opacity of points, in range 0.0 (completely transparent) to 1.0 (completely opaque); default is 1.0\
 <li><b>pointoutlinewidth</b> width, in pixels, of outline to draw around markers; default is 0, which means draw no outline\
@@ -48,6 +48,7 @@ package multigraph.renderer {
     private static var SQUARE_SHAPE:int   = 2;
     private static var TRIANGLE_SHAPE:int = 3;
     private static var DIAMOND_SHAPE:int  = 4;
+    private static var STAR_SHAPE:int     = 5;
 
 
     private var points:Array;
@@ -116,6 +117,8 @@ package multigraph.renderer {
         _pointshape = TRIANGLE_SHAPE;
       } else if (s == "diamond") {
         _pointshape = DIAMOND_SHAPE;
+      } else if (s == "star") {
+        _pointshape = STAR_SHAPE;
       } else {
         _pointshape = CIRCLE_SHAPE;
       }
@@ -125,6 +128,7 @@ package multigraph.renderer {
       if (_pointshape == SQUARE_SHAPE) { return "square"; }
       if (_pointshape == TRIANGLE_SHAPE) { return "triangle"; }
       if (_pointshape == DIAMOND_SHAPE) { return "diamond"; }
+      if (_pointshape == STAR_SHAPE) { return "star"; }
       return "(unknown)";
     }
 
@@ -197,6 +201,18 @@ package multigraph.renderer {
         g.lineTo(x, y+p);
         g.lineTo(x+_pointsize, y);
         g.lineTo(x, y-p);
+      } else if (_pointshape == STAR_SHAPE) {
+        var p:Number = 1.5*_pointsize;
+        g.moveTo(x-p*0.0000, y+p*1.0000);
+        g.lineTo(x+p*0.3536, y+p*0.3536);
+        g.lineTo(x+p*0.9511, y+p*0.3090);
+        g.lineTo(x+p*0.4455, y-p*0.2270);
+        g.lineTo(x+p*0.5878, y-p*0.8090);
+        g.lineTo(x-p*0.0782, y-p*0.4938);
+        g.lineTo(x-p*0.5878, y-p*0.8090);
+        g.lineTo(x-p*0.4938, y-p*0.0782);
+        g.lineTo(x-p*0.9511, y+p*0.3090);
+        g.lineTo(x-p*0.2270, y+p*0.4455);
       } else { // CIRCLE_SHAPE:
         g.drawCircle(x, y, _pointsize);
       }
