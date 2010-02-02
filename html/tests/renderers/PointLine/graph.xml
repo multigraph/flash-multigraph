@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<mugl>
+  <legend visible="true"/>
+  <window margin="2" border="2" padding="5"/>
+  
+  <legend border="2" opacity="1" />
+  
+  <horizontalaxis id="xaxis"
+                  min="0"
+                  max="10">
+  </horizontalaxis>
+  
+  <verticalaxis id="yaxis"
+                min="0"
+                max="10">
+  </verticalaxis>
+
+  <plot>
+    <legend label="PointLine" />
+    <horizontalaxis ref="xaxis"/>
+    <verticalaxis ref="yaxis">
+      <variable ref="yvar" />
+    </verticalaxis>
+    <renderer type="pointline">
+      <option name="linewidth" value="1"/>
+      <option name="pointshape" value="diamond"/>
+      <option name="pointsize" value="4"/>
+      <option name="pointcolor" value="0x00DD00"/>
+      <option name="pointoutlinewidth" value="2"/>
+      <option name="pointoutlinecolor" value="0x000000"/>
+    </renderer>
+  </plot>
+
+  <data>
+    <variables>
+      <variable id="xvar" column="0" type="number"/>
+      <variable id="yvar" column="1"/>
+    </variables>
+    <values>
+      0, 3
+      1, 2
+      2, 4
+      3, 5
+      4, 3
+      5, 6
+      6, 7
+      7, 8
+      8, 5
+      9, 4
+      10,5
+    </values>
+  </data>
+</mugl>

@@ -15,65 +15,60 @@
   </verticalaxis>
 
   <plot>
-    <legend label="Circle"/>
+    <legend label="circle"/>
     <horizontalaxis ref="xaxis"/>
     <verticalaxis ref="yaxis">
       <variable ref="yvar" />
     </verticalaxis>
     <renderer type="point">
-      <option name="shape" value="circle"/>
-      <option name="linecolor" value="black"/>
-      <option name="color"  value="blue"/>
-      <option name="size"   value="4"/>
-      <option name="fillopacity" value=".5"/>
-      <option name="linethickness" value="2"/>
+      <option name="pointshape" value="circle"/>
+      <option name="pointoutlinecolor" value="black"/>
+      <option name="pointcolor"  value="blue"/>
+      <option name="pointsize"   value="4"/>
     </renderer>
   </plot>
   
   <plot>
-    <legend label="Square"/>
+    <legend label="square"/>
     <horizontalaxis ref="xaxis"/>
     <verticalaxis ref="yaxis">
       <variable ref="zvar" />
     </verticalaxis>
     <renderer type="point">
-      <option name="shape" value="square"/>
-      <option name="linecolor" value="black"/>
-      <option name="color"  value="green"/>
-      <option name="size"   value="4"/>
-      <option name="fillopacity" value=".5"/>
-      <option name="linethickness" value="2"/>
+      <option name="pointshape" value="square"/>
+      <option name="pointoutlinecolor" value="black"/>
+      <option name="pointcolor"  value="green"/>
+      <option name="pointsize"   value="4"/>
     </renderer>
   </plot>
   
   <!-- This plot will not contribute to the legend -->
   <plot>
+    <legend label="diamond"/>
     <horizontalaxis ref="xaxis"/>
     <verticalaxis ref="yaxis">
       <variable ref="tvar"/>
     </verticalaxis>
     <renderer type="point">
-      <option name="shape" value="diamond"/>
-      <option name="linecolor" value="black"/>
-      <option name="color"  value="red"/>
-      <option name="size"   value="4"/>
-      <option name="fillopacity" value=".5"/>
-      <option name="linethickness" value="2"/>
+      <option name="pointshape" value="diamond"/>
+      <option name="pointoutlinecolor" value="black"/>
+      <option name="pointcolor"  value="red"/>
+      <option name="pointsize"   value="4"/>
     </renderer>
   </plot>
 
   <plot>
+    <legend label="triangle"/>
     <horizontalaxis ref="xaxis"/>
     <verticalaxis ref="yaxis">
       <variable ref="dvar"/>
     </verticalaxis>
     <renderer type="point">
-      <option name="shape" value="star"/>
-      <option name="linecolor" value="black"/>
+      <option name="pointshape" value="triangle"/>
+      <option name="pointoutlinecolor" value="black"/>
       <option name="linethickness" value="2"/>
-      <option name="color"  value="violet"/>
-      <option name="size"   value="3"/>
-      <option name="fillopacity" value=".5"/>
+      <option name="pointcolor"  value="violet"/>
+      <option name="pointsize"   value="3"/>
     </renderer>
   </plot>
 

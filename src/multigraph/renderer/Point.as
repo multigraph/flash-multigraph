@@ -12,221 +12,52 @@ package multigraph.renderer {
 	import multigraph.Axis;
 	import multigraph.MultigraphUIComponent;
 	
-  public class Point extends Renderer
+  public class Point extends PointLine
   {
     static public var keyword:String = 'point';
-    static public var description:String = 'Standard point plot with optional shapes (circle, square, triangle)';
-    static public var options:String = '<ul>' +  
-		'<li><b>shape</b>: shape of the point (circle, square, triangle)\
-		<li><b>linecolor</b>: color to be used for the lines\
-		<li><b>linethickness</b>: the thickness of the line around the drawn point\
-		<li><b>color</b>: color to be used for filling the points\
-		<li><b>size</b>: size of the points (radius or width)\
-		<li><b>fillopacity</b>: the opacity of the filled color (0-1)\
-		</ul>';
+    static public var description:String = 'Draw a marker at the location of each data point';
+    static public var options:String = '<ul>\
+<li><b>pointsize</b> radius of the markers, in pixels; default is 1\
+<li><b>pointshape</b> shape to use for the markers; must be one of "circle", "square", "triangle", or "diamond"; default is "circle"\
+<li><b>pointcolor</b> color to use for the markers; default is 0x000000 (black)\
+<li><b>pointopacity</b> opacity of points, in range 0.0 (completely transparent) to 1.0 (completely opaque); default is 1.0\
+<li><b>pointoutlinewidth</b> width, in pixels, of outline to draw around markers; default is 0, which means draw no outline\
+<li><b>pointoutlinecolor</b> color to use for outline around markers\
+<li><b>size</b> deprecated; sames as <b>pointsize</b>  \
+<li><b>shape</b> deprecated; same as <b>pointshape</b> \
+<li><b>color</b> deprecated; same as <b>pointcolor</b> \
+<li><b>fillopacity</b> deprecated; sames as <b>pointopacity</b>  \
+<li><b>linethickness</b> deprecated; same as <b>pointoutlinewidth</b> \
+<li><b>linecolor</b> deprecated; same as <b>pointoutlinecolor</b>'
++optionsMissing+
+'</ul>';
 
-	// Mugl properties
-	private var _linecolor:uint;
-	private var _linecolor_str:String;
-    private var _color:uint;
-    private var _color_str:String;
-    private var _size:Number;
-    private var _size_str:String;
-    private var _shape:String;
-    private var _fillopacity:Number;
-    private var _linethickness:int;
-        
-    private var dots:Array;
-    private var _prevPoint:Array;
-    
-    public function set linecolor(color:String):void {
-    	_linecolor_str = color;
-    	_linecolor = parseColor(color);
-    }
-    public function get linecolor():String {
-    	return _linecolor_str;
-    }
-    
-    public function set color(color:String):void {
-    	_color_str = color;
-    	_color = parseColor(color);
-    }
-    public function get color():String {
-    	return _color_str;
-    }
-    
-    public function get size():String {
-    	return _size_str;
-    }
-    
-    public function set size(size:String):void {
-    	_size_str = size;
-    	_size = Number(size);
-    }
-    
-    public function get shape():String {
-    	return _shape;
-    }
-    
-    public function set shape(shape:String):void {
-    	_shape = shape;
-    }
-    
-    public function set fillopacity(opacity:Number):void {
-    	_fillopacity = opacity;
-    }
-    
-    public function set linethickness(thickness:int):void {
-    	_linethickness = thickness;
-    }
-    
-    public function get linethickness():int {
-    	return _linethickness;
-    }
-    
+    public function set size(s:String):void { pointsize = s; }
+    public function get size():String { return pointsize; }
+
+    public function set shape(s:String):void { pointshape = s; }
+    public function get shape():String { return pointshape; }
+
+    public function set color(c:String):void { pointcolor = c; }
+    public function get color():String { return pointcolor; }
+
+    public function set linethickness(c:String):void { pointoutlinewidth = c; }
+    public function get linethickness():String { return pointoutlinewidth; }
+
+    override public function set linecolor(c:String):void { pointoutlinecolor = c; }
+    override public function get linecolor():String { return pointoutlinecolor; }
+
+    public function set fillopacity(o:String):void { pointopacity = o; }
+    public function get fillopacity():String { return pointopacity; }
+
     public function Point(haxis:Axis, vaxis:Axis) {
       super(haxis, vaxis);
-      _linecolor = 0x000000;
-      _color  = 0x000000;
-      _fillopacity = 1;
-      _size   = 3;
-      _linethickness = 1;
-      _prevPoint = null;
-    }
-
-    override public function begin(sprite:MultigraphUIComponent):void {
-      _prevPoint = null;
-    }
-
-    override public function dataPoint(sprite:MultigraphUIComponent, datap:Array):void {
-      var p:Array = [];
-      transformPoint(p, datap);
-      var g:Graphics = sprite.graphics;
-      if (_prevPoint != null) {
-        g.lineStyle(_linethickness, _linecolor, 1);
-        
-        g.beginFill(_color, _fillopacity);
-        switch(_shape) {
-        	case "triangle":
-        		var scale:Number = _size;
-        		g.moveTo(_prevPoint[0], _prevPoint[1] - scale);
-        		g.lineTo(_prevPoint[0] + _size, _prevPoint[1] - scale);
-        		g.lineTo(_prevPoint[0], _prevPoint[1] - scale + _size * 2);
-        		g.lineTo(_prevPoint[0] - _size, _prevPoint[1] - scale);
-        		break;
-        	case "square":
-        		g.drawRect(_prevPoint[0] - _size, _prevPoint[1] - _size, _size * 2, _size * 2);
-        		break;
-        	case "diamond":
-        		g.moveTo(_prevPoint[0], _prevPoint[1] + _size * 2);
-        		g.lineTo(_prevPoint[0] + _size, _prevPoint[1]);
-        		g.lineTo(_prevPoint[0], _prevPoint[1] - _size * 2);
-        		g.lineTo(_prevPoint[0] - _size, _prevPoint[1]);
-        		break;
-        	case "star":
-        		g.moveTo(_prevPoint[0], _prevPoint[1] + _size * 2);
-        		g.lineTo(_prevPoint[0] - _size * 2 / 3, _prevPoint[1] + _size * 2 / 3);
-        		g.lineTo(_prevPoint[0] - _size * 2, _prevPoint[1]);
-        		g.lineTo(_prevPoint[0] - _size * 2 / 3, _prevPoint[1] - _size * 2 / 3);
-        		g.lineTo(_prevPoint[0], _prevPoint[1] - _size * 2);
-        		g.lineTo(_prevPoint[0] + _size * 2 / 3, _prevPoint[1] - _size * 2 / 3);
-        		g.lineTo(_prevPoint[0] + _size * 2, _prevPoint[1]);
-        		g.lineTo(_prevPoint[0] + _size * 2 / 3, _prevPoint[1] + _size * 2 / 3);
-        		break;          		
-        	case "circle":
-        	default:
-        		g.drawCircle(_prevPoint[0], _prevPoint[1], _size);
-        		break;
-        }
-        g.endFill();
-      }
-      _prevPoint = p;
-    }
-
-    override public function end(sprite:MultigraphUIComponent):void {
-
-    }
-    
-    override public function renderLegendIcon(sprite:MultigraphUIComponent, legendLabel:String, opacity:Number):void {
-    	var g:Graphics = sprite.graphics;
-            
-        // Draw icon background (with opacity)
-        g.lineStyle(1, 0xFFFFFF, opacity);
-        g.beginFill(0xFFFFFF, opacity);        
-        g.drawRect(0, 0, sprite.width, sprite.height);
-        g.endFill();
-        
-        // Draw the image within the icon
-        g.lineStyle(1, _linecolor, 1);
-        g.beginFill(_color, _fillopacity);
-        var size:Number = 3;
-        switch(_shape) {
-            case "triangle":               
-                g.moveTo(sprite.width / 2, sprite.height / 2 - size);
-                g.lineTo(sprite.width / 2 + size, sprite.height / 2 - size);
-                g.lineTo(sprite.width / 2, sprite.height / 2 - size + size * 2);
-                g.lineTo(sprite.width / 2 - size, sprite.height / 2 - size);
-                
-                g.moveTo(sprite.width / 4, sprite.height / 4 - size);
-                g.lineTo(sprite.width / 4 + size, sprite.height / 4 - size);
-                g.lineTo(sprite.width / 4, sprite.height / 4 - size + size * 2);
-                g.lineTo(sprite.width / 4 - size, sprite.height / 4 - size);
-                
-                g.moveTo(sprite.width - sprite.width / 4, sprite.height - sprite.height / 4 - size);
-                g.lineTo(sprite.width - sprite.width / 4 + size, sprite.height - sprite.height / 4 - size);
-                g.lineTo(sprite.width - sprite.width / 4, sprite.height - sprite.height / 4 - size + size * 2);
-                g.lineTo(sprite.width - sprite.width / 4 - size, sprite.height - sprite.height / 4 - size);               
-                break;
-            case "square":                
-                g.drawRect(sprite.width / 2 - size, sprite.height / 2 - size, size * 2, size * 2);
-                               
-                g.drawRect(sprite.width / 4 - size, sprite.height / 4 - size, size * 2, size * 2);
-                
-                g.drawRect(sprite.width - sprite.width / 4 - size, sprite.height - sprite.height / 4 - size, size * 2, size * 2);               
-                break;
-            case "diamond":
-                size = 2;
-                g.moveTo(sprite.width / 2, sprite.height / 2 + size * 2);
-                g.lineTo(sprite.width / 2 + size, sprite.height / 2);
-                g.lineTo(sprite.width / 2, sprite.height / 2 - size * 2);
-                g.lineTo(sprite.width / 2 - size, sprite.height / 2);
-                
-                g.moveTo(sprite.width / 4, sprite.height / 4 + size * 2);
-                g.lineTo(sprite.width / 4 + size, sprite.height / 4);
-                g.lineTo(sprite.width / 4, sprite.height / 4 - size * 2);
-                g.lineTo(sprite.width / 4 - size, sprite.height / 4);
-                
-                g.moveTo(sprite.width - sprite.width / 4, sprite.height - sprite.height / 4 + size * 2);
-                g.lineTo(sprite.width - sprite.width / 4 + size, sprite.height - sprite.height / 4);
-                g.lineTo(sprite.width - sprite.width / 4, sprite.height - sprite.height / 4 - size * 2);
-                g.lineTo(sprite.width - sprite.width / 4 - size, sprite.height - sprite.height / 4);
-                break;
-            case "star":
-                /*g.moveTo(_prevPoint[0], _prevPoint[1] + _size * 2);
-                g.lineTo(_prevPoint[0] - _size * 2 / 3, _prevPoint[1] + _size * 2 / 3);
-                g.lineTo(_prevPoint[0] - _size * 2, _prevPoint[1]);
-                g.lineTo(_prevPoint[0] - _size * 2 / 3, _prevPoint[1] - _size * 2 / 3);
-                g.lineTo(_prevPoint[0], _prevPoint[1] - _size * 2);
-                g.lineTo(_prevPoint[0] + _size * 2 / 3, _prevPoint[1] - _size * 2 / 3);
-                g.lineTo(_prevPoint[0] + _size * 2, _prevPoint[1]);
-                g.lineTo(_prevPoint[0] + _size * 2 / 3, _prevPoint[1] + _size * 2 / 3);*/
-                break;                  
-            case "circle":
-            default:
-                g.drawCircle(sprite.width / 2, sprite.height / 2, size);
-                
-                g.drawCircle(sprite.width / 4, sprite.height / 4, size);
-                
-                g.drawCircle(sprite.width - sprite.width / 4, sprite.height - sprite.height / 4, size);
-                break;
-        }
-        g.endFill();
-        
-        // Draw the icon border     
-        g.lineStyle(1, 0x000000, 1);
-        g.beginFill(0xFFFFFF, 0);
-        g.drawRect(0, 0, sprite.width, sprite.height);
-        g.endFill();
+      // force linewidth = 0 to suppress drawing of lines
+      linewidth = "0";
+      // default pointsize = 1
+      pointsize = "1";
     }
   }
+
 }
+
