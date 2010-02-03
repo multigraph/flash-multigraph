@@ -37,7 +37,12 @@ package multigraph
                               numberOfRows:int, numberOfColumns:int, color:uint, border:Number,
                            borderColor:uint, opacity:Number, icon:Object, radius:Number=0):void 
     {
-      _plots       = plots;
+      _plots = [];
+      for (var i:int = 0; i<plots.length; ++i) {
+        if (plots[i].legendLabel != null) {
+          _plots.push(plots[i]);
+        }
+      }
 
       // if neither rows nor cols is specified, default to 1 col
       if (numberOfRows == -1 && numberOfColumns == -1) {

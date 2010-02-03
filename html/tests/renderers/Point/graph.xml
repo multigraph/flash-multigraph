@@ -2,7 +2,7 @@
 <mugl>
   <window margin="2" border="2" padding="5"/>
   
-  <legend border="2" opacity="1" />
+  <legend border="2" opacity="1"/>
   
   <horizontalaxis id="xaxis"
                   min="0"
