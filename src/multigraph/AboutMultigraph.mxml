@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="350" height="225"
+	showCloseButton="true"
+	close="closeMe()"
+	styleName="myStyle">
+
+    <mx:Style>
+        .myStyle { fontSize: 12; fontWeight: bold; textAlign: center; horizontalAlign: center; }
+    </mx:Style>
+    <mx:Text width="100%">
+        <mx:htmlText>
+            <![CDATA[Multigraph is a tool for displaying<br>interactive data plots.  See<br><br><a target="_blank" href="http://www.multigraph.org">www.multigraph.org</a><br><br>for details.<br> <br>]]>
+        </mx:htmlText>
+    </mx:Text>
+    <mx:Button label="OK" click="closeMe()"/>
+
+  <mx:Script><![CDATA[
+    import mx.managers.PopUpManager;
+    private function closeMe():void {
+    	PopUpManager.removePopUp(this);
+    }
+  ]]></mx:Script>
+	    
+	
+</mx:TitleWindow>

@@ -16,6 +16,9 @@
     </mx:Style>
 
     <mx:Script><![CDATA[
+    	import mx.containers.TitleWindow;
+    	import mx.controls.Label;
+    	import mx.events.CloseEvent;
 
 	import multigraph.Graph;
 	import multigraph.renderer.RendererList;
@@ -28,6 +31,7 @@
 	import mx.controls.Alert;
 
 	private var _swfname:String;
+    private var aboutWindow:TitleWindow;
 
     [Bindable]
     public var test:String = "";
@@ -52,6 +56,8 @@
     
     [Bindable]
     public var muglfile:String = "";
+    
+    private var myMenu:ContextMenu;
 
     public static function create(muglfile:String):Multigraph {
  	   var m:Multigraph = new Multigraph();
@@ -76,10 +82,39 @@
 			);
     		loader.load( new URLRequest( proxiedUrl( proxy, muglfile ) ) ); 
 		}
+		myMenu = new ContextMenu();
+		myMenu.hideBuiltInItems();
+		myMenu.builtInItems.print = true;
+		var item:ContextMenuItem = new ContextMenuItem("About Multigraph");
+		item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, showAboutWindow);
+		myMenu.customItems.push(item);
+		this.contextMenu = myMenu;
 //		stage.scaleMode = StageScaleMode.NO_SCALE;
 //    	stage.align = StageAlign.TOP_LEFT;
 	}
 
+
+	private function showAboutWindow(evt:Event):void {
+		/*
+	   var label:Label = new Label();
+       label.text = "Multigraph is Way Cool!";
+       trace('show aboutWindow now!');
+       aboutWindow = new TitleWindow();
+       aboutWindow.title = "About Multigraph";
+       aboutWindow.showCloseButton = true;
+	   aboutWindow.width = 200;
+       aboutWindow.height = 100;
+       aboutWindow.addEventListener(CloseEvent.CLOSE, aboutWindow_close);
+       aboutWindow.addChild(label);
+*/
+	   aboutWindow = new AboutMultigraph();
+       PopUpManager.addPopUp(aboutWindow, this.parent, true);
+       PopUpManager.centerPopUp(aboutWindow);
+    }
+            
+    private function aboutWindow_close(evt:CloseEvent):void {
+        PopUpManager.removePopUp(aboutWindow);
+    }
 
     private function createGraphs(xmlText:String, 
                                   swfname:String, hostname:String, pathname:String, port:String, proxy:String):void {
