@@ -161,7 +161,6 @@ the color to be used for the fill inside each bar; if barbase is specified, this
       var p:Array = [];
       transformPoint(p, datap);
       var g:Graphics = sprite.graphics;
-      //var gsprite:Sprite = sprite;
             
       if (_barbaseIsSet && _downfillcolor_str != null && p[1] < _barpixelBase) {
         g.beginFill(_downfillcolor, _fillopacity);
@@ -171,16 +170,11 @@ the color to be used for the fill inside each bar; if barbase is specified, this
       var x0:int = p[0] - _barpixelOffset;
       var x1:int = p[0] - _barpixelOffset + _barpixelWidth;
 
-      if (!_drawLines) {
-        x0 -= 1;
-        x1 += 1;
-      }
-
       g.lineStyle(0,  1, 0);
-      g.moveTo(x0, _barpixelBase);
-      g.lineTo(x0, p[1]);
-      g.lineTo(x1, p[1]);
-      g.lineTo(x1, _barpixelBase);
+      g.moveTo(x0-1, _barpixelBase);
+      g.lineTo(x0-1, p[1]);
+      g.lineTo(x1+1, p[1]);
+      g.lineTo(x1+1, _barpixelBase);
       g.endFill();
 
       if (_drawLines) {
