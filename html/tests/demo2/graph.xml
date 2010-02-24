@@ -15,6 +15,7 @@
       <verticalaxis ref="T"><variable ref="I"/></verticalaxis>
       <renderer type="bar">
         <option name="linecolor" value="black"/>
+        <option name="linethickness" value="2"/>
         <option name="fillcolor" value="red"/>
         <option name="downfillcolor" value="blue"/>
         <option name="barwidth"  value="1.0"/>

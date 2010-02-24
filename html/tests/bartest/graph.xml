@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<mugl>
+    <horizontalaxis id="x" min="5"  max="15"/>
+    <verticalaxis   id="y" min="2"  max="7"/>
+    <plot>
+      <horizontalaxis ref="x"><variable ref="x"/></horizontalaxis>
+      <verticalaxis ref="y"><variable ref="y"/></verticalaxis>
+      <renderer type="bar">
+        <option name="linecolor" value="green"/>
+        <option name="linethickness" value="2"/>
+        <option name="fillcolor" value="red"/>
+        <option name="barwidth"  value="1.0"/>
+        <option name="baroffset" value="0.5"/>
+      </renderer>
+    </plot>
+    <data>
+      <variables>
+        <variable id="x" column="0"/>
+        <variable id="y" column="1"/>
+      </variables>
+      <values>
+5,8
+6,5
+7,3
+8,4
+9,6
+10,5
+11,7
+12,7
+      </values>
+    </data>
+</mugl>

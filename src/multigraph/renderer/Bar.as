@@ -23,7 +23,10 @@ package multigraph.renderer
     static public var options:String = '<ul>\
 <li><b>barwidth</b>: the width of each bar, in pixels\
 <li><b>baroffset</b>: the offset of the left edge of each bar from the corresponding data value\
-<li><b>fillcolor</b>: the color to be used for the fill inside each bar\
+<li><b>barbase</b>: the location, relative to the plot\'s vertical axis, of the bottom of the bar; if no barbase is specified, the bars will extend down to the bottom of the plot area\
+<li><b>fillcolor</b>: the color to be used for the fill inside each bar; if barbase is specified, this color is used only for bars that extend above the base\
+<li><b>downfillcolor</b>: if a barbase is specified, this color is used for bars that extend below the base; if no barbase is specified, downfillcolor is ignored because the base is the bottom of the plot area, so no bars extend below that\
+the color to be used for the fill inside each bar; if barbase is specified, this color is used for the part of the bar above the base\
 <li><b>linecolor</b>: the color to be used for the outline around each bar'
 +optionsMissing+
 '</ul>';
@@ -49,9 +52,12 @@ package multigraph.renderer
     private var _barbaseIsSet:Boolean;
     private var _barpixelBase:Number;
         
-    private var _prevPoint:Array;
-    private var _linePoints:Array;
-    private var _iDatas:Array;
+    private var _barGroups:Array;
+    private var _currentBarGroup:Array;
+    private var _prevCorner:Array;
+    private var _drawLines:Boolean;
+
+    private var _pixelEdgeTolerance = 1;
         
     private var _numberAndUnit:Object;
     
@@ -133,7 +139,6 @@ package multigraph.renderer
         break;
       }
             
-      _prevPoint = null;
       _barpixelWidth = _trueWidth * _haxis.axisToDataRatio;
       if (_barpixelWidth < 1) { _barpixelWidth = 1; }
       _barpixelOffset = _barpixelWidth * _baroffset;
@@ -141,7 +146,14 @@ package multigraph.renderer
       if (_barbaseIsSet) {
         _barpixelBase = _vaxis.dataValueToAxisValue(_barbase);
       }
-      _linePoints = new Array();
+      _barGroups = [];
+      _currentBarGroup = null;
+      _prevCorner = null;
+      if (_barpixelWidth > 3*_pixelEdgeTolerance) {
+        _drawLines = true;
+      } else {
+        _drawLines = false;
+      }
     }
     
     override public function dataPoint (sprite:MultigraphUIComponent, datap:Array):void {
@@ -156,52 +168,120 @@ package multigraph.renderer
       } else {
         g.beginFill(_fillcolor, _fillopacity);
       }
+      var x0:int = p[0] - _barpixelOffset;
+      var x1:int = p[0] - _barpixelOffset + _barpixelWidth;
+
+      if (!_drawLines) {
+        x0 -= 1;
+        x1 += 1;
+      }
+
       g.lineStyle(0,  1, 0);
-      g.moveTo(p[0] - _barpixelOffset, _barpixelBase);
-      g.lineTo(p[0] - _barpixelOffset, _barpixelBase);
-      g.lineTo(p[0] - _barpixelOffset, p[1]);
-      g.lineTo(p[0] - _barpixelOffset + _barpixelWidth, p[1]);
-      g.lineTo(p[0] - _barpixelOffset + _barpixelWidth, _barpixelBase);
+      g.moveTo(x0, _barpixelBase);
+      g.lineTo(x0, p[1]);
+      g.lineTo(x1, p[1]);
+      g.lineTo(x1, _barpixelBase);
       g.endFill();
-      _linePoints.push(p);
+
+      if (_drawLines) {
+        if (_prevCorner == null) {
+          _currentBarGroup = [ [x0,p[1]] ];
+        } else {
+          if (Math.abs(x0 - _prevCorner[0]) <= _pixelEdgeTolerance) {
+            _currentBarGroup.push( [x0,p[1]] );
+          } else {
+            _currentBarGroup.push( [_prevCorner[0], _prevCorner[1]] );
+            _barGroups.push( _currentBarGroup );
+            _currentBarGroup = [ [x0,p[1]] ];
+          }
+        }
+        _prevCorner = [x1,p[1]];
+      }
     }
         
     override public function end(sprite:MultigraphUIComponent):void {
+   	  if (_linethickness <= 0) { return; }
+
+      if (_prevCorner != null && _currentBarGroup != null) {
+          _currentBarGroup.push( [_prevCorner[0], _prevCorner[1]] );
+          _barGroups.push( _currentBarGroup );
+      }        
+
 	  var g:Graphics = sprite.graphics;
-	           
-      if (_barpixelWidth < _linethickness) { 
-      	g.lineStyle(_linethickness, _fillcolor, _fillopacity);
+      /*
+      if (_barpixelWidth > 3*_pixelEdgeTolerance) {
+        g.lineStyle(_linethickness, _linecolor, 1);
       } else {
-      	g.lineStyle(_linethickness, _linecolor, 1);
+        g.lineStyle(_linethickness, _fillcolor, 1);
       }
-      
-      var x:int = _linePoints.length;
-      for each (var p:Array in _linePoints) {
-          g.moveTo(p[0] - _barpixelOffset, _barpixelBase);
-          g.lineTo(p[0] - _barpixelOffset, p[1]);
-          g.lineTo(p[0] - _barpixelOffset + _barpixelWidth, p[1]);
-                
-          if (_prevPoint != null) {
-            if (p[0] - _barpixelOffset - _barpixelWidth > _prevPoint[0] - _barpixelOffset + _barpixelWidth) {
-              g.moveTo(_prevPoint[0] - _barpixelOffset + _barpixelWidth, _prevPoint[1]);
-              g.lineTo(_prevPoint[0] - _barpixelOffset + _barpixelWidth, _barpixelBase);
-                        
-            } else if(p[1] < _prevPoint[1]) {
-              g.moveTo(p[0] - _barpixelOffset, _prevPoint[1]);
-              g.lineTo(p[0] - _barpixelOffset, p[1]);
-            }
+      */
+      g.lineStyle(_linethickness, _linecolor, 1);
+      for each (var barGroup:Array in _barGroups) {
+          var n:int = barGroup.length;
+          if (n < 2) { return; } // this should never happen
+
+          // For the first point, draw 3 lines:
+          //
+          //       y |------
+          //         |
+          //         |
+          //    base |------
+          //         ^     ^
+          //         x     x(next)
+          //
+
+          /*
+          //   vertical line @ x from base to y
+          g.moveTo(barGroup[0][0], _barpixelBase);
+          //   horizontal line @ y from this x to x(next)
+          g.lineTo(barGroup[0][0], barGroup[0][1]);
+          g.lineTo(barGroup[1][0], barGroup[0][1]);
+          */
+
+          //   horizontal line @ y from x(next) to x
+          g.moveTo(barGroup[1][0], barGroup[0][1]);
+          g.lineTo(barGroup[0][0], barGroup[0][1]);
+          //   vertical line @ x from y to base
+          g.lineTo(barGroup[0][0], _barpixelBase);
+          //   horizontal line @ base from x to x(next)
+          g.lineTo(barGroup[1][0], _barpixelBase);
+
+          for (var i:int=1; i<n-1; ++i) {
+            // For intermediate points, draw 3 lines:
+            //
+            //       y |
+            //         |
+            //         |
+            //         |------ y(next)
+            //         |
+            //         |
+            //         |------ base
+            //         ^     ^
+            //         x     x(next)
+            //
+            //   vertical line @ x from min to max of (y, y(next), base)
+            g.moveTo(barGroup[i][0], Math.min(barGroup[i-1][1], barGroup[i][1], _barpixelBase));
+            g.lineTo(barGroup[i][0], Math.max(barGroup[i-1][1], barGroup[i][1], _barpixelBase));
+            //   horizontal line @ y(next) from x to x(next)
+            g.moveTo(barGroup[i][0],   barGroup[i][1]);
+            g.lineTo(barGroup[i+1][0], barGroup[i][1]);
+            //   horizontal line @ base from x to x(next)
+            g.moveTo(barGroup[i][0],   _barpixelBase);
+            g.lineTo(barGroup[i+1][0], _barpixelBase);
           }
-                
-          // Draw the last line
-          if (x == 1) {
-            g.moveTo(p[0] - _barpixelOffset + _barpixelWidth, p[1]);
-            g.lineTo(p[0] - _barpixelOffset + _barpixelWidth, _barpixelBase);   
-          }
-                
-          x--;
-          _prevPoint = p;
-                
-        }
+          // For last point, draw one line:
+          //
+          //       y |
+          //         |
+          //         |
+          //    base |
+          //         ^     ^
+          //         x     x(next)
+          //
+          //   vertical line @ x from base to y
+          g.moveTo(barGroup[n-1][0], barGroup[n-1][1]);
+          g.lineTo(barGroup[n-1][0], _barpixelBase);
+      }
     }
     
     override public function renderLegendIcon(sprite:MultigraphUIComponent, legendLabel:String, opacity:Number):void {   	

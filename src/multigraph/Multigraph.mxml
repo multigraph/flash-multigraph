@@ -95,21 +95,10 @@
 
 
 	private function showAboutWindow(evt:Event):void {
-		/*
-	   var label:Label = new Label();
-       label.text = "Multigraph is Way Cool!";
-       trace('show aboutWindow now!');
-       aboutWindow = new TitleWindow();
-       aboutWindow.title = "About Multigraph";
-       aboutWindow.showCloseButton = true;
-	   aboutWindow.width = 200;
-       aboutWindow.height = 100;
-       aboutWindow.addEventListener(CloseEvent.CLOSE, aboutWindow_close);
-       aboutWindow.addChild(label);
-*/
 	   aboutWindow = new AboutMultigraph();
        PopUpManager.addPopUp(aboutWindow, this.parent, true);
        PopUpManager.centerPopUp(aboutWindow);
+       this.cursorManager.removeAllCursors();
     }
             
     private function aboutWindow_close(evt:CloseEvent):void {

@@ -104,11 +104,11 @@ package multigraph {
       private var minusIcon:Class;
       
     // Mouse cursor assets
-    [Embed(source="assets/cursors/grab.png")]
+    [Embed(source="assets/cursors/HandOpen.png")]
       [Bindable]
       private var mouseCursorGrab:Class;
 
-    [Embed(source="assets/cursors/grabbing.png")]
+    [Embed(source="assets/cursors/HandClosed.png")]
       [Bindable]
       private var mouseCursorGrabbing:Class;
 

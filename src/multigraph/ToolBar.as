@@ -20,7 +20,7 @@ package multigraph
 			[Bindable]
 			private var zoomIcon:Class;
 			
-		[Embed(source="assets/cursors/grab.png")]
+		[Embed(source="assets/cursors/HandOpen.png")]
 			[Bindable]
 			private var panCursor:Class;
 			
