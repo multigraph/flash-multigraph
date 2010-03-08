@@ -135,7 +135,7 @@ package multigraph
 
       override public function next():Number {
         var val:Number = _current;
-        _current += _spacing;
+        _current += _spacing;    
         return val;
       }
     }

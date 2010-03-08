@@ -8,6 +8,8 @@
  */
 package multigraph.format
 {
+  import multigraph.printf;
+  
   public class NumberFormatter extends Formatter
   {
   	private var _widthFlag:int;
@@ -19,7 +21,8 @@ package multigraph.format
     }
     
     override public function format(value:Number):String {
-    	return printf(_formatString, value);
+    	var s:String = printf(_formatString, value);
+    	return s;
     }
     
     override public function getLength():int {
@@ -31,7 +34,7 @@ package multigraph.format
     		return _precisionSize;	
     	}
     }
-    
+/*     
     private function printf(fstring:String, value:Number):String {
         var pad = function(str,ch,len) {
             var ps='';
@@ -187,7 +190,7 @@ package multigraph.format
 		
         return retstr;
     }
-    
+     */
     // This is a simplified version of what should be an incredibly complicated function
     override public function parse(string:String):Number {
         var number:Number = Number(string);

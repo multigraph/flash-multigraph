@@ -94,22 +94,27 @@ package multigraph
             labeler = labelers[i];
           }
         }
+
+        if (density <= 1.5) {
 	
-        //// Now draw the tics and labels & grid lines
-        labeler.prepare(dataMin, dataMax);
-        while (labeler.hasNext()) {
-          var v:Number = labeler.next();
-          var a:Number = dataValueToAxisValue(v);
-          g.lineStyle(1,0,1);
-          g.moveTo(a, position+3);
-          g.lineTo(a, position-3);
-          labeler.renderLabel(sprite, this, v);
-		  if (grid) {
+          //// Now draw the tics and labels & grid lines
+          labeler.prepare(dataMin, dataMax);
+          while (labeler.hasNext()) {
+            var v:Number = labeler.next();
+            var a:Number = dataValueToAxisValue(v);
+            g.lineStyle(1,0,1);
+            g.moveTo(a, position+3);
+            g.lineTo(a, position-3);
+            labeler.renderLabel(sprite, this, v);
+            if (grid) {
 		  	  g.lineStyle(1, gridColor, 1);
 			  g.moveTo(a, position);
 			  g.lineTo(a, graph.plotBox.height - position);
-		  }			  
+            }			  
+          }
+
         }
+
       }
     }
   }
