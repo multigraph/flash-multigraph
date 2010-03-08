@@ -235,7 +235,7 @@ package multigraph {
       }
       
       _panConfig = new PanConfig('allowed', null, null, this);
-      _zoomConfig = new ZoomConfig('allowed', null, null, null, this);
+      _zoomConfig = new ZoomConfig('allowed', null);
 
     }
     
@@ -298,12 +298,38 @@ package multigraph {
       if(axisControl != null) axisControl.destroyAllControls();
       _mouseDragBase = p;
       _mouseLast     = _mouseDragBase;
+      if (event.shiftKey) {
+        if (_orientation == Axis.ORIENTATION_VERTICAL)  {
+          _graph.cursor.setState(Cursor.STATE_ZOOM_VERTICAL_ACTIVE);
+        } else {
+          _graph.cursor.setState(Cursor.STATE_ZOOM_HORIZONTAL_ACTIVE);
+        }
+      } else {
+        if (_orientation == Axis.ORIENTATION_VERTICAL)  {
+          _graph.cursor.setState(Cursor.STATE_PAN_VERTICAL_ACTIVE);
+        } else {
+          _graph.cursor.setState(Cursor.STATE_PAN_HORIZONTAL_ACTIVE);
+        }
+      }
       return true;
     }
 
     public function handleMouseUp(p:PixelPoint, event:MouseEvent):Boolean {
       _mouseDragBase = null;
       _graph.prepareData();
+      if (event.shiftKey) {
+        if (_orientation == Axis.ORIENTATION_VERTICAL)  {
+          _graph.cursor.setState(Cursor.STATE_ZOOM_VERTICAL_INACTIVE);
+        } else {
+          _graph.cursor.setState(Cursor.STATE_ZOOM_HORIZONTAL_INACTIVE);
+        }
+      } else {
+        if (_orientation == Axis.ORIENTATION_VERTICAL)  {
+          _graph.cursor.setState(Cursor.STATE_PAN_VERTICAL_INACTIVE);
+        } else {
+          _graph.cursor.setState(Cursor.STATE_PAN_HORIZONTAL_INACTIVE);
+        }
+      }
       return true;
     }
 
@@ -322,14 +348,19 @@ package multigraph {
         }
         if ( ((d >= 0) && (d < _pixelSelectionDistance)) || ((d < 0) && (d > -_pixelSelectionDistance)) ) {
 		  if (_graph != null) { _graph.selectAxis(this); }
-	/*
-          // change the mouse cursor
-          if (_orientation == Axis.VERTICAL) {
-            graph.div.style.cursor="n-resize";
+          if (event.shiftKey) {
+            if (_orientation == Axis.ORIENTATION_VERTICAL)  {
+              _graph.cursor.setState(Cursor.STATE_ZOOM_VERTICAL_ACTIVE);
+            } else {
+              _graph.cursor.setState(Cursor.STATE_ZOOM_HORIZONTAL_ACTIVE);
+            }
           } else {
-            graph.div.style.cursor="e-resize";
+            if (_orientation == Axis.ORIENTATION_VERTICAL)  {
+              _graph.cursor.setState(Cursor.STATE_PAN_VERTICAL_ACTIVE);
+            } else {
+              _graph.cursor.setState(Cursor.STATE_PAN_HORIZONTAL_ACTIVE);
+            }
           }
-    */
           return true;
         }
       } else {
@@ -337,6 +368,20 @@ package multigraph {
         var dy:Number = p.y- _mouseLast.y;
         _mouseLast = p;
         handleMouseDrag(dx, dy, event);
+
+        if (event.shiftKey) {
+          if (_orientation == Axis.ORIENTATION_VERTICAL)  {
+            _graph.cursor.setState(Cursor.STATE_ZOOM_VERTICAL_ACTIVE);
+          } else {
+            _graph.cursor.setState(Cursor.STATE_ZOOM_HORIZONTAL_ACTIVE);
+          }
+        } else {
+          if (_orientation == Axis.ORIENTATION_VERTICAL)  {
+            _graph.cursor.setState(Cursor.STATE_PAN_VERTICAL_ACTIVE);
+          } else {
+            _graph.cursor.setState(Cursor.STATE_PAN_HORIZONTAL_ACTIVE);
+          }
+        }
         return true;
       }
       return false;
@@ -464,20 +509,8 @@ package multigraph {
         if (_panConfig.haveMax && newMax > _panConfig.max) {
             newMax = _panConfig.max;
         }
-
         if (newMin < newMax) {
-
-          if (_zoomConfig.haveMax && (newMax - newMin > _zoomConfig.max)) {
-            var d:Number = (newMax - newMin - _zoomConfig.max) / 2;
-            newMax -= d;
-            newMin += d;
-          } else if (_zoomConfig.haveMin && (newMax - newMin < _zoomConfig.min)) {
-            var d:Number = (_zoomConfig.min - (newMax - newMin)) / 2;
-            newMax += d;
-            newMin -= d;
-          }
-
-          setDataRange( newMin, newMax );
+            setDataRange( newMin, newMax );
         }
     }
 

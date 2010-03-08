@@ -27,7 +27,8 @@ package multigraph.renderer
 <li><b>fillcolor</b>: the color to be used for the fill inside each bar; if barbase is specified, this color is used only for bars that extend above the base\
 <li><b>downfillcolor</b>: if a barbase is specified, this color is used for bars that extend below the base; if no barbase is specified, downfillcolor is ignored because the base is the bottom of the plot area, so no bars extend below that\
 the color to be used for the fill inside each bar; if barbase is specified, this color is used for the part of the bar above the base\
-<li><b>linecolor</b>: the color to be used for the outline around each bar'
+<li><b>linecolor</b>: the color to be used for the outline around each bar\
+<li><b>hidelines</b>: hide bar outlines when the bars are less wide than this number of pixels; default is 2'
 +optionsMissing+
 '</ul>';
 
@@ -40,6 +41,10 @@ the color to be used for the fill inside each bar; if barbase is specified, this
     private var _fillopacity:Number;
     private var _linethickness:Number;
     private var _barbase:Number;
+
+    // _hidelines is the threshold, measured in pixels, for drawing outlines around bars; the outlines
+    // are drawn when the bar widths are greater than this threshold.
+    private var _hidelines:int = 2;
         
     // Accessible color properties
     public var _linecolor_str:String;   
@@ -57,7 +62,10 @@ the color to be used for the fill inside each bar; if barbase is specified, this
     private var _prevCorner:Array;
     private var _drawLines:Boolean;
 
-    private var _pixelEdgeTolerance = 1;
+    // _pixelEdgeTolerance is the threshold, measured in pixels, for which bars are considered adjacent; bars
+    // that are this close or closer are considered to be adjacent, for the purpose of drawing bar outlines.
+    private var _pixelEdgeTolerance:int = 1;
+
         
     private var _numberAndUnit:Object;
     
@@ -79,6 +87,9 @@ the color to be used for the fill inside each bar; if barbase is specified, this
       _linecolor = parseColor(color);
     }
         
+    public function get hidelines ():int { return _hidelines; }
+    public function set hidelines (width:int):void { _hidelines = width; }
+
     public function get barwidth ():String { return _barwidth; }
     public function set barwidth (width:String):void { _barwidth = width; }
         
@@ -149,7 +160,7 @@ the color to be used for the fill inside each bar; if barbase is specified, this
       _barGroups = [];
       _currentBarGroup = null;
       _prevCorner = null;
-      if (_barpixelWidth > 3*_pixelEdgeTolerance) {
+      if (_barpixelWidth > _hidelines) {
         _drawLines = true;
       } else {
         _drawLines = false;
@@ -170,11 +181,14 @@ the color to be used for the fill inside each bar; if barbase is specified, this
       var x0:int = p[0] - _barpixelOffset;
       var x1:int = p[0] - _barpixelOffset + _barpixelWidth;
 
+      // draw the bar one pixel wider than its actual dimensions, to make sure that adjacent bars have no gap between them.
+      var x0minus1:int = x0 - 1;
+      var x1plus1:int  = x1 + 1;
       g.lineStyle(0,  1, 0);
-      g.moveTo(x0-1, _barpixelBase);
-      g.lineTo(x0-1, p[1]);
-      g.lineTo(x1+1, p[1]);
-      g.lineTo(x1+1, _barpixelBase);
+      g.moveTo(x0minus1, _barpixelBase);
+      g.lineTo(x0minus1, p[1]);
+      g.lineTo(x1plus1, p[1]);
+      g.lineTo(x1plus1, _barpixelBase);
       g.endFill();
 
       if (_drawLines) {
@@ -202,13 +216,6 @@ the color to be used for the fill inside each bar; if barbase is specified, this
       }        
 
 	  var g:Graphics = sprite.graphics;
-      /*
-      if (_barpixelWidth > 3*_pixelEdgeTolerance) {
-        g.lineStyle(_linethickness, _linecolor, 1);
-      } else {
-        g.lineStyle(_linethickness, _fillcolor, 1);
-      }
-      */
       g.lineStyle(_linethickness, _linecolor, 1);
       for each (var barGroup:Array in _barGroups) {
           var n:int = barGroup.length;

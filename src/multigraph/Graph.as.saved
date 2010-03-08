@@ -53,6 +53,10 @@ package multigraph {
     private var _title       : Title;
     private var _toolbar	 : ToolBar;
     private var _toolbarState : String;
+    private var _cursor : Cursor;
+
+    public function get cursor():Cursor { return _cursor; }
+
     public function set toolbarState(state:String):void {
     	_toolbarState = state;
     }
@@ -103,16 +107,6 @@ package multigraph {
       [Bindable]
       private var minusIcon:Class;
       
-    // Mouse cursor assets
-    [Embed(source="assets/cursors/HandOpen.png")]
-      [Bindable]
-      private var mouseCursorGrab:Class;
-
-    [Embed(source="assets/cursors/HandClosed.png")]
-      [Bindable]
-      private var mouseCursorGrabbing:Class;
-
-    
     public function displayMessage(msg:String):void {
       //_app.displayMessage(msg);
     }
@@ -256,6 +250,8 @@ package multigraph {
       //_cursorManager = new CursorManager();
       
       _window = new Box(_graphWidth, _graphHeight);
+
+      _cursor = new Cursor(this);
       
       // Just a test
       var debugable:Object = {type:_window, data:"BALH"};
@@ -305,7 +301,8 @@ package multigraph {
 
 	  // Remove the cursor if it moves outside of the graph window
 	  _divSprite.addEventListener(MouseEvent.MOUSE_OUT, function (event:MouseEvent):void {
-	  	CursorManager.removeAllCursors();
+          _cursor.setState(Cursor.STATE_DEFAULT);
+          //CursorManager.removeAllCursors();
 	  });
 	  
       addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
@@ -730,12 +727,10 @@ package multigraph {
 
         axes[i].panConfig.setConfig(_config.value(axistag, i, 'pan', '@allowed'),
                                     _config.value(axistag, i, 'pan', '@min'),
-                                    _config.value(axistag, i, 'pan', '@max'));
+                                    _config.value(axistag, i, 'pan', '@max'))
                                        
           axes[i].zoomConfig.setConfig(_config.value(axistag, i, 'zoom', '@allowed'),
-                                       _config.value(axistag, i, 'zoom', '@anchor'),
-                                       _config.value(axistag, i, 'zoom', '@min'),
-                                       _config.value(axistag, i, 'zoom', '@max'));
+                                       _config.value(axistag, i, 'zoom', '@anchor'));
                                        
         // Setup the axis controls
         var axisControlsVisible:String = _config.value(axistag, i, 'axiscontrols', '@visible');
@@ -939,41 +934,43 @@ package multigraph {
     public function onMouseDown(event:MouseEvent):void {
       stage.focus = this;
       delegateMouseEventToAxis('handleMouseDown', event);
-      
+      /*
       if (_toolbarState != "zoom") {
       	this.cursorManager.removeAllCursors();
       	if (event.localX > _axisSprite.x && event.localX < _plotBox.width + _plotMargin.left) {
       		if (event.localY > _axisSprite.y && event.localY < _plotBox.height + _plotMargin.bottom) {
-            	this.cursorManager.setCursor(mouseCursorGrabbing);
+            	this.cursorManager.setCursor(mouseCursorHandClosed);
       		} 
       	}
       }
+      */
     }
         
     public function onMouseUp(event:MouseEvent):void {
       delegateMouseEventToAxis('handleMouseUp', event);
-      
+      /*
       if (_toolbarState != "zoom") {
       	this.cursorManager.removeAllCursors();
       	if (event.localX > _axisSprite.x && event.localX < _plotBox.width + _plotMargin.left) {
       		if (event.localY > _axisSprite.y && event.localY < _plotBox.height + _plotMargin.bottom) {
-            	this.cursorManager.setCursor(mouseCursorGrab);
+            	this.cursorManager.setCursor(mouseCursorHandOpen);
       		} 
       	}
       } 
+      */
     }
 
     public function onMouseMove(event:MouseEvent):void {
       delegateMouseEventToAxis('handleMouseMove', event);
-     
+      /*
       if (!event.buttonDown && _toolbarState != "zoom") {
       	this.cursorManager.removeAllCursors();
       	if (event.localX > _axisSprite.x && event.localX < _plotBox.width + _plotMargin.left) {
           if (event.localY > _axisSprite.y && event.localY < _plotBox.height + _plotMargin.bottom) {
           	if (event.buttonDown)
-              this.cursorManager.setCursor(mouseCursorGrabbing);
+              this.cursorManager.setCursor(mouseCursorHandClosed);
           	else 
-      	      this.cursorManager.setCursor(mouseCursorGrab);
+      	      this.cursorManager.setCursor(mouseCursorHandOpen);
       	  } else {
       	  	this.cursorManager.removeAllCursors();
       	  }	
@@ -981,10 +978,12 @@ package multigraph {
       	  this.cursorManager.removeAllCursors();
       	}	
       }
+      */
     }
 
     public function onMouseOut(event:MouseEvent):void {
       delegateMouseEventToAxis('handleMouseOut', event);
+      _cursor.setState(Cursor.STATE_DEFAULT);
     }
 
     private var _aCharCode:uint = 'a'.charCodeAt();

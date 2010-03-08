@@ -2,6 +2,7 @@
   <plotarea marginleft="50"/>
  <horizontalaxis id="Year" min="1900" max="2000">
    <grid/>
+   <zoom min="5" max="200"/>
  </horizontalaxis>
  <verticalaxis id="tempanomoly" type="number" min="-1" max="1">
    <labels format="%.2f"  start="0" spacing="50 20 10 5 2 1 0.5 0.2 0.1 0.05 0.02 0.01"/>
