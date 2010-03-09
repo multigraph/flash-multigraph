@@ -13,6 +13,7 @@ package multigraph.renderer {
 	
 	import multigraph.Axis;
 	import multigraph.MultigraphUIComponent;
+  import multigraph.parsecolor;
 	
   public class PointLine extends Renderer
   {
@@ -56,7 +57,7 @@ package multigraph.renderer {
     
     public function set linecolor(color:String):void {
     	_linecolor_str = color;
-    	_linecolor = parseColor(color);
+    	_linecolor = parsecolor(color);
     }
     public function get linecolor():String {
     	return _linecolor_str;
@@ -64,7 +65,7 @@ package multigraph.renderer {
     
     public function set pointcolor(color:String):void {
     	_pointcolor_str = color;
-    	_pointcolor = parseColor(color);
+    	_pointcolor = parsecolor(color);
     }
     public function get pointcolor():String {
     	return _pointcolor_str;
@@ -72,7 +73,7 @@ package multigraph.renderer {
 
     public function set pointoutlinecolor(color:String):void {
     	_pointoutlinecolor_str = color;
-    	_pointoutlinecolor = parseColor(color);
+    	_pointoutlinecolor = parsecolor(color);
     }
     public function get pointoutlinecolor():String {
     	return _pointoutlinecolor_str;

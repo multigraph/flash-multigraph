@@ -12,6 +12,7 @@ package multigraph.renderer
 	
 	import multigraph.Axis;
 	import multigraph.MultigraphUIComponent;
+    import multigraph.parsecolor;
 
 	public class Fill extends Renderer
 	{
@@ -42,13 +43,13 @@ package multigraph.renderer
 		public function get fillcolor():String { return _fillcolor+''; }
 		public function set fillcolor(color:String):void {
 			_fillcolor_str = color; 
-			_fillcolor = parseColor(color);
+			_fillcolor = parsecolor(color);
 		}
 		
 		public function get linecolor():String { return _linecolor+''; }
 		public function set linecolor(color:String):void {
 			_linecolor_str = color;
-			_linecolor = parseColor(color);
+			_linecolor = parsecolor(color);
 		}
 		
 		public function get fillopacity ():String { return _fillopacity+''; }

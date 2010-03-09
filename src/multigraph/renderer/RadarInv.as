@@ -14,6 +14,7 @@ package multigraph.renderer {
 	import multigraph.Axis;
 	import multigraph.TextLabel;
 	import multigraph.format.DateFormatter;
+  import multigraph.parsecolor;
 	
 	import mx.controls.Button;
 	

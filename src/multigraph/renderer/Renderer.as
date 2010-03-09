@@ -9,6 +9,7 @@
 package multigraph.renderer {
 	import multigraph.Axis;
 	import multigraph.MultigraphUIComponent;
+	import multigraph.parsecolor;
 
   public class Renderer
   {
@@ -108,6 +109,7 @@ package multigraph.renderer {
     * experienced users will probably want to supply a hex set for a specific color. The follow function 
     * takes several popular color names and returns the hex uint code for that color.
     * */
+    /*
     protected function parseColor(color:String):uint {
 		switch(color) {
 			case "black":   return 0x000000;
@@ -128,6 +130,7 @@ package multigraph.renderer {
 		}
 		return uint(color);
 	}
+    */
 
   	public function transformPoint(output:Array, input:Array):void {
 		output[0] = _haxis.dataValueToAxisValue(input[0]);

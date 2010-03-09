@@ -20,6 +20,7 @@ package multigraph {
   import multigraph.debug.NetworkMonitor;
   import multigraph.format.*;
   import multigraph.renderer.*;
+  import multigraph.parsecolor;
   
   import mx.controls.*;
   import mx.core.UIComponent;
@@ -40,6 +41,8 @@ package multigraph {
     private var _border       : Insets;
     private var _padding      : Insets;
     private var _plotMargin   : Insets;
+    private var _plotareaBorder : Number;
+    private var _plotareaBorderColor : uint;
     private var _window       : Box;
     private var _paddingBox   : Box;
     private var _plotBox      : Box;
@@ -277,6 +280,9 @@ package multigraph {
                               _config.value('plotarea', '@marginleft'),
                               _config.value('plotarea', '@marginbottom'),
                               _config.value('plotarea', '@marginright'));
+
+      _plotareaBorder = _config.value('plotarea', '@border');
+      _plotareaBorderColor = parsecolor( _config.value('plotarea', '@bordercolor') );
 
       _plotBox = new Box(_paddingBox.width - ( _plotMargin.left + _plotMargin.right),
                          _paddingBox.height - ( _plotMargin.top + _plotMargin.bottom ));
@@ -542,8 +548,8 @@ package multigraph {
       var legendBorder:Number    = _config.value('legend', 0, '@border');    
       var legendRows:Number      = _config.value('legend', 0, '@rows');     
       var legendColumns:Number   = _config.value('legend', 0, '@columns');
-      var legendBgColor:uint     = _config.value('legend', 0, '@color');
-      var legendBorderColor:uint = _config.value('legend', 0, '@bordercolor');
+      var legendBgColor:uint     = parsecolor( _config.value('legend', 0, '@color') );
+      var legendBorderColor:uint = parsecolor( _config.value('legend', 0, '@bordercolor') );
       var legendOpacity:Number   = _config.value('legend', 0, '@opacity');
       var legendRadius:Number    = _config.value('legend', 0, '@cornerradius');
       var icon:Object = {
@@ -590,8 +596,8 @@ package multigraph {
       var titleBase:Array       = _config.value('title', 0, '@base').split(" ");
       var titleFrame:String     = _config.value('title', 0, '@frame');
       var titleBorder:Number    = _config.value('title', 0, '@border');    
-      var titleBgColor:uint     = _config.value('title', 0, '@color');
-      var titleBorderColor:uint = _config.value('title', 0, '@bordercolor');
+      var titleBgColor:uint     = parsecolor( _config.value('title', 0, '@color') );
+      var titleBorderColor:uint = parsecolor( _config.value('title', 0, '@bordercolor') );
       var titleOpacity:Number   = _config.value('title', 0, '@opacity');
       var titleFontSize:uint    = _config.value('title', 0, '@fontsize');
       var titlePadding:Number   = _config.value('title', 0, '@padding');
@@ -704,8 +710,7 @@ package multigraph {
         var labelAnchor:PixelPoint;
 
         var grid:Boolean = (_config.xmlvalue(axistag,i,'grid') != null);
-        var gridColorString:String = _config.value(axistag,i,'grid','@color');
-        var gridColor:uint = uint(gridColorString);
+        var gridColor:uint = parsecolor( _config.value(axistag,i,'grid','@color') );
 
         axes[i] = new axisType(id,
                                this,
@@ -1094,21 +1099,34 @@ package multigraph {
       // clear out the axis sprite
       _axisSprite.graphics.clear();
       while (_axisSprite.numChildren) { _axisSprite.removeChildAt(0); }
-      
-      // render the axes
-      for (i=0; i<_haxes.length; ++i) {
-        _haxes[i].render(_axisSprite);
-      }
-      for (i=0; i<_vaxes.length; ++i) {
-        _vaxes[i].render(_axisSprite);
-      }
-      
+
+
       // clear out the plotBox sprite
       _plotBoxSprite.graphics.clear();
-      
-      // don't need this yet, but might in the future:
-      //while (_plotBoxSprite.numChildren) { _plotBoxSprite.removeChildAt(0); }
       while (_plotBoxSprite.numChildren) { _plotBoxSprite.removeChildAt(0); }
+
+      // draw the plotbox border, if any, in the padding box, so that its full linewidth shows up (if we draw
+      // it in the plotbox, it gets clipped to the plotbox)
+      if (_plotareaBorder > 0) {
+        _paddingBoxSprite.graphics.lineStyle(_plotareaBorder, _plotareaBorderColor, 1);
+        _paddingBoxSprite.graphics.drawRect(_plotMargin.left, _plotMargin.bottom, _plotBox.width, _plotBox.height);
+      }
+
+      // render the axes' grid lines (axis render "step 0")
+      for (i=0; i<_haxes.length; ++i) {
+        _haxes[i].render(_axisSprite, 0);
+      }
+      for (i=0; i<_vaxes.length; ++i) {
+        _vaxes[i].render(_axisSprite, 0);
+      }
+
+      // render the axes themselves: (axis render "step 1")
+      for (i=0; i<_haxes.length; ++i) {
+        _haxes[i].render(_axisSprite, 1);
+      }
+      for (i=0; i<_vaxes.length; ++i) {
+        _vaxes[i].render(_axisSprite, 1);
+      }
       
       // render the plots
       for (i=0; i<_plots.length; ++i) {

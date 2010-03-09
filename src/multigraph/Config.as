@@ -206,10 +206,12 @@ package multigraph
                 fontsize : 18
             },
             plotarea : {
-                marginbottom : 35,
-                marginleft   : 38,
-                margintop    : 10,
-                marginright  : 35
+              border : 0,
+              bordercolor : '0xeeeeee',
+              marginbottom : 35,
+              marginleft   : 38,
+              margintop    : 10,
+              marginright  : 35
             },
             data : {
                 variables : {

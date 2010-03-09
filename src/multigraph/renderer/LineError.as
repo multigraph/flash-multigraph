@@ -11,6 +11,7 @@ package multigraph.renderer {
 	
 	import multigraph.Axis;
 	import multigraph.MultigraphUIComponent;
+  import multigraph.parsecolor;
 	
   public class LineError extends Renderer
   {
@@ -37,7 +38,7 @@ package multigraph.renderer {
     
     public function set linecolor(color:String):void {
     	_linecolor_str = color;
-    	_linecolor = parseColor(color);
+    	_linecolor = parsecolor(color);
     }
     public function get linecolor():String {
     	return _linecolor_str;
@@ -45,7 +46,7 @@ package multigraph.renderer {
     
     public function set dotcolor(color:String):void {
     	_dotcolor_str = color;
-    	_dotcolor = parseColor(color);
+    	_dotcolor = parsecolor(color);
     }
     public function get dotcolor():String {
     	return _dotcolor_str;

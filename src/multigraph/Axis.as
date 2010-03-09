@@ -9,6 +9,11 @@
 package multigraph {
   import flash.events.KeyboardEvent;
   import flash.events.MouseEvent;
+  import flash.display.Graphics;
+  import flash.text.TextField;
+  import flash.text.TextFieldAutoSize;
+  import flash.text.TextFormat;
+  import flash.text.TextFormatAlign;
   
   import multigraph.format.*;
   
@@ -177,6 +182,8 @@ package multigraph {
 	public function get hasAxisControls():Boolean { return _hasAxisControls; }
 	public function set hasAxisControls(condition:Boolean):void { _hasAxisControls = condition; } 
 
+    private var _textFormat:TextFormat;
+
     public function Axis(id:String, graph:Graph, length:int, offset:int, position:int, type:int,
 		   				 _color:uint,
 						 min:String, minoffset:int, max:String, maxoffset:int,
@@ -237,6 +244,12 @@ package multigraph {
       _panConfig = new PanConfig('allowed', null, null, this);
       _zoomConfig = new ZoomConfig('allowed', null, null, null, this);
 
+      _textFormat = new TextFormat(  );
+      _textFormat.font = "DefaultFont";
+      _textFormat.color = 0x000000;
+      _textFormat.size = 12;
+      _textFormat.align = TextFormatAlign.LEFT;
+
     }
     
     public function parse(string:String):Number {
@@ -288,7 +301,94 @@ package multigraph {
       return (V - _minOffset - _offset) / _axisToDataRatio + _dataMin;
     }
 
-    public function render(s:MultigraphUIComponent):void {}
+    public function render(sprite:MultigraphUIComponent, step:int):void {
+      // Render this axis in the given sprite.  Step is an integer
+      // that says which step of the rendering should be done. There
+      // are currently two steps: step 0, which consists of rendering
+      // the axis's grid lines, and step 1, which renders everything
+      // else.  These are separated into two steps so that all of a
+      // graph's axis' grid lines can be rendered before any of the
+      // axes themselves, in order to insure that no grid lines lie on
+      // top of any axes.
+      var g:Graphics = sprite.graphics;
+
+      switch (step) {
+      case 0:  // in step 0, render the grid lines associated with this axis, if any
+        prepareRender();
+        if (grid) {
+          if (labelers.length > 0 && _density <= 1.5) {
+            _labeler.prepare(dataMin, dataMax);
+            while (_labeler.hasNext()) {
+              var v:Number = _labeler.next();
+              var a:Number = dataValueToAxisValue(v);
+              g.lineStyle(1, gridColor, 1);
+              if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
+                g.moveTo(a, position);
+                g.lineTo(a, graph.plotBox.height - position);
+              } else {
+                g.moveTo(position, a);
+                g.lineTo(graph.plotBox.width - position, a);
+              }
+            }
+          }
+        }
+        break;
+
+      default:
+      case 1:  // in step 1, render everything else
+        // render the axis itself:
+        if (this.selected) {
+          g.lineStyle(3,0,1);
+        } else {
+          g.lineStyle(1,0,1);
+        }
+        if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
+          g.moveTo(offset, position);
+          g.lineTo(offset + length, position);
+        } else {
+          g.moveTo(position, offset);
+          g.lineTo(position, offset + length);
+        }
+
+        // render the axis title
+        if (title != null) {
+          if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
+            sprite.addChild(new TextLabel(title,
+                                          _textFormat,
+                                          offset + length / 2 + titlePx,  position + titlePy,
+                                          titleAx, titleAy,
+                                          titleAngle));
+          } else {
+            sprite.addChild(new TextLabel(title,
+                                          _textFormat,
+                                          position + titlePx,  offset + length / 2 + titlePy,
+                                          titleAx, titleAy,
+                                          titleAngle));
+          }
+        }
+
+        // render the tick marks and labels
+        if (labelers.length > 0 && _density <= 1.5) {
+          _labeler.prepare(dataMin, dataMax);
+          while (_labeler.hasNext()) {
+            var v:Number = _labeler.next();
+            var a:Number = dataValueToAxisValue(v);
+            g.lineStyle(1,0,1);
+            if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
+              g.moveTo(a, position+3);
+              g.lineTo(a, position-3);
+            } else {
+              g.moveTo(position-3, a);
+              g.lineTo(position+3, a);
+            }
+            _labeler.renderLabel(sprite, this, v);
+          }
+        }
+        break;
+      }
+
+    }
+
 
     public function addLabeler(labeler:Labeler):void {
       _labelers.push(labeler);
@@ -485,5 +585,29 @@ package multigraph {
     public static function getInstanceById(id:String):Axis {
       return _s_instances[id];
     }
+
+
+
+    public var _labeler:Labeler;
+    public var _density:Number;
+    public function prepareRender() {
+      // Decide which labeler to use: take the one with the largest density <= 0.8.
+      // Unless all have density > 0.8, in which case we take the first one.  This assumes
+      // that the labelers list is ordered in increasing order of label density.
+      // This function sets the _labeler and _density private properties.
+      _labeler = labelers[0];
+      _density = _labeler.labelDensity(this);
+      if (_density < 0.8) {
+        for (var i:uint = 1; i < _labelers.length; i++) {
+          var density:Number = labelers[i].labelDensity(this);
+          if (density > 0.8) { break; }
+          _labeler = labelers[i];
+          _density = density;
+        }
+      }
+    }
+
+
+
   }
 }

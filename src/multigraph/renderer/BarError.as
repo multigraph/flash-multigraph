@@ -15,6 +15,7 @@ package multigraph.renderer
   import multigraph.HorizontalAxis;
   import multigraph.NumberAndUnit;
   import multigraph.VerticalAxis;
+  import multigraph.parsecolor;
     
   public class BarError extends Renderer
   {
@@ -57,19 +58,19 @@ package multigraph.renderer
     public function get fillcolor ():String { return _fillcolor_str; }
     public function set fillcolor (color:String):void {
       _fillcolor_str = color;
-      _fillcolor = parseColor(color); 
+      _fillcolor = parsecolor(color); 
     }
         
     public function get downfillcolor ():String { return _downfillcolor_str; }
     public function set downfillcolor (color:String):void {
       _downfillcolor_str = color;
-      _downfillcolor = parseColor(color); 
+      _downfillcolor = parsecolor(color); 
     }
         
     public function get linecolor ():String { return _linecolor_str; }
     public function set linecolor (color:String):void {
       _linecolor_str = color; 
-      _linecolor = parseColor(color);
+      _linecolor = parsecolor(color);
     }
         
     public function get barwidth ():String { return _barwidth; }

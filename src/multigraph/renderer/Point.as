@@ -11,6 +11,7 @@ package multigraph.renderer {
 	
 	import multigraph.Axis;
 	import multigraph.MultigraphUIComponent;
+  import multigraph.parsecolor;
 	
   public class Point extends PointLine
   {
