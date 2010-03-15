@@ -1,10 +1,10 @@
 <mugl>
-  <plotarea marginleft="50" border="1"/>
- <horizontalaxis position="" id="Year" min="1900" max="2000">
+  <plotarea marginleft="50" border="1" bordercolor="0x000000"/>
+ <horizontalaxis position="0" id="Year" min="1900" max="2000">
    <zoom min="5" max="200"/>
    <grid/>
  </horizontalaxis>
- <verticalaxis position="" id="tempanomoly" type="number" min="-1" max="1">
+ <verticalaxis position="0" id="tempanomoly" type="number" min="-1" max="1">
    <labels format="%.2f"  start="0" spacing="50 20 10 5 2 1 0.5 0.2 0.1 0.05 0.02 0.01"/>
    <title angle="90" position="-40 0" anchor="0 -1">Temperature Anomaly (C)</title>
    <grid/>

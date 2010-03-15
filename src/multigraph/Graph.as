@@ -79,7 +79,14 @@ package multigraph {
     private var _axisControlSprite:MultigraphUIComponent;
     private var _paddingBoxSprite:MultigraphUIComponent;
     private var _plotBoxSprite:MultigraphUIComponent;
-    private var _axisSprite:MultigraphUIComponent;
+    // There are 2 axis sprites: one below the plotBoxSprite, and one
+    // above.  The one below (_axisSprite1) is where the axis grid
+    // lines are drawn, so they appear below the data.  The one above
+    // (_axisSprite2) is where the axes themselves, and their labels &
+    // tic marks, appear, so that these things are drawn on top of the
+    // data.
+    private var _axisSprite1:MultigraphUIComponent;
+    private var _axisSprite2:MultigraphUIComponent;
 
     private var _graphWidth:Number;
     private var _graphHeight:Number;
@@ -337,11 +344,11 @@ package multigraph {
       _paddingBoxSprite.x = _windowMargin.left + _border.left + _padding.left;
       _paddingBoxSprite.y = _windowMargin.bottom + _border.bottom + _padding.bottom;
 
-      _axisSprite = new MultigraphUIComponent();
-      _axisSprite.x = _plotMargin.left;
-      _axisSprite.y = _plotMargin.bottom;
+      _axisSprite1 = new MultigraphUIComponent();
+      _axisSprite1.x = _plotMargin.left;
+      _axisSprite1.y = _plotMargin.bottom;
       
-      _paddingBoxSprite.addChild(_axisSprite);
+      _paddingBoxSprite.addChild(_axisSprite1);
 
       var plotBoxMask:Shape = new Shape();
       plotBoxMask.graphics.beginFill(0x000000);
@@ -355,6 +362,12 @@ package multigraph {
       _plotBoxSprite.mask = plotBoxMask;
       _plotBoxSprite.x = _plotMargin.left;
       _plotBoxSprite.y = _plotMargin.bottom;
+
+      _axisSprite2 = new MultigraphUIComponent();
+      _axisSprite2.x = _plotMargin.left;
+      _axisSprite2.y = _plotMargin.bottom;
+      _paddingBoxSprite.addChild(_axisSprite2);
+
       
       var numDataSections:int = _config.xmlvalue('data').length();
       var vars:Array;
@@ -947,8 +960,8 @@ package multigraph {
       
       if (_toolbarState != "zoom") {
       	this.cursorManager.removeAllCursors();
-      	if (event.localX > _axisSprite.x && event.localX < _plotBox.width + _plotMargin.left) {
-      		if (event.localY > _axisSprite.y && event.localY < _plotBox.height + _plotMargin.bottom) {
+      	if (event.localX > _axisSprite1.x && event.localX < _plotBox.width + _plotMargin.left) {
+      		if (event.localY > _axisSprite1.y && event.localY < _plotBox.height + _plotMargin.bottom) {
             	this.cursorManager.setCursor(mouseCursorGrabbing);
       		} 
       	}
@@ -960,8 +973,8 @@ package multigraph {
       
       if (_toolbarState != "zoom") {
       	this.cursorManager.removeAllCursors();
-      	if (event.localX > _axisSprite.x && event.localX < _plotBox.width + _plotMargin.left) {
-      		if (event.localY > _axisSprite.y && event.localY < _plotBox.height + _plotMargin.bottom) {
+      	if (event.localX > _axisSprite1.x && event.localX < _plotBox.width + _plotMargin.left) {
+      		if (event.localY > _axisSprite1.y && event.localY < _plotBox.height + _plotMargin.bottom) {
             	this.cursorManager.setCursor(mouseCursorGrab);
       		} 
       	}
@@ -973,8 +986,8 @@ package multigraph {
      
       if (!event.buttonDown && _toolbarState != "zoom") {
       	this.cursorManager.removeAllCursors();
-      	if (event.localX > _axisSprite.x && event.localX < _plotBox.width + _plotMargin.left) {
-          if (event.localY > _axisSprite.y && event.localY < _plotBox.height + _plotMargin.bottom) {
+      	if (event.localX > _axisSprite1.x && event.localX < _plotBox.width + _plotMargin.left) {
+          if (event.localY > _axisSprite1.y && event.localY < _plotBox.height + _plotMargin.bottom) {
           	if (event.buttonDown)
               this.cursorManager.setCursor(mouseCursorGrabbing);
           	else 
@@ -1096,10 +1109,12 @@ package multigraph {
         }
       }
    
-      // clear out the axis sprite
-      _axisSprite.graphics.clear();
-      while (_axisSprite.numChildren) { _axisSprite.removeChildAt(0); }
+      // clear out the axis sprites
+      _axisSprite1.graphics.clear();
+      while (_axisSprite1.numChildren) { _axisSprite1.removeChildAt(0); }
 
+      _axisSprite2.graphics.clear();
+      while (_axisSprite2.numChildren) { _axisSprite2.removeChildAt(0); }
 
       // clear out the plotBox sprite
       _plotBoxSprite.graphics.clear();
@@ -1108,31 +1123,32 @@ package multigraph {
       // draw the plotbox border, if any, in the padding box, so that its full linewidth shows up (if we draw
       // it in the plotbox, it gets clipped to the plotbox)
       if (_plotareaBorder > 0) {
-        _paddingBoxSprite.graphics.lineStyle(_plotareaBorder, _plotareaBorderColor, 1);
-        _paddingBoxSprite.graphics.drawRect(_plotMargin.left, _plotMargin.bottom, _plotBox.width, _plotBox.height);
+        _axisSprite2.graphics.lineStyle(_plotareaBorder, _plotareaBorderColor, 1);
+        _axisSprite2.graphics.drawRect(0, 0, _plotBox.width, _plotBox.height);
       }
 
       // render the axes' grid lines (axis render "step 0")
       for (i=0; i<_haxes.length; ++i) {
-        _haxes[i].render(_axisSprite, 0);
+        _haxes[i].render(_axisSprite1, 0);
       }
       for (i=0; i<_vaxes.length; ++i) {
-        _vaxes[i].render(_axisSprite, 0);
+        _vaxes[i].render(_axisSprite1, 0);
       }
 
-      // render the axes themselves: (axis render "step 1")
-      for (i=0; i<_haxes.length; ++i) {
-        _haxes[i].render(_axisSprite, 1);
-      }
-      for (i=0; i<_vaxes.length; ++i) {
-        _vaxes[i].render(_axisSprite, 1);
-      }
-      
+     
       // render the plots
       for (i=0; i<_plots.length; ++i) {
         _plots[i].render(_plotBoxSprite);
       }
       
+      // render the axes themselves: (axis render "step 1")
+      for (i=0; i<_haxes.length; ++i) {
+        _haxes[i].render(_axisSprite2, 1);
+      }
+      for (i=0; i<_vaxes.length; ++i) {
+        _vaxes[i].render(_axisSprite2, 1);
+      }
+
       // render the legend
       if (_legend!=null) {
         _legend.render(_paddingBoxSprite, _plotBoxSprite);
