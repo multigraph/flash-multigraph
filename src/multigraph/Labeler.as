@@ -8,6 +8,8 @@
  */
 package multigraph
 {
+    import flash.text.TextFormat;
+  
 	public class Labeler
 	{
       protected var _spacing:Number;  // Number of axis relative spaces to place labels
@@ -19,6 +21,9 @@ package multigraph
       protected var _angle:Number;    // The angle of the label relative to its anchor point in degrees           
       protected var _ax:Number;       // x anchor point to a theoretical box around a label
       protected var _ay:Number;       // y anchor point to a theoretical box around a label
+
+      protected var _fontSize:int;
+      protected var _textFormat:TextFormat;
       
       public function Labeler(spacing:Number, unit:String, formatString:String, start:Number, px:Number, py:Number, angle:Number, ax:Number, ay:Number) {
         _spacing = spacing;
@@ -30,6 +35,12 @@ package multigraph
         _angle  = angle;
         _ax     = ax;
         _ay     = ay;
+
+        _fontSize            = 12;
+    	_textFormat = new TextFormat(  );
+		_textFormat.font = "DefaultFont";
+		_textFormat.color = 0x000000;
+		_textFormat.size = _fontSize;
       }
       
       public function labelDensity(axis:Axis):Number { return 0; }
@@ -37,6 +48,7 @@ package multigraph
 	  public function prepare(dataMin:Number, dataMax:Number):void {}
 	  public function hasNext():Boolean { return true; }
 	  public function next():Number { return 0; }
+      public function set textFormat(newTextFormat:TextFormat) { _textFormat = newTextFormat; }
 	}
 }
 

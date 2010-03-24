@@ -15,8 +15,6 @@ package multigraph
     public class NumberLabeler extends Labeler
     {
       private var _formatter:NumberFormatter;
-      private var _textFormat:TextFormat;
-      private var _fontSize:int;
       
       private var _current:Number;
       private var _end:Number;
@@ -31,7 +29,6 @@ package multigraph
       public function NumberLabeler(spacing:Number, unit:String, formatString:String, start:Number,
                                     px:Number, py:Number, angle:Number, ax:Number, ay:Number) {
         super(spacing, unit, formatString, start, px, py, angle, ax, ay);
-        _fontSize            = 12;
         _current             = 0;
         _end                 = 0;
         _spacingPixels       = 0;
@@ -39,11 +36,6 @@ package multigraph
         _pixelsPerInchFactor = 60.0/ 72.0;
         _formatter           = new NumberFormatter(formatString);
         
-    	_textFormat = new TextFormat(  );
-		_textFormat.font = "DefaultFont";
-		_textFormat.color = 0x000000;
-		_textFormat.size = _fontSize;
-
       }
 
   	  override public function labelDensity(axis:Axis):Number {

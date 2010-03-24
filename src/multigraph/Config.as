@@ -66,6 +66,10 @@ package multigraph
             minoffset : 0,
             max       : 'auto',
             maxoffset : 0,
+            linewidth : 1,
+            tickmin   : -3,
+            tickmax   : 3,
+            highlightstyle : "axis",
             title : {
                 angle : 0,
                 position : function(...args):String {

@@ -4,10 +4,33 @@
 <!-- creationComplete="init()" -->
 
     <mx:Style>
+<!--
+  **        
+  ** @font-face {
+  **     src: url("location") | local("name");
+  **     fontFamily: alias;
+  **     [fontStyle: normal | italic | oblique;]
+  **     [fontWeight: normal | bold | heavy;]
+  **     [advancedAntiAliasing: true | false;]
+  ** }
+  **        
+  -->
+
       @font-face
       {
 		font-family: DefaultFont;
         src: url("../../fonts/TIMES.TTF");
+      }
+      @font-face
+      {
+		font-family: SansFont;
+        src: url("../../fonts/myriadweb.ttf");
+      }
+      @font-face
+      {
+		font-family: SansBoldFont;
+        src: url("../../fonts/myriadwebbol.ttf");
+        font-weight: bold;
       }
       .defaultBoldStyle {
         font-family: DefaultFont;

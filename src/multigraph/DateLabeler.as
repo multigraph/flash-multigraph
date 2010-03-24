@@ -14,11 +14,9 @@ package multigraph
 	
 	public class DateLabeler extends Labeler
 	{
-		private var _fontSize:uint;
 		private var _current:Number;
 		private var _end:Number;
 		private var _formatter:DateFormatter;
-		private var _textFormat:TextFormat;
 		
 		private var _msSpacing:Number;
 		private var _spacingPixels:Number;
@@ -40,11 +38,6 @@ package multigraph
 			_spacingPixels 		 = 0;
 			_labelWidthPixels 	 = 0;
 			_pixelsPerInchFactor = 0.8 * (60.0 / 72.0);
-			
-			_textFormat = new TextFormat();
-			_textFormat.font = "DefaultFont";
-			_textFormat.color = 0x000000;
-			_textFormat.size = _fontSize;
 			
 			switch(unit){
 	        case "H":

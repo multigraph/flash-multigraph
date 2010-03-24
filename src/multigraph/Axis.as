@@ -173,6 +173,22 @@ package multigraph {
 
 	private var _color:uint = 0x000000;
 	public function get color():uint { return _color; }
+
+    private var _lineWidth:int;
+    public function get lineWidth():int { return _lineWidth; }
+	
+    private var _tickMin:int;
+    public function get tickMin():int { return _tickMin; }
+	
+    private var _tickMax:int;
+    public function get tickMax():int { return _tickMax; }
+	
+    public static var HIGHLIGHT_AXIS:int = 1;
+    public static var HIGHLIGHT_LABELS:int = 2;
+    public static var HIGHLIGHT_ALL:int = 3;
+
+    private var _highlightStyle:int;
+    public function get highlightStyle():int { return _highlightStyle; }
 	
 	private var _axisControl:AxisControls = null;
 	public function get axisControl():AxisControls { return _axisControl; }
@@ -183,6 +199,7 @@ package multigraph {
 	public function set hasAxisControls(condition:Boolean):void { _hasAxisControls = condition; } 
 
     private var _textFormat:TextFormat;
+    private var _boldTextFormat:TextFormat;
 
     public function Axis(id:String, graph:Graph, length:int, offset:int, position:int, type:int,
 		   				 _color:uint,
@@ -192,7 +209,11 @@ package multigraph {
                          titleAx:Number, titleAy:Number,
                          titleAngle:Number,
 						 grid:Boolean,
-						 gridColor:uint
+						 gridColor:uint,
+                         lineWidth:int,
+                         tickMin:int,
+                         tickMax:int,
+                         highlightStyle:int
 						 )   {
       _id              = id;
       _s_instances[id] = this;
@@ -212,6 +233,10 @@ package multigraph {
 	  _grid            = grid;
 	  _gridColor       = gridColor;
 	  _color           = color;
+      _lineWidth       = lineWidth;
+      _tickMin		   = tickMin;
+      _tickMax		   = tickMax;
+      _highlightStyle  = highlightStyle;
 
 	  if (title == null) { _title = _id; }
       if (_title == '') { _title = null; }
@@ -245,10 +270,17 @@ package multigraph {
       _zoomConfig = new ZoomConfig('allowed', null, null, null, this);
 
       _textFormat = new TextFormat(  );
-      _textFormat.font = "DefaultFont";
+      //_textFormat.font = "DefaultFont";
+      _textFormat.font = "SansFont";
       _textFormat.color = 0x000000;
       _textFormat.size = 12;
       _textFormat.align = TextFormatAlign.LEFT;
+
+      _boldTextFormat = new TextFormat(  );
+      _boldTextFormat.font = "SansBoldFont";
+      _boldTextFormat.color = 0x000000;
+      _boldTextFormat.size = 12;
+      _boldTextFormat.align = TextFormatAlign.LEFT;
 
     }
     
@@ -312,12 +344,18 @@ package multigraph {
       // top of any axes.
       var g:Graphics = sprite.graphics;
 
+      var textFormat:TextFormat = ( this.selected && (_highlightStyle==Axis.HIGHLIGHT_LABELS || _highlightStyle==Axis.HIGHLIGHT_ALL)
+                                    ? _boldTextFormat
+                                    : _textFormat
+                                    );
+
       switch (step) {
       case 0:  // in step 0, render the grid lines associated with this axis, if any
         prepareRender();
         if (grid) {
           if (labelers.length > 0 && _density <= 1.5) {
             _labeler.prepare(dataMin, dataMax);
+            _labeler.textFormat = textFormat;
             while (_labeler.hasNext()) {
               var v:Number = _labeler.next();
               var a:Number = dataValueToAxisValue(v);
@@ -337,30 +375,32 @@ package multigraph {
       default:
       case 1:  // in step 1, render everything else
         // render the axis itself:
-        if (this.selected) {
-          g.lineStyle(3,0,1);
-        } else {
-          g.lineStyle(1,0,1);
-        }
-        if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-          g.moveTo(offset, position);
-          g.lineTo(offset + length, position);
-        } else {
-          g.moveTo(position, offset);
-          g.lineTo(position, offset + length);
+        if (_lineWidth > 0) {
+          if (this.selected && (_highlightStyle==Axis.HIGHLIGHT_AXIS || _highlightStyle==Axis.HIGHLIGHT_ALL)) {
+            g.lineStyle(_lineWidth+3,0,1);
+          } else {
+            g.lineStyle(_lineWidth,0,1);
+          }
+          if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
+            g.moveTo(offset, position);
+            g.lineTo(offset + length, position);
+          } else {
+            g.moveTo(position, offset);
+            g.lineTo(position, offset + length);
+          }
         }
 
         // render the axis title
         if (title != null) {
           if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
             sprite.addChild(new TextLabel(title,
-                                          _textFormat,
+                                          textFormat,
                                           offset + length / 2 + titlePx,  position + titlePy,
                                           titleAx, titleAy,
                                           titleAngle));
           } else {
             sprite.addChild(new TextLabel(title,
-                                          _textFormat,
+                                          textFormat,
                                           position + titlePx,  offset + length / 2 + titlePy,
                                           titleAx, titleAy,
                                           titleAngle));
@@ -369,17 +409,22 @@ package multigraph {
 
         // render the tick marks and labels
         if (labelers.length > 0 && _density <= 1.5) {
+          var tickThickness:int = 1;
+          if (this.selected && (_highlightStyle==Axis.HIGHLIGHT_LABELS || _highlightStyle==Axis.HIGHLIGHT_ALL)) {
+            tickThickness = 3;
+          }
           _labeler.prepare(dataMin, dataMax);
+          _labeler.textFormat = textFormat;
           while (_labeler.hasNext()) {
             var v:Number = _labeler.next();
             var a:Number = dataValueToAxisValue(v);
-            g.lineStyle(1,0,1);
+            g.lineStyle(tickThickness,0,1);
             if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-              g.moveTo(a, position+3);
-              g.lineTo(a, position-3);
+              g.moveTo(a, position+_tickMax);
+              g.lineTo(a, position+_tickMin);
             } else {
-              g.moveTo(position-3, a);
-              g.lineTo(position+3, a);
+              g.moveTo(position+_tickMin, a);
+              g.lineTo(position+_tickMax, a);
             }
             _labeler.renderLabel(sprite, this, v);
           }

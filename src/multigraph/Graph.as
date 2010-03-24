@@ -32,9 +32,6 @@ package multigraph {
     import mx.core.Application;
   */
 
-  //[Embed(source="../../fonts/TIMES.TTF", fontName="DefaultFont", mimeType="application/x-font-truetype")]
-  
-  
   public class Graph extends UIComponent
   {
     private var _windowMargin : Insets;
@@ -725,6 +722,19 @@ package multigraph {
         var grid:Boolean = (_config.xmlvalue(axistag,i,'grid') != null);
         var gridColor:uint = parsecolor( _config.value(axistag,i,'grid','@color') );
 
+        var lineWidth:int = _config.value(axistag,i,'@linewidth');
+
+        var tickMin:int = _config.value(axistag,i,'@tickmin');
+        var tickMax:int = _config.value(axistag,i,'@tickmax');
+
+        var highlightStyleString:String = _config.value(axistag,i,'@highlightstyle');
+        var highlightStyle:int = Axis.HIGHLIGHT_AXIS;
+        if (highlightStyleString == "labels") {
+          highlightStyle = Axis.HIGHLIGHT_LABELS;
+        } else if (highlightStyleString == "all") {
+          highlightStyle = Axis.HIGHLIGHT_ALL;
+        }
+
         axes[i] = new axisType(id,
                                this,
                                ((axisType == HorizontalAxis) ? _plotBox.width : _plotBox.height) - pregap - postgap,
@@ -743,7 +753,11 @@ package multigraph {
                                titleAnchor.y,
                                titleAngle,
                                grid,
-                               gridColor
+                               gridColor,
+                               lineWidth,
+                               tickMin,
+                               tickMax,
+                               highlightStyle
                                );
 
         axes[i].panConfig.setConfig(_config.value(axistag, i, 'pan', '@allowed'),

@@ -28,7 +28,11 @@ package multigraph
                                    titleAx:Number, titleAy:Number,
                                    titleAngle:Number,
 								   grid:Boolean,
-								   gridColor:uint) {
+								   gridColor:uint,
+                                   lineWidth:int,
+                                   tickMin:int,
+                                   tickMax:int,
+                                   highlightStyle:int) {
       if (id == null) {
         if (_s_instance_number == 0) {
           id = 'x';
@@ -38,7 +42,8 @@ package multigraph
       }
       ++_s_instance_number;
       super(id, graph, length, offset, position, type, color, min, minoffset, max, maxoffset,
-            title, titlePx, titlePy, titleAx, titleAy, titleAngle, grid, gridColor)
+            title, titlePx, titlePy, titleAx, titleAy, titleAngle, grid, gridColor,
+            lineWidth, tickMin, tickMax, highlightStyle);
       this.orientation = Axis.ORIENTATION_HORIZONTAL;
     }
   }
