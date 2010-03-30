@@ -1,6 +1,6 @@
 Multigraph.swf: _always
 	-@mkdir bin-debug
-	mxmlc -use-network=false -compiler.show-actionscript-warnings=false -output bin-debug/MultigraphApp.swf src/MultigraphApp.mxml
+	mxmlc -use-network=false -compiler.show-actionscript-warnings=false -managers flash.fonts.AFEFontManager -output bin-debug/MultigraphApp.swf src/MultigraphApp.mxml
 	cp bin-debug/MultigraphApp.swf Multigraph.swf
 
 Multigraph.swc: _always
