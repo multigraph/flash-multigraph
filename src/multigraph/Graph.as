@@ -440,9 +440,15 @@ package multigraph {
         if (_config.value('plot', i, 'renderer', 'option') != null) {
           var noptions:int = _config.value('plot', i, 'renderer', 'option').length();
           for (var j:int=0; j<noptions; ++j) {
-            var name:String = _config.value('plot', i, 'renderer', 'option', j, '@name');
-            var value:String = _config.value('plot', i, 'renderer', 'option', j, '@value')  
+            var name:String  = _config.value('plot', i, 'renderer', 'option', j, '@name');
+            var value:String = _config.value('plot', i, 'renderer', 'option', j, '@value');
+            var min:String   = _config.value('plot', i, 'renderer', 'option', j, '@min');
+            var max:String   = _config.value('plot', i, 'renderer', 'option', j, '@max');
+            if (min != null || max != null) {
+              renderer.setRangeOption(name, value, min, max);
+            } else {
               renderer[name] = value;
+            }
           }
         }
 
@@ -749,18 +755,6 @@ package multigraph {
         titleBoldTextFormat.color = titleTextFormat.color;
         titleBoldTextFormat.align = titleTextFormat.align;
 
-        var labelTextFormat:TextFormat = new TextFormat();
-        labelTextFormat.font  = _config.value(axistag,i,'labels','@fontname');
-        labelTextFormat.size  = _config.value(axistag,i,'labels','@fontsize');
-        labelTextFormat.color = _config.value(axistag,i,'labels','@fontcolor');
-        labelTextFormat.align = TextFormatAlign.LEFT;
-
-        var labelBoldTextFormat:TextFormat = new TextFormat();
-        labelBoldTextFormat.font  = labelTextFormat.font + "Bold";
-        labelBoldTextFormat.size  = labelTextFormat.size;
-        labelBoldTextFormat.color = labelTextFormat.color;
-        labelBoldTextFormat.align = labelTextFormat.align;
-
         axes[i] = new axisType(id,
                                this,
                                ((axisType == HorizontalAxis) ? _plotBox.width : _plotBox.height) - pregap - postgap,
@@ -785,19 +779,17 @@ package multigraph {
                                tickMax,
                                highlightStyle,
                                titleTextFormat,
-                               titleBoldTextFormat,
-                               labelTextFormat,
-                               labelBoldTextFormat
+                               titleBoldTextFormat
                                );
 
         axes[i].panConfig.setConfig(_config.value(axistag, i, 'pan', '@allowed'),
                                     _config.value(axistag, i, 'pan', '@min'),
                                     _config.value(axistag, i, 'pan', '@max'));
                                        
-          axes[i].zoomConfig.setConfig(_config.value(axistag, i, 'zoom', '@allowed'),
-                                       _config.value(axistag, i, 'zoom', '@anchor'),
-                                       _config.value(axistag, i, 'zoom', '@min'),
-                                       _config.value(axistag, i, 'zoom', '@max'));
+        axes[i].zoomConfig.setConfig(_config.value(axistag, i, 'zoom', '@allowed'),
+                                     _config.value(axistag, i, 'zoom', '@anchor'),
+                                     _config.value(axistag, i, 'zoom', '@min'),
+                                     _config.value(axistag, i, 'zoom', '@max'));
                                        
         // Setup the axis controls
         var axisControlsVisible:String = _config.value(axistag, i, 'axiscontrols', '@visible');
@@ -813,24 +805,52 @@ package multigraph {
         var labelerType:Object = (type == Axis.TYPE_DATETIME) ? DateLabeler : NumberLabeler;
         
         var spacingAndUnit:NumberAndUnit;
-        if(_config.xmlvalue(axistag, i, 'labels', '@label') != null) {
-          var nlabelers:int = _config.xmlvalue(axistag, i, 'labels','@label').length();
-          for(var k:int = 0; k < nlabelers; ++k) {
-            spacingAndUnit = NumberAndUnit.parse(_config.value(axistag, i, 'labels', 'label', k, '@spacing'));
-            //var spacingAndUnit:Array = parseSpacingAndUnit();
-            labeler = new labelerType(spacingAndUnit.number,
-                                      spacingAndUnit.unit,
-                                      _config.value(axistag, i, 'labels', 'label', k, '@format'),
-                                      _config.value(axistag, i, 'labels', '@start'),
-                                      labelPosition.x,
-                                      labelPosition.y,
-                                      _config.value(axistag, i, 'labels', '@angle'),
-                                      labelAnchor.x, 
-                                      labelAnchor.y);
-            axes[i].addLabeler(labeler);
+        if(_config.xmlvalue(axistag, i, 'labels', 'label') != null) {
+          var nlabeltags:int = _config.xmlvalue(axistag, i, 'labels','label').length();
+          for(var k:int = 0; k < nlabeltags; ++k) {
+            var hlabelSpacings:Array = _config.value(axistag, i, 'labels', 'label', k, '@spacing').split(" ");
+            var labelTextFormat:TextFormat = new TextFormat();
+            labelTextFormat.font  = _config.value(axistag,i,'labels','label',k,'@fontname');
+            labelTextFormat.size  = _config.value(axistag,i,'labels','label',k,'@fontsize');
+            labelTextFormat.color = _config.value(axistag,i,'labels','label',k,'@fontcolor');
+            labelTextFormat.align = TextFormatAlign.LEFT;
+            
+            var labelBoldTextFormat:TextFormat = new TextFormat();
+            labelBoldTextFormat.font  = labelTextFormat.font + "Bold";
+            labelBoldTextFormat.size  = labelTextFormat.size;
+            labelBoldTextFormat.color = labelTextFormat.color;
+            labelBoldTextFormat.align = labelTextFormat.align;
+            for (var j:int=0; j<hlabelSpacings.length; ++j) {
+              var spacing = hlabelSpacings[j];
+              spacingAndUnit = NumberAndUnit.parse(spacing);
+
+              labeler = new labelerType(spacingAndUnit.number,
+                                        spacingAndUnit.unit,
+                                        _config.value(axistag, i, 'labels', 'label', k, '@format'),
+                                        _config.value(axistag, i, 'labels', '@start'),
+                                        labelPosition.x,
+                                        labelPosition.y,
+                                        _config.value(axistag, i, 'labels', '@angle'),
+                                        labelAnchor.x, 
+                                        labelAnchor.y,
+                                        labelTextFormat,
+                                        labelBoldTextFormat);
+              axes[i].addLabeler(labeler);
+            }
           } 
         } else {
           var hlabelSpacings:Array = _config.value(axistag, i, 'labels', '@spacing').split(" ");
+          var labelTextFormat:TextFormat = new TextFormat();
+          labelTextFormat.font  = _config.value(axistag,i,'labels','@fontname');
+          labelTextFormat.size  = _config.value(axistag,i,'labels','@fontsize');
+          labelTextFormat.color = _config.value(axistag,i,'labels','@fontcolor');
+          labelTextFormat.align = TextFormatAlign.LEFT;
+          
+          var labelBoldTextFormat:TextFormat = new TextFormat();
+          labelBoldTextFormat.font  = labelTextFormat.font + "Bold";
+          labelBoldTextFormat.size  = labelTextFormat.size;
+          labelBoldTextFormat.color = labelTextFormat.color;
+          labelBoldTextFormat.align = labelTextFormat.align;
           for (var k:int=0; k<hlabelSpacings.length; ++k) {
             var spacing = hlabelSpacings[k];
             spacingAndUnit = NumberAndUnit.parse(spacing);
@@ -842,7 +862,9 @@ package multigraph {
                                       labelPosition.y,
                                       parseFloat(_config.value(axistag, i, 'labels','@angle')),
                                       labelAnchor.x,
-                                      labelAnchor.y);
+                                      labelAnchor.y,
+                                      labelTextFormat,
+                                      labelBoldTextFormat);
             axes[i].addLabeler(labeler);
           }   
         }

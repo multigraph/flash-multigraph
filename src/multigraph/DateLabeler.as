@@ -27,11 +27,10 @@ package multigraph
 		private var _lastTextLabelHeight:Number = 25;
 				
 		public function DateLabeler(spacing:Number, unit:String, formatString:String, start:String, 
-									px:Number, py:Number, angle:Number, ax:Number, ay:Number)
+									px:Number, py:Number, angle:Number, ax:Number, ay:Number, textFormat:TextFormat, boldTextFormat:TextFormat)
 		{
 			_formatter 			 = new DateFormatter(formatString);
-			super(spacing, unit, formatString, _formatter.parse(start), px, py, angle, ax, ay);
-			_fontSize 			 = 12;
+			super(spacing, unit, formatString, _formatter.parse(start), px, py, angle, ax, ay, textFormat, boldTextFormat);
 			_current 			 = null;
 			_end 				 = null;
 			_msSpacing 			 = null;
@@ -93,7 +92,7 @@ package multigraph
 	        	py = axis.position + _py;
 	        }
 	        var tLabel:TextLabel = new TextLabel(_formatter.format(value),
-	        									 _textFormat,
+	        									 _useBold ? _boldTextFormat :_textFormat,
 	        									 px, py,
 	        									 _ax, _ay,
 	        									 _angle);

@@ -22,10 +22,13 @@ package multigraph
       protected var _ax:Number;       // x anchor point to a theoretical box around a label
       protected var _ay:Number;       // y anchor point to a theoretical box around a label
 
-      protected var _fontSize:int;
       protected var _textFormat:TextFormat;
+      protected var _boldTextFormat:TextFormat;
+
+      protected var _useBold:Boolean = false;
       
-      public function Labeler(spacing:Number, unit:String, formatString:String, start:Number, px:Number, py:Number, angle:Number, ax:Number, ay:Number) {
+      public function Labeler(spacing:Number, unit:String, formatString:String, start:Number, px:Number, py:Number, angle:Number, ax:Number, ay:Number,
+                              textFormat:TextFormat, boldTextFormat:TextFormat) {
         _spacing = spacing;
         _unit    = unit;
         _formatString = (formatString == null) ? "number" : formatString;
@@ -36,11 +39,8 @@ package multigraph
         _ax     = ax;
         _ay     = ay;
 
-        _fontSize            = 12;
-    	_textFormat = new TextFormat(  );
-		_textFormat.font = "DefaultFont";
-		_textFormat.color = 0x000000;
-		_textFormat.size = _fontSize;
+        _textFormat = textFormat;
+        _boldTextFormat = boldTextFormat;
       }
       
       public function labelDensity(axis:Axis):Number { return 0; }
@@ -48,7 +48,9 @@ package multigraph
 	  public function prepare(dataMin:Number, dataMax:Number):void {}
 	  public function hasNext():Boolean { return true; }
 	  public function next():Number { return 0; }
-      public function set textFormat(newTextFormat:TextFormat) { _textFormat = newTextFormat; }
+      public function set useBold(b:Boolean):void { _useBold = b; }
+      //public function set textFormat(newTextFormat:TextFormat) { _textFormat = newTextFormat; }
+
 	}
 }
 

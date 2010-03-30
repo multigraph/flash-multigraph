@@ -34,7 +34,7 @@ the color to be used for the fill inside each bar; if barbase is specified, this
 '</ul>';
 
     // mugl properties
-    private var _fillcolor:uint;
+    public  var fillcolor;
     private var _downfillcolor:uint;
     private var _linecolor:uint;
     private var _barwidth:String;
@@ -49,7 +49,7 @@ the color to be used for the fill inside each bar; if barbase is specified, this
         
     // Accessible color properties
     public var _linecolor_str:String;   
-    public var _fillcolor_str:String;
+    //public var _fillcolor_str:String;
     public var _downfillcolor_str:String;
         
     private var _trueWidth:Number;
@@ -70,11 +70,11 @@ the color to be used for the fill inside each bar; if barbase is specified, this
         
     private var _numberAndUnit:Object;
     
-    public function get fillcolor ():String { return _fillcolor_str; }
-    public function set fillcolor (color:String):void {
-      _fillcolor_str = color;
-      _fillcolor = parsecolor(color); 
-    }
+    //public function get fillcolor ():String { return _fillcolor_str; }
+    //    public function set fillcolor (color:String):void {
+    //      _fillcolor_str = color;
+    //      fillcolor = parsecolor(color); 
+    //    }
         
     public function get downfillcolor ():String { return _downfillcolor_str; }
     public function set downfillcolor (color:String):void {
@@ -116,7 +116,7 @@ the color to be used for the fill inside each bar; if barbase is specified, this
     public function Bar (haxis:HorizontalAxis, vaxis:VerticalAxis)
     {
       super(haxis, vaxis);
-      _fillcolor = 0x000000;
+      //_fillcolor = 0x000000;
       _downfillcolor_str = null;
       _linecolor = 0x000000;
       _barwidth = "1";
@@ -127,6 +127,35 @@ the color to be used for the fill inside each bar; if barbase is specified, this
     }
         
     override public function begin (sprite:MultigraphUIComponent):void {
+
+      if (fillcolor is String) {
+        fillcolor = parsecolor(fillcolor);
+      }
+
+      var option:String;
+      for (option in _rangeOptions) {
+        if (option == "fillcolor" || option == "linecolor") {
+          for (var i:int=0; i<_rangeOptions[option].length; ++i) {
+            if (_rangeOptions[option][i].value is String) {
+              _rangeOptions[option][i].value = parsecolor(_rangeOptions[option][i].value);
+            }
+          }
+        }
+      }
+
+      /*
+      for (var i:int=0; i<_rangeOptions.length; ++i) {
+        if ((_rangeOptions[i].name == "fillcolor"
+             ||
+             _rangeOptions[i].name == "linecolor")) {
+          for (var j:int=0; j<
+             && (_rangeOptions[i].value is String) ) {
+          _rangeOptions[i].value = parsecolor(_rangeOptions[i].value);
+        }
+      }
+      }
+      */
+
       var g:Graphics = sprite.graphics;
       _numberAndUnit = NumberAndUnit.parse(_barwidth);
             
@@ -173,12 +202,17 @@ the color to be used for the fill inside each bar; if barbase is specified, this
       var p:Array = [];
       transformPoint(p, datap);
       var g:Graphics = sprite.graphics;
-            
+
+      /*            
       if (_barbaseIsSet && _downfillcolor_str != null && p[1] < _barpixelBase) {
         g.beginFill(_downfillcolor, _fillopacity);
       } else {
         g.beginFill(_fillcolor, _fillopacity);
       }
+      */
+      var fillcolor:uint = getRangeOption("fillcolor", datap[1]);
+      g.beginFill(fillcolor, _fillopacity);
+
       var x0:int = p[0] - _barpixelOffset;
       var x1:int = p[0] - _barpixelOffset + _barpixelWidth;
 
@@ -294,10 +328,12 @@ the color to be used for the fill inside each bar; if barbase is specified, this
     	g.beginFill(0xFFFFFF, opacity);
     	g.drawRect(0, 0, sprite.width, sprite.height);
     	g.endFill();
+
+        var fillcolor:uint = getRangeOption("fillcolor", 0);
     	
-    	g.beginFill(_fillcolor, _fillopacity);
+    	g.beginFill(fillcolor, _fillopacity);
     	if (_barpixelWidth < 10) { 
-      		g.lineStyle(_linethickness, _fillcolor, _fillopacity);
+      		g.lineStyle(_linethickness, fillcolor, _fillopacity);
       	} else {
       		g.lineStyle(_linethickness, _linecolor, 1);
       	}

@@ -27,8 +27,9 @@ package multigraph
       private var _lastTextLabelHeight:Number = 25;
     	
       public function NumberLabeler(spacing:Number, unit:String, formatString:String, start:Number,
-                                    px:Number, py:Number, angle:Number, ax:Number, ay:Number) {
-        super(spacing, unit, formatString, start, px, py, angle, ax, ay);
+                                    px:Number, py:Number, angle:Number, ax:Number, ay:Number,
+                                    textFormat:TextFormat, boldTextFormat:TextFormat) {
+        super(spacing, unit, formatString, start, px, py, angle, ax, ay, textFormat, boldTextFormat);
         _current             = 0;
         _end                 = 0;
         _spacingPixels       = 0;
@@ -71,7 +72,7 @@ package multigraph
         	py = axis.position + _py;
         }
         var tLabel:TextLabel = new TextLabel(_formatter.format(value),
-        									 _textFormat,
+                                             _useBold ? _boldTextFormat :_textFormat,
         									 px, py,
         									 _ax, _ay,
         									 _angle);

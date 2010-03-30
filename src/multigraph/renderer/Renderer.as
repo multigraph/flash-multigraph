@@ -23,14 +23,15 @@ package multigraph.renderer {
     private var _missingvalue:Number;
 
     private var _missingop_str:String;
-    private var _missingopNONE:int = -10;
-    private var _missingopLT:int   =  -2;
-    private var _missingopLE:int   =  -1;
-    private var _missingopEQ:int   =   0;
-    private var _missingopGE:int   =   1;
-    private var _missingopGT:int   =   2;
-    private var _missingop:int     =  _missingopNONE;
-  	
+    private var _missingopNONE:int   = -10;
+    private var _missingopLT:int     =  -2;
+    private var _missingopLE:int     =  -1;
+    private var _missingopEQ:int     =   0;
+    private var _missingopGE:int     =   1;
+    private var _missingopGT:int     =   2;
+    private var _missingop:int       =  _missingopNONE;
+    protected var _rangeOptions:Object = {};
+
     public function set missingvalue(value:Number):void {
       _missingvalue = value;
     }
@@ -147,6 +148,53 @@ package multigraph.renderer {
       if (_missingop == _missingopGE) { return x >= _missingvalue; }
       if (_missingop == _missingopGT) { return x >  _missingvalue; }
       return false;
+    }
+
+//    var rangeOptions:Object = {
+//      fillcolor : [
+//      				{         max: -1, value: '0xee9944' },
+//      				{ min:-1, max:  1, value: '0xee9944' },
+//      				{ min: 1,          value: '0xee9944' }
+//                  ]
+//    };
+
+    protected function getRangeOption(name:String, x:Number) {
+      // for value x, use first rangeOption for which min < x <= max, if any.  If no
+      // range option satisfies that, use the regular (attribute) option value
+      var rOpts = _rangeOptions[name];
+      var rOpt:Object;
+      if (rOpts != undefined) {
+        for (var i:int=0; i<rOpts.length; ++i) {
+          rOpt = rOpts[i];
+          if ( (rOpt.min == undefined || (rOpt.min < x)) && ((rOpt.max == undefined) || (x <= rOpt.max)) ) {
+            return rOpt.value;
+          }
+        }
+      }
+      return this[name];
+    }
+
+    public function setRangeOption(name:String, value:Object, min:String, max:String) {
+      var rOpt:Object = { 'value' : value };
+      if (min != null) { rOpt.min = Number(min); }
+      if (max != null) { rOpt.max = Number(max); }
+      var oldRangeOptions:Array = [];
+      if (_rangeOptions[name] != undefined) {
+        oldRangeOptions = _rangeOptions[name];
+      }
+      _rangeOptions[name] = [];
+      var rOptInserted:Boolean = false;
+      for (var i:int=0; i<oldRangeOptions.length; ++i) {
+        if (!rOptInserted && ((rOpt.min == undefined) || (rOpt.min < oldRangeOptions[i].min))) {
+          _rangeOptions[name].push(rOpt);
+          rOptInserted = true;
+        }
+        _rangeOptions[name].push(oldRangeOptions[i]);
+      }
+	  if (!rOptInserted) {
+        _rangeOptions[name].push(rOpt);
+      }
+      
     }
 
   }

@@ -1,14 +1,13 @@
 <mugl>
   <plotarea marginleft="50" border="0" bordercolor="0x000000"/>
  <horizontalaxis position="0" id="Year" min="1900" max="2000" tickmax="0" tickmin="-4" highlightstyle="labels" linewidth="0">
-   <labels fontname="freesans" fontsize="11"/>
-   <title fontname="freesans" fontsize="11">Year</title>
+   <title>Year</title>
    <zoom min="5" max="200"/>
    <grid/>
  </horizontalaxis>
  <verticalaxis position="0" id="tempanomoly" type="number" min="-1" max="1" tickmax="0" tickmin="-4" highlightstyle="labels" linewidth="0">
-   <labels fontname="freesans" format="%.2f"  start="0" spacing="50 20 10 5 2 1 0.5 0.2 0.1 0.05 0.02 0.01"/>
-   <title fontname="freesans" angle="90" position="-40 0" anchor="0 -1">Temperature Anomaly (C)</title>
+   <labels format="%.2f"  start="0" spacing="50 20 10 5 2 1 0.5 0.2 0.1 0.05 0.02 0.01"/>
+   <title angle="90" position="-40 0" anchor="0 -1">Temperature Anomaly (C)</title>
    <grid/>
  </verticalaxis>
  <plot>
@@ -20,12 +19,12 @@
       <variable ref="temp"/>
     </verticalaxis>
     <renderer type="bar">
-      <option name="fillcolor"  value="red"/>
+      <option name="fillcolor"  value="blue" max="-0.1"/>
+      <option name="fillcolor"  value="0x666666" min="-0.1" max="0.1"/>
+      <option name="fillcolor"  value="red" min="0.1"/>
       <option name="barwidth" value="1"/>
       <option name="baroffset" value="0"/>
       <option name="barbase" value="0"/>
-      <option name="fillcolor" value="red"/>
-      <option name="downfillcolor" value="blue"/>
       </renderer>
    </plot>
    <data>

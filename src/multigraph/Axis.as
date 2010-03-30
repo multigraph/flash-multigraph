@@ -200,9 +200,6 @@ package multigraph {
 
     private var _titleTextFormat:TextFormat;
     private var _titleBoldTextFormat:TextFormat;
-    private var _labelTextFormat:TextFormat;
-    private var _labelBoldTextFormat:TextFormat;
-
 
     public function Axis(id:String, graph:Graph, length:int, offset:int, position:int, type:int,
 		   				 _color:uint,
@@ -218,9 +215,7 @@ package multigraph {
                          tickMax:int,
                          highlightStyle:int,
                          titleTextFormat:TextFormat,
-                         titleBoldTextFormat:TextFormat,
-                         labelTextFormat:TextFormat,
-                         labelBoldTextFormat:TextFormat
+                         titleBoldTextFormat:TextFormat
 						 )   {
       _id              = id;
       _s_instances[id] = this;
@@ -278,9 +273,6 @@ package multigraph {
 
       this._titleTextFormat = titleTextFormat;
       this._titleBoldTextFormat = titleBoldTextFormat;
-      this._labelTextFormat = labelTextFormat;
-      this._labelBoldTextFormat = labelBoldTextFormat;
-
     }
     
     public function parse(string:String):Number {
@@ -344,10 +336,11 @@ package multigraph {
       var g:Graphics = sprite.graphics;
 
       var titleTextFormat:TextFormat = _titleTextFormat;
-      var labelTextFormat:TextFormat = _labelTextFormat;
-      if (this.selected && (_highlightStyle==Axis.HIGHLIGHT_LABELS || _highlightStyle==Axis.HIGHLIGHT_ALL)) {
+
+      var useBold:Boolean =  (this.selected && (_highlightStyle==Axis.HIGHLIGHT_LABELS || _highlightStyle==Axis.HIGHLIGHT_ALL));
+
+      if (useBold) {
         titleTextFormat = _titleBoldTextFormat;
-        labelTextFormat = _labelBoldTextFormat;
       }
 
       switch (step) {
@@ -356,7 +349,7 @@ package multigraph {
         if (grid) {
           if (labelers.length > 0 && _density <= 1.5) {
             _labeler.prepare(dataMin, dataMax);
-            _labeler.textFormat = labelTextFormat;
+            _labeler.useBold = useBold;
             while (_labeler.hasNext()) {
               var v:Number = _labeler.next();
               var a:Number = dataValueToAxisValue(v);
@@ -415,7 +408,7 @@ package multigraph {
             tickThickness = 3;
           }
           _labeler.prepare(dataMin, dataMax);
-          _labeler.textFormat = labelTextFormat;
+          _labeler.useBold = useBold;
           while (_labeler.hasNext()) {
             var v:Number = _labeler.next();
             var a:Number = dataValueToAxisValue(v);

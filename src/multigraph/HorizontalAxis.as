@@ -34,9 +34,7 @@ package multigraph
                                    tickMax:int,
                                    highlightStyle:int,
                                    titleTextFormat:TextFormat,
-                                   titleBoldTextFormat:TextFormat,
-                                   labelTextFormat:TextFormat,
-                                   labelBoldTextFormat:TextFormat
+                                   titleBoldTextFormat:TextFormat
                                    ) {
       if (id == null) {
         if (_s_instance_number == 0) {
@@ -50,9 +48,7 @@ package multigraph
             title, titlePx, titlePy, titleAx, titleAy, titleAngle, grid, gridColor,
             lineWidth, tickMin, tickMax, highlightStyle,
             titleTextFormat,
-            titleBoldTextFormat,
-            labelTextFormat,
-            labelBoldTextFormat
+            titleBoldTextFormat
             );
       this.orientation = Axis.ORIENTATION_HORIZONTAL;
     }

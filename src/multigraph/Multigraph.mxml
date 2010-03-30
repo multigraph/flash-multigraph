@@ -24,12 +24,12 @@
       @font-face
       {
 		font-family: default;
-        src: url("../../fonts/TIMES.TTF");
+        src: url("../../fonts/myriadweb.ttf");
       }
       @font-face
       {
 		font-family: defaultBold;
-        src: url("../../fonts/TIMESBD.TTF");
+        src: url("../../fonts/myriadwebbol.ttf");
         font-weight: bold;
       }
       @font-face
