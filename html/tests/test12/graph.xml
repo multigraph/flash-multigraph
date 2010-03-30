@@ -1,5 +1,6 @@
 <mugl>
   <plotarea marginleft="50" border="0" bordercolor="0x000000"/>
+  <font name="sans" size="12"/>
  <horizontalaxis position="0" id="Year" min="1900" max="2000" tickmax="0" tickmin="-4" highlightstyle="labels" linewidth="0">
    <zoom min="5" max="200"/>
    <grid/>
