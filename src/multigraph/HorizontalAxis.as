@@ -32,7 +32,12 @@ package multigraph
                                    lineWidth:int,
                                    tickMin:int,
                                    tickMax:int,
-                                   highlightStyle:int) {
+                                   highlightStyle:int,
+                                   titleTextFormat:TextFormat,
+                                   titleBoldTextFormat:TextFormat,
+                                   labelTextFormat:TextFormat,
+                                   labelBoldTextFormat:TextFormat
+                                   ) {
       if (id == null) {
         if (_s_instance_number == 0) {
           id = 'x';
@@ -43,7 +48,12 @@ package multigraph
       ++_s_instance_number;
       super(id, graph, length, offset, position, type, color, min, minoffset, max, maxoffset,
             title, titlePx, titlePy, titleAx, titleAy, titleAngle, grid, gridColor,
-            lineWidth, tickMin, tickMax, highlightStyle);
+            lineWidth, tickMin, tickMax, highlightStyle,
+            titleTextFormat,
+            titleBoldTextFormat,
+            labelTextFormat,
+            labelBoldTextFormat
+            );
       this.orientation = Axis.ORIENTATION_HORIZONTAL;
     }
   }

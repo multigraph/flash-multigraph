@@ -13,6 +13,8 @@ package multigraph {
   import flash.geom.Matrix;
   import flash.net.*;
   import flash.utils.*;
+  import flash.text.TextFormat;
+  import flash.text.TextFormatAlign;
   
   import multigraph.data.*;
   import multigraph.debug.DebugWindow;
@@ -735,6 +737,30 @@ package multigraph {
           highlightStyle = Axis.HIGHLIGHT_ALL;
         }
 
+        var titleTextFormat:TextFormat = new TextFormat();
+        titleTextFormat.font  = _config.value(axistag,i,'title','@fontname');
+        titleTextFormat.size  = _config.value(axistag,i,'title','@fontsize');
+        titleTextFormat.color = _config.value(axistag,i,'title','@fontcolor');
+        titleTextFormat.align = TextFormatAlign.LEFT;
+
+        var titleBoldTextFormat:TextFormat = new TextFormat();
+        titleBoldTextFormat.font  = titleTextFormat.font + "Bold";
+        titleBoldTextFormat.size  = titleTextFormat.size;
+        titleBoldTextFormat.color = titleTextFormat.color;
+        titleBoldTextFormat.align = titleTextFormat.align;
+
+        var labelTextFormat:TextFormat = new TextFormat();
+        labelTextFormat.font  = _config.value(axistag,i,'labels','@fontname');
+        labelTextFormat.size  = _config.value(axistag,i,'labels','@fontsize');
+        labelTextFormat.color = _config.value(axistag,i,'labels','@fontcolor');
+        labelTextFormat.align = TextFormatAlign.LEFT;
+
+        var labelBoldTextFormat:TextFormat = new TextFormat();
+        labelBoldTextFormat.font  = labelTextFormat.font + "Bold";
+        labelBoldTextFormat.size  = labelTextFormat.size;
+        labelBoldTextFormat.color = labelTextFormat.color;
+        labelBoldTextFormat.align = labelTextFormat.align;
+
         axes[i] = new axisType(id,
                                this,
                                ((axisType == HorizontalAxis) ? _plotBox.width : _plotBox.height) - pregap - postgap,
@@ -757,7 +783,11 @@ package multigraph {
                                lineWidth,
                                tickMin,
                                tickMax,
-                               highlightStyle
+                               highlightStyle,
+                               titleTextFormat,
+                               titleBoldTextFormat,
+                               labelTextFormat,
+                               labelBoldTextFormat
                                );
 
         axes[i].panConfig.setConfig(_config.value(axistag, i, 'pan', '@allowed'),

@@ -71,6 +71,9 @@ package multigraph
             tickmax   : 3,
             highlightstyle : "axis",
             title : {
+                fontname : "default",
+                fontsize : 12,
+                fontcolor : '0x000000',
                 angle : 0,
                 position : function(...args):String {
                 	var positionbase:String = this.value.apply( this, this.relpath(args, '..', '..', '@positionbase') );
@@ -106,6 +109,9 @@ package multigraph
                 }
             },
             labels : {
+                fontname : "default",
+                fontsize : 12,
+                fontcolor : '0x000000',
                 format   : '%1d',
                 start    : 0,
                 angle    : 0,
@@ -144,7 +150,7 @@ package multigraph
                 },
                 spacing : '10000 5000 2000 1000 500 200 100 50 20 10 5 2 1 0.1 0.01 0.001',
                 label : {
-                    format   : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', 'format') ); },
+            		format   : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', 'format') ); },
                     start    : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', 'start') ); },
                     angle    : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', 'angle') ); },
                     position : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', 'position') ); },

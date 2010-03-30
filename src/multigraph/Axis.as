@@ -198,8 +198,11 @@ package multigraph {
 	public function get hasAxisControls():Boolean { return _hasAxisControls; }
 	public function set hasAxisControls(condition:Boolean):void { _hasAxisControls = condition; } 
 
-    private var _textFormat:TextFormat;
-    private var _boldTextFormat:TextFormat;
+    private var _titleTextFormat:TextFormat;
+    private var _titleBoldTextFormat:TextFormat;
+    private var _labelTextFormat:TextFormat;
+    private var _labelBoldTextFormat:TextFormat;
+
 
     public function Axis(id:String, graph:Graph, length:int, offset:int, position:int, type:int,
 		   				 _color:uint,
@@ -213,7 +216,11 @@ package multigraph {
                          lineWidth:int,
                          tickMin:int,
                          tickMax:int,
-                         highlightStyle:int
+                         highlightStyle:int,
+                         titleTextFormat:TextFormat,
+                         titleBoldTextFormat:TextFormat,
+                         labelTextFormat:TextFormat,
+                         labelBoldTextFormat:TextFormat
 						 )   {
       _id              = id;
       _s_instances[id] = this;
@@ -269,18 +276,10 @@ package multigraph {
       _panConfig = new PanConfig('allowed', null, null, this);
       _zoomConfig = new ZoomConfig('allowed', null, null, null, this);
 
-      _textFormat = new TextFormat(  );
-      //_textFormat.font = "DefaultFont";
-      _textFormat.font = "SansFont";
-      _textFormat.color = 0x000000;
-      _textFormat.size = 12;
-      _textFormat.align = TextFormatAlign.LEFT;
-
-      _boldTextFormat = new TextFormat(  );
-      _boldTextFormat.font = "SansBoldFont";
-      _boldTextFormat.color = 0x000000;
-      _boldTextFormat.size = 12;
-      _boldTextFormat.align = TextFormatAlign.LEFT;
+      this._titleTextFormat = titleTextFormat;
+      this._titleBoldTextFormat = titleBoldTextFormat;
+      this._labelTextFormat = labelTextFormat;
+      this._labelBoldTextFormat = labelBoldTextFormat;
 
     }
     
@@ -344,10 +343,12 @@ package multigraph {
       // top of any axes.
       var g:Graphics = sprite.graphics;
 
-      var textFormat:TextFormat = ( this.selected && (_highlightStyle==Axis.HIGHLIGHT_LABELS || _highlightStyle==Axis.HIGHLIGHT_ALL)
-                                    ? _boldTextFormat
-                                    : _textFormat
-                                    );
+      var titleTextFormat:TextFormat = _titleTextFormat;
+      var labelTextFormat:TextFormat = _labelTextFormat;
+      if (this.selected && (_highlightStyle==Axis.HIGHLIGHT_LABELS || _highlightStyle==Axis.HIGHLIGHT_ALL)) {
+        titleTextFormat = _titleBoldTextFormat;
+        labelTextFormat = _labelBoldTextFormat;
+      }
 
       switch (step) {
       case 0:  // in step 0, render the grid lines associated with this axis, if any
@@ -355,7 +356,7 @@ package multigraph {
         if (grid) {
           if (labelers.length > 0 && _density <= 1.5) {
             _labeler.prepare(dataMin, dataMax);
-            _labeler.textFormat = textFormat;
+            _labeler.textFormat = labelTextFormat;
             while (_labeler.hasNext()) {
               var v:Number = _labeler.next();
               var a:Number = dataValueToAxisValue(v);
@@ -394,13 +395,13 @@ package multigraph {
         if (title != null) {
           if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
             sprite.addChild(new TextLabel(title,
-                                          textFormat,
+                                          titleTextFormat,
                                           offset + length / 2 + titlePx,  position + titlePy,
                                           titleAx, titleAy,
                                           titleAngle));
           } else {
             sprite.addChild(new TextLabel(title,
-                                          textFormat,
+                                          titleTextFormat,
                                           position + titlePx,  offset + length / 2 + titlePy,
                                           titleAx, titleAy,
                                           titleAngle));
@@ -414,7 +415,7 @@ package multigraph {
             tickThickness = 3;
           }
           _labeler.prepare(dataMin, dataMax);
-          _labeler.textFormat = textFormat;
+          _labeler.textFormat = labelTextFormat;
           while (_labeler.hasNext()) {
             var v:Number = _labeler.next();
             var a:Number = dataValueToAxisValue(v);

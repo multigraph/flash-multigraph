@@ -23,15 +23,51 @@
       }
       @font-face
       {
-		font-family: SansFont;
+		font-family: default;
+        src: url("../../fonts/TIMES.TTF");
+      }
+      @font-face
+      {
+		font-family: defaultBold;
+        src: url("../../fonts/TIMESBD.TTF");
+        font-weight: bold;
+      }
+      @font-face
+      {
+		font-family: myriad;
         src: url("../../fonts/myriadweb.ttf");
       }
       @font-face
       {
-		font-family: SansBoldFont;
+		font-family: myriadBold;
         src: url("../../fonts/myriadwebbol.ttf");
-        font-weight: bold;
+        font-weight: bold; 
+     }
+
+      @font-face
+      {
+		font-family: arial;
+        src: url("../../fonts/Arial.ttf");
       }
+      @font-face
+      {
+		font-family: arialBold;
+        src: url("../../fonts/Arial_Bold.ttf");
+        font-weight: bold; 
+      }
+
+      @font-face
+      {
+		font-family: freesans;
+        src: url("../../fonts/FreeSans.ttf");
+      }
+      @font-face
+      {
+		font-family: freesansBold;
+        src: url("../../fonts/FreeSansBold.ttf");
+        font-weight: bold; 
+      }
+
       .defaultBoldStyle {
         font-family: DefaultFont;
         font-weight: bold;
