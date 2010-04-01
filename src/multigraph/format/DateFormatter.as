@@ -126,7 +126,7 @@ package multigraph.format
     	*/
     	override public function parse(string:String):Number {
  			var YYYY:Number = 0;
-            var   MM:Number = 1;
+            var   MM:Number = 0;
             var   DD:Number = 1;
             var   HH:Number = 0;
             var   mm:Number = 0;

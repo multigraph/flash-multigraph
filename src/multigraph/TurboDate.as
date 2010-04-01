@@ -16,25 +16,80 @@ package multigraph
   	public var hour:int;
   	public var minute:int;
   	public var second:int;
-  	public var ms:int;
+  	public var millisecond:Number;
 
-    private static var msInOneDay:int    = 1000 * 60 * 60 * 24;
-    private static var msInOneHour:int   = 1000 * 60 * 60;
-    private static var msInOneMinute:int = 1000 * 60;
-    private static var msInOneSecond:int = 1000;
+    public static var millisecondsInOneDay:int    = 1000 * 60 * 60 * 24;
+    public static var millisecondsInOneHour:int   = 1000 * 60 * 60;
+    public static var millisecondsInOneMinute:int = 1000 * 60;
+    public static var millisecondsInOneSecond:int = 1000;
 
     private static var month_days_nonleap:Array = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     private static var month_days_leap   :Array = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
-    public function TurboDate(year:int, month:int, day:int = 1, hour:int = 0,
-                     minute:int = 0, second:int = 0, ms:int = 0) {
-      this.year        = year;
-      this.month       = month;
-      this.day         = day;
-      this.hour        = hour;
-      this.minute      = minute;
-      this.second      = second;
-      this.ms          = ms;
+    public function TurboDate(...args) {
+      switch (args.length) {
+      case 0: // do nothing if no args passed; leave all fields undefined
+        break; 
+      case 1: // single argument is UTC milliseconds
+        this.fromUTCDate(new Date(args[0]));
+        break;
+      case 2: //     year,   month
+        setFields(args[0], args[1]);
+        break;
+      case 3: //     year,   month,     day
+        setFields(args[0], args[1], args[2]);
+        break;
+      case 4: //     year,   month,     day,    hour
+        setFields(args[0], args[1], args[2], args[3]);
+        break;
+      case 5: //     year,   month,     day,    hour,  minute
+        setFields(args[0], args[1], args[2], args[3], args[4]);
+        break;
+      case 6: //     year,   month,     day,    hour,  minute,  second
+        setFields(args[0], args[1], args[2], args[3], args[4], args[5]);
+        break;
+      default: //    year,   month,     day,    hour,  minute,  second, millisecond
+        setFields(args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
+        break;
+      }
+    }
+
+    public function setFields(year:int, month:int = 0, day:int = 1, hour:int = 0,
+                              minute:int = 0, second:int = 0, millisecond:Number = 0) {
+      this.year         = year;
+      this.month        = month;
+      this.day          = day;
+      this.hour         = hour;
+      this.minute       = minute;
+      this.second       = second;
+      this.millisecond = millisecond;
+    }
+
+
+    public function clone():TurboDate {
+      return new TurboDate(this.year, this.month, this.day, this.hour, this.minute, this.second, this.millisecond);
+    }
+
+    public function toUTCDate():Date {
+      return new Date(getUTCMilliseconds());
+    }
+
+    public function getUTCMilliseconds():Number {
+      return Date.UTC(this.year,this.month,this.day,this.hour,this.minute,this.second,this.millisecond);
+    }
+
+    public function fromUTCDate(date:Date):void {
+      this.year         = date.getUTCFullYear();
+      this.month        = date.getUTCMonth();
+      this.day          = date.getUTCDate();
+      this.hour         = date.getUTCHours();
+      this.minute       = date.getUTCMinutes();
+      this.second       = date.getUTCSeconds();
+      this.millisecond  = date.getUTCMilliseconds();
+    }
+
+    public function addYears(n:int) {
+      this.year += n;
     }
 
     public function addMonths(n:int) {
@@ -47,38 +102,28 @@ package multigraph
       }
     }
 
-    public function toUTCDate():Date {
-      return new Date(Date.UTC(this.year,this.month,this.day,this.hour,this.minute,this.second,this.ms));
-    }
-
-    public function fromUTCDate(date:Date):void {
-      this.year   = date.getUTCFullYear();
-      this.month  = date.getUTCMonth();
-      this.day    = date.getUTCDate();
-      this.hour   = date.getUTCHours();
-      this.minute = date.getUTCMinutes();
-      this.second = date.getUTCSeconds();
-      this.ms     = date.getUTCMilliseconds();
-    }
-
     public function addDays(n:int) {
-      var d:Date = toUTCDate();
-      var newms:Number = d.getTime() + n * msInOneDay;
-      d = new Date(newms);
-      this.fromUTCDate(d);
+      addMilliseconds(n * millisecondsInOneDay);
     }
 
     public function addHours(n:int) {
+      addMilliseconds(n * millisecondsInOneHour);
+    }
+
+    public function addMinutes(n:int) {
+      addMilliseconds(n * millisecondsInOneMinute);
+    }
+
+    public function addSeconds(n:int) {
+      addMilliseconds(n * millisecondsInOneSecond);
+    }
+
+    public function addMilliseconds(n:Number) {
       var d:Date = toUTCDate();
-      var newms:Number = d.getTime() + n * msInOneHour;
-      d = new Date(newms);
+      var newmilliseconds:Number = d.getTime() + n;
+      d = new Date(newmilliseconds);
       this.fromUTCDate(d);
     }
-
-    public function addYears(n:int) {
-      this.year += n;
-    }
-
 
     public function numDaysInCurrentMonth() {
       if (isLeapYear(this.year)) {
@@ -89,6 +134,58 @@ package multigraph
 
     private static function isLeapYear(y:int) {
       return (y%4) ?  0 : (!(y%100) && (y%400)) ?  0 : 1;
+    }
+
+    // return the "first tick" date at or after this date, with ticks starting at "start"
+    // and occurring every daySpacing days
+    public function firstMillisecondSpacingTickAtOrAfter(start:TurboDate, msSpacing:Number):TurboDate {
+      var startms:Number = start.getUTCMilliseconds();
+      var tms:Number = this.getUTCMilliseconds() - startms;
+      var d:Number = Math.floor( tms / msSpacing );
+      if (tms % msSpacing != 0) {
+        ++d;
+      }
+      return new TurboDate(startms + d * msSpacing)
+    }
+
+    public function firstSecondSpacingTickAtOrAfter(start:TurboDate, secondSpacing:Number):TurboDate {
+      return firstMillisecondSpacingTickAtOrAfter(start, secondSpacing * millisecondsInOneSecond);
+    }
+
+    public function firstMinuteSpacingTickAtOrAfter(start:TurboDate, minuteSpacing:Number):TurboDate {
+      return firstMillisecondSpacingTickAtOrAfter(start, minuteSpacing * millisecondsInOneMinute);
+    }
+
+    public function firstHourSpacingTickAtOrAfter(start:TurboDate, hourSpacing:Number):TurboDate {
+      return firstMillisecondSpacingTickAtOrAfter(start, hourSpacing * millisecondsInOneHour);
+    }
+
+    public function firstDaySpacingTickAtOrAfter(start:TurboDate, daySpacing:Number):TurboDate {
+      return firstMillisecondSpacingTickAtOrAfter(start, daySpacing * millisecondsInOneDay);
+    }
+
+    // return the "first tick" date at or after this date, with ticks starting at "start"
+    // and occurring every monthSpacing months
+    public function firstMonthSpacingTickAtOrAfter(start:TurboDate, monthSpacing:int):TurboDate {
+      var tmonths:int = 12 * (this.year - start.year) + (this.month - start.month);
+      var d:int = Math.floor( tmonths / monthSpacing );
+
+      if (tmonths % monthSpacing != 0) { ++d; }
+      else if (this.day>start.day) { ++d; }
+      else if (this.day==start.day && this.hour>start.hour) { ++d; }
+      else if (this.day==start.day && this.hour==start.hour && this.hour>start.hour) { ++d; }
+      else if (this.day==start.day && this.hour==start.hour && this.hour==start.hour && this.minute>start.minute) { ++d; }
+      else if (this.day==start.day && this.hour==start.hour && this.hour==start.hour && this.minute==start.minute && this.second==start.second && this.millisecond>start.millisecond) { ++d; }
+
+      var firstTick:TurboDate = start.clone();
+      firstTick.addMonths(d * monthSpacing);
+      return firstTick;
+    }
+
+    // return the "first tick" date at or after this date, with ticks starting at "start"
+    // and occurring every yearSpacing years
+    public function firstYearSpacingTickAtOrAfter(start:TurboDate, yearSpacing:int):TurboDate {
+      return firstMonthSpacingTickAtOrAfter(start, yearSpacing*12);
     }
 
   }
