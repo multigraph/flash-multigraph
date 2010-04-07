@@ -19,17 +19,22 @@ package multigraph.data
       private var _haveData:Boolean;
       private var _url:String;
       private var _graph:Graph;
+      private var _randomize:Boolean;
+      private var _onLoadComplete:Function;
 
-      public function CSVFileArrayData(variables:Array, url:String, graph:Graph)
+      public function CSVFileArrayData(variables:Array, url:String, graph:Graph, randomize:Boolean=false, onLoadComplete:Function=null)
       {
         super(variables);
         _url = url;
         _graph = graph;
+        _randomize = randomize;
         var loader:URLLoader = new URLLoader();
         loader.dataFormat = "text";
         loader.addEventListener( Event.COMPLETE, handleLoadComplete );
         _haveData = false;
-        loader.load( new URLRequest( url ) );
+        _onLoadComplete = onLoadComplete;
+        var theUrl:String = url + (_randomize ? Math.floor(100000*Math.random()) : "");
+        loader.load( new URLRequest( theUrl ) );
       }
 
 
@@ -37,6 +42,9 @@ package multigraph.data
         parseText(event.target.data);
         _haveData = true;
         _graph.paintNeeded = true;
+        if (_onLoadComplete != null) {
+        	_onLoadComplete(this);
+        }
       }
 
       override public function getIterator(variableIds:Array, min:Number, max:Number, buffer:int):DataIterator {
@@ -50,7 +58,6 @@ package multigraph.data
       override public function getStatus():Array {
         return [ _haveData ? Data.STATUS_COMPLETE : Data.STATUS_CSV_WAITING ];
       }
-
 		
 	}
 }

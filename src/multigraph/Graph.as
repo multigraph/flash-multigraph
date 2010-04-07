@@ -12,9 +12,9 @@ package multigraph {
   import flash.events.*;
   import flash.geom.Matrix;
   import flash.net.*;
-  import flash.utils.*;
   import flash.text.TextFormat;
   import flash.text.TextFormatAlign;
+  import flash.utils.*;
   
   import multigraph.data.*;
   import multigraph.debug.DebugWindow;
@@ -22,7 +22,6 @@ package multigraph {
   import multigraph.debug.NetworkMonitor;
   import multigraph.format.*;
   import multigraph.renderer.*;
-  import multigraph.parsecolor;
   
   import mx.controls.*;
   import mx.core.UIComponent;
@@ -102,6 +101,7 @@ package multigraph {
     private var _port:String;
     private var _proxy:String;
     public function get port():String { return _port; }
+    private var _numCsvOutstanding = 0;
 
     // icon asset
     [Embed(source="assets/plus.PNG")]
@@ -133,23 +133,13 @@ package multigraph {
       this._pathname = pathname; 
       this._port= port; 
       this._proxy = proxy;
-      init_wrapper(width, height);
-
+      init(width, height);
     }       
 
-    private function init_wrapper(width:int, height:int):void {
+    private function init(width:int, height:int):void {
       _graphWidth  = width;
       _graphHeight = height;
-
-      init();
-      
-      addChild(_divSprite);
-      addChild(_eventSprite);  
-      addChild(_axisControlSprite);
-      
-      addEventListener(Event.ENTER_FRAME, doEveryFrame);
-      prepareData();
-      _paintNeeded = true;
+      init_phase1();
     }
 
 
@@ -240,7 +230,7 @@ package multigraph {
       }
     }
 
-    private function init():void {
+    private function init_phase1():void {
       _config = new Config(_xml);
       
       var diagnosticsVisible:String = _config.xmlvalue('diagnostics', '@visible');
@@ -370,6 +360,7 @@ package multigraph {
       
       var numDataSections:int = _config.xmlvalue('data').length();
       var vars:Array;
+      var haveCsv:Boolean = false;
       for (var j:int=0; j<numDataSections; ++j) {
         // Determine where to get the data for this data section...
         if (_config.value('data', j, 'values') != null) {
@@ -384,8 +375,10 @@ package multigraph {
           // in a Multigraph.ArrayData object.
           vars = buildDataVariableArrayFromConfig(j);
           var url:String = _config.value('data', j, 'csv','@location');
-          _data[j] = new CSVFileArrayData( vars, Multigraph.proxiedUrl(_proxy, url), this );
-
+          var randomize:Boolean = (_config.xmlvalue('data', j, 'csv','@randomize') == "true");
+          ++_numCsvOutstanding;
+          _data[j] = new CSVFileArrayData( vars, Multigraph.proxiedUrl(_proxy, url), this, randomize, this.finishCsv );
+		  haveCsv = true;
         } else if (_config.value('data', j, 'service') != null) {
           // The <data> section contains a <service> element, so the data is to be fetched
           // from a web service.  Use a Multigraph.WebServiceData object.
@@ -396,8 +389,22 @@ package multigraph {
         } else {
           trace("unknown data section type!");
         }
-        
       }
+      
+      if (!haveCsv) {
+        init_phase2();
+      }
+      
+    }
+    
+    private function finishCsv(data:CSVFileArrayData):void {
+    	--_numCsvOutstanding;
+    	if (_numCsvOutstanding == 0) {
+          init_phase2();
+    	}
+    }
+    
+    private function init_phase2():void {
       
       /// create horizontal axes
       _haxes = createAxes('horizontalaxis', HorizontalAxis);
@@ -668,6 +675,19 @@ package multigraph {
 
       _keyTimer = new Timer(_keyTimerDelay, 1);
       _keyTimer.addEventListener("timer", keyTimerHandler);
+
+      // phase3
+      init_phase3();
+    }
+
+    private function init_phase3():void {
+      addChild(_divSprite);
+      addChild(_eventSprite);  
+      addChild(_axisControlSprite);
+      
+      addEventListener(Event.ENTER_FRAME, doEveryFrame);
+      prepareData();
+      _paintNeeded = true;
     }
 
     private function keyTimerHandler(event:TimerEvent):void {
