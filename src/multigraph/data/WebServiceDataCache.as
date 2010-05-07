@@ -33,12 +33,20 @@ package multigraph.data
     }
 
     public function get coveredMin():Number {
+    	/*
+    	if (_head == null) { return NaN; }
+    	return _head.coveredMin;
+    	*/
     	var b:WebServiceDataCacheBlock = dataHead();
       	if (b==null) { return NaN; }
       	return b.coveredMin;
     }
 
     public function get coveredMax():Number {
+    	/*
+    	if (_tail == null) { return NaN; }
+    	return _tail.coveredMax;
+    	*/
     	var b:WebServiceDataCacheBlock = dataTail();
       	if (b==null) { return NaN; }
       	return b.coveredMax;

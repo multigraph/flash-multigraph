@@ -37,9 +37,14 @@ package multigraph.data
       super(variables);
       _graph = graph;
 
-      var pageHost:String=_graph.hostname;
-      var pagePath:String=_graph.pathname;
-      var pagePort:String=_graph.port;
+      var pageHost:String;
+      var pagePath:String;
+      var pagePort:String;
+	  if (_graph != null) {
+      	pageHost = _graph.hostname;
+      	pagePath = _graph.pathname;
+      	pagePort = _graph.port;
+      }
       
       if (pagePort != '80') {
       	  pageHost += ':' + pagePort;
@@ -54,7 +59,7 @@ package multigraph.data
       } else {
         serviceUrl = 'http://' + pageHost + pagePath.replace(/\/[^\/]*$/,'/') + url;
       }
-	  _graph.diagnosticOutput('web service url is "' + serviceUrl + '"');
+      if (_graph != null) { _graph.diagnosticOutput('web service url is "' + serviceUrl + '"'); }
       _webService = new HttpWebService(serviceUrl, _graph);
 
       _cache = new WebServiceDataCache();
@@ -65,7 +70,7 @@ package multigraph.data
                                  max:Number, maxBuffer:int):void {
       _webService.request(_variables, min, minBuffer, max, maxBuffer,
                           function(dataText:String):void {
-                          	_graph.diagnosticOutput('got a data response of length ' + dataText.length);
+                          	if (_graph!=null) { _graph.diagnosticOutput('got a data response of length ' + dataText.length); }
                             insertData(block, dataText);
                           }                    
                           );

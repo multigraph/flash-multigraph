@@ -8,25 +8,59 @@
  */
 package multigraph.data {
 
+  /**
+   * This is the (abstract) superclass for classes that Multigraph
+   * uses for loading, storing, and managing data to be plotted.  When
+   * drawing a plot, Multigraph accesses the data through methods of
+   * this class.  Individual subclasses implement their own ways of
+   * loading & managing data.
+   */
   public class Data {
 
-    public static var STATUS_COMPLETE:int    = 0;
-    public static var STATUS_WEB_WAITING:int = 1;
-    public static var STATUS_CSV_WAITING:int = 2;
-
-	protected var _variables:Array;
+    /**
+     * 'variables' is an array of DataVariable instances corresponding to the variables stored
+     * in this data object.
+     */
 	public function get variables():Array { return _variables; }
+	protected var _variables:Array;
+
+    /**
+     * Create a new Data object with the given array of DataVariable instances.
+     */
     public function Data(variables:Array) {
       _variables = variables;
     }
-    protected var _prepareDataCalled:Boolean = false;
-    public function prepareDataReset():void { _prepareDataCalled = false; }
+
+    /**
+     * Do whatever work is necessary, if any, to get the data object to load
+     * data between min and max, with a given buffer (padding amount) on either
+     * end.  Subclasses that actually need to do something for this method
+     * should override it with an implementation that actually does something.
+     * Implementations check the value of _prepareDataCalled, and should do
+     * nothing if it is true.  If it is false, they should do whatever work
+     * they need to do, and set _prepareDataCalled to true.
+     */
 	public function prepareData(min:Number, max:Number, buffer:int):void {}
+
+    /**
+     * Once prepareData has been called, additional calls to prepareData should
+     * do nothing until prepareDataReset is called.
+     */
+    public function prepareDataReset():void { _prepareDataCalled = false; }
+    protected var _prepareDataCalled:Boolean = false;
+
+
     public function getIterator(variableIds:Array, min:Number, max:Number, buffer:int):DataIterator { return null; }
 	public function getBounds(varid:String):Array { return null; }
     //public function newRange():void {}
 	//public static function findDataObjectContainingVariable(id:String):Data { return null;}
 
+    /**
+     * status stuff is used only by network monitor for debugging
+     */
+    public static var STATUS_COMPLETE:int    = 0;
+    public static var STATUS_WEB_WAITING:int = 1;
+    public static var STATUS_CSV_WAITING:int = 2;
     public function getStatus():Array { return []; }
 
     /**

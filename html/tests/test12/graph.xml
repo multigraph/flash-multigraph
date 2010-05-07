@@ -1,41 +1,41 @@
 <mugl>
-  <plotarea marginleft="50"/>
- <horizontalaxis type="datetime">
-   <labels>
-     <label format="%n" spacing="1M"/>
-     <label format="%n %d" spacing="1M 7D 3D 2D 1D"/>
-     <label format="%n %d %h:00" spacing="12H 6H 3H 2H 1H"/>
-   </labels>
+  <legend base="0 1" anchor="0 1" position="0 -25" border="0" rows="1" frame="padding">
+    <icon width="15" height="15" border="0"/>
+  </legend>
+  <window margin="2" border="2" padding="5" />
+  <plotarea marginleft="50" marginright="180" marginbottom="80" margintop="75"/>
+  <title position="0 5">24 Hour ASOS Data</title>
+ <horizontalaxis type="datetime" id="Date/Time" min="2010050100" max="2010050600">
+   <title angle="0" position="0 -50" anchor="0 1">Date/Time</title>
+   <labels spacing="1Y 6M 3M 2M 1M 7D 2D 1D 12H 6H 2H 1H" format="%Y%L%n%d%L%h:00"/>
    <grid/>
  </horizontalaxis>
- <verticalaxis id="tempf" type="number">
+ <verticalaxis id="tempf" type="number" positionbase="left">
    <labels format="%.2f"  spacing="50 20 10 5 2 1 0.5 0.2 0.1 0.05 0.02 0.01"/>
-   <grid/>
-   <title angle="90" position="-40 0" anchor="0 -1">Temperature (F)</title>
+   <title angle="90" position="-30 0" anchor="0 -1">Degrees (F)</title>
+   <binding id="tempbinding" min="30" max="90"/>
  </verticalaxis>
  <plot>
-    <legend label="Temperature"/>
-    <horizontalaxis ref="xaxis">
-      <variable ref="year"/>
-    </horizontalaxis>
-    <verticalaxis ref="tempf">
-      <variable ref="tempf"/>
-    </verticalaxis>
-    <renderer type="pointline">
-    </renderer>
-   </plot>
-   <data>
+   <verticalaxis ref="tempf">
+     <variable ref="ftemp"/>
+   </verticalaxis>
+   <horizontalaxis ref="xaxis">
+     <variable ref="ftime"/>
+   </horizontalaxis>
+ <legend label="Forecast Temperature"/>
+ <renderer type="pointline">
+   <option name="linecolor" value="0xCC0000"/>
+   <option name="linewidth" value="2"/>
+   <option name="pointshape" value="circle"/>
+   <option name="pointsize" value="2"/>
+ </renderer>
+ </plot> 
+  <data>
     <variables>
-     <variable id="year" column="0" type="datetime"/>
-     <variable id="tempf" column="1"/>
-     <variable id="tempc" column="2"/>
-     <variable id="dpf" column="3"/>
-     <variable id="dpc" column="4"/>
-     <variable id="pi" column="5"/>
-     <variable id="phpa" column="6"/>
-     <variable id="winddir" column="7"/>
-     <variable id="windspd" column="8"/>
+      <variable id="ftime" column="0" type="datetime"/>
+      <variable id="ftemp" column="1"/>
     </variables>
-    <csv location="http://services.multigraph.org/asos/?station=KGSP," randomize="true"/>
+    <service location="http://services.multigraph.org/ndfd/?lonlat=-82.5,35.5&var=temp&q="/>
   </data>
 </mugl>
+

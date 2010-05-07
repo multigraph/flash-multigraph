@@ -241,6 +241,7 @@
 
         titleWindow.addChild(mGraph);
         PopUpManager.addPopUp(titleWindow, parent, modal);
+        return titleWindow;
    }
    
    public static function proxiedUrl(proxy:String, url:String):String {
