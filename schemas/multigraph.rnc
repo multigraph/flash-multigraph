@@ -95,6 +95,10 @@ axis = (
    attribute max      { text }?&		# number or 'auto'; default: 'auto'
    attribute minoffset { text }?&		# number; default: 0
    attribute maxoffset { text }?&		# number; default: 0
+   attribute tickmin   { text }?&
+   attribute tickmax   { text }?&
+   attribute linewidth  { xsd:integer }?&
+   attribute highlightstyle   { text }?&
    element title {
       attribute position   { text }?&		# pair of numbers, separated by spaces; default '0 -30' for horiz, '-20 0' for vert
       attribute anchor     { text }?&		# pair of numbers, separated by spaces
@@ -168,7 +172,9 @@ plot = element plot {
       attribute type { text },
       element option {
          attribute name { text }&
-         attribute value { text }
+         attribute value { text }&
+         attribute min { text }?&
+         attribute max { text }?
       }*
    }
 }
