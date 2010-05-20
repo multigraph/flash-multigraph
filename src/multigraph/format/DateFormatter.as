@@ -10,6 +10,9 @@ package multigraph.format
 {
 	public class DateFormatter extends Formatter
 	{		
+
+      private var intervalRegexp:RegExp = /^(\d+)([A-Za-z])$/;
+
 		public function DateFormatter(string:String)
 		{
 			_formatString = string;
@@ -125,37 +128,71 @@ package multigraph.format
     		@returns The millisecond numerial value of an arbitrary string representing a date
     	*/
     	override public function parse(string:String):Number {
- 			var YYYY:Number = 0;
-            var   MM:Number = 0;
-            var   DD:Number = 1;
-            var   HH:Number = 0;
-            var   mm:Number = 0;
-            var   ss:Number = 0;
-            
-            switch (string.length) {
-            case 14: // YYYYMMDDHHmmss
-                    ss = int(string.substring(12,14));
-            case 12: // YYYYMMDDHHmm
-                    mm = int(string.substring(10,12));
-            case 10: // YYYYMMDDHH
-                    HH = int(string.substring(8,10));
-            case  8: // YYYYMMDD
-                    DD = int(string.substring(6,8));
-            case  6: // YYYYMM
-                    MM = int(string.substring(4,6)) - 1;
-            case  4: // YYYY
-                    YYYY = int(string.substring(0,4));
-                    break;
-            }
-		    
-            if (YYYY != 0) {
-                return Date.UTC(YYYY, MM, DD, HH, mm, ss, 0);   // note that this returns ms, not a Date object!
-            }
+          var YYYY:Number = 0;
+          var   MM:Number = 0;
+          var   DD:Number = 1;
+          var   HH:Number = 0;
+          var   mm:Number = 0;
+          var   ss:Number = 0;
 
-            // YYYY = 0, then we can't make sense of the string as a date at all, so just parse it as a number directly.
-            // This behavior is here so that the axis-binding code will work if min="0" max="1" are given for a datetime axis!
- 			return Number(string);
+          // First check to see if the string consists of a number followed by a single character,
+          // by matching against intervalRegexp defined above.  If it does, treat it as an interval
+          // of time rather than an instantaneous date/time value, and return the length of
+          // that interval in ms.
+          var    a:Array = intervalRegexp.exec(string);
+          if (a != null) {
+            var len:Number  = Number(a[1]);
+            var unit:String = a[2];
+            switch(unit){
+            case "H":
+              len = len * 3600000;
+              break;
+            case "D":
+              len = len * 3600000 * 24;
+              break;
+            case "M":
+              len = len * 3600000 * 24 * 30;
+              break;
+            case "Y":
+              len = len * 3600000 * 24 * 365;
+              break;
+            case "m":
+              len = len * 60000;
+              break;
+            default:
+              break;
+            }
+            return len;
+          }
+            
+          // If we make it to here, assume the string represents an instantaneous date/time value,
+          // and parse based on its length
+          switch (string.length) {
+          case 14: // YYYYMMDDHHmmss
+            ss = int(string.substring(12,14));
+          case 12: // YYYYMMDDHHmm
+            mm = int(string.substring(10,12));
+          case 10: // YYYYMMDDHH
+            HH = int(string.substring(8,10));
+          case  8: // YYYYMMDD
+            DD = int(string.substring(6,8));
+          case  6: // YYYYMM
+            MM = int(string.substring(4,6)) - 1;
+          case  4: // YYYY
+            YYYY = int(string.substring(0,4));
+            break;
+          }
+          
+          if (YYYY != 0) {
+            return Date.UTC(YYYY, MM, DD, HH, mm, ss, 0);   // note that this returns ms, not a Date object!
+          }
+          
+          // YYYY = 0, then we can't make sense of the string as a date at all, so just parse it as a number directly.
+          // This behavior is here so that the axis-binding code will work if min="0" max="1" are given for a datetime axis!
+          return Number(string);
 		}
+
+
     	
     	/*
     		This function calculates the approximate character length of the formatted value 
