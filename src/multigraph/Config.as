@@ -228,8 +228,11 @@ package multigraph
             },
             data : {
                 variables : {
+                    missingop: "eq",
                     variable : {
-                        type   : 'number'
+                      type   : 'number',
+                      missingop: function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '..', '@missingop') ); },
+                      missingvalue: function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '..', '@missingvalue') ); }
                     }
                 }
             },

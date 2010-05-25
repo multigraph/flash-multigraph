@@ -12,6 +12,7 @@ package multigraph.renderer {
 	import multigraph.Axis;
 	import multigraph.MultigraphUIComponent;
   import multigraph.parsecolor;
+  import multigraph.data.Data;
 	
   public class LineError extends Renderer
   {
@@ -61,8 +62,8 @@ package multigraph.renderer {
     	_dotsize = Number(size);
     }
     
-    public function LineError(haxis:Axis, vaxis:Axis) {
-      super(haxis, vaxis);
+    public function LineError(haxis:Axis, vaxis:Axis, data:Data, varids:Array) {
+      super(haxis, vaxis, data, varids);
       _linecolor = 0x000000;
       _dotcolor  = 0x000000;
       _dotsize   = 0;

@@ -16,6 +16,7 @@ package multigraph.renderer
   import multigraph.NumberAndUnit;
   import multigraph.VerticalAxis;
   import multigraph.parsecolor;
+  import multigraph.data.Data;
     
   public class BarError extends Renderer
   {
@@ -95,9 +96,9 @@ package multigraph.renderer
       _linethickness = Number(thickness);
     }
         
-    public function BarError (haxis:HorizontalAxis, vaxis:VerticalAxis)
+    public function BarError (haxis:HorizontalAxis, vaxis:VerticalAxis, data:Data, varids:Array)
     {
-      super(haxis, vaxis);
+      super(haxis, vaxis, data, varids);
       _fillcolor = 0x000000;
       _downfillcolor_str = null;
       _linecolor = 0x000000;

@@ -14,7 +14,9 @@ package multigraph.renderer {
 	import multigraph.Axis;
 	import multigraph.TextLabel;
 	import multigraph.format.DateFormatter;
-  import multigraph.parsecolor;
+    import multigraph.parsecolor;
+    import multigraph.data.Data;
+
 	
 	import mx.controls.Button;
 	
@@ -42,8 +44,8 @@ package multigraph.renderer {
 	public function set linethickness(h:String):void { _linethickness = int(h); }
 	public function get linethickness():String { return _linethickness.toString(); }
 
-    public function RadarInv(haxis:Axis, vaxis:Axis) {
-      super(haxis, vaxis);
+    public function RadarInv(haxis:Axis, vaxis:Axis, data:Data, varids:Array) {
+      super(haxis, vaxis, data, varids);
       _dateFormatter = new DateFormatter(_dateFormat);
       _textFormat = new TextFormat();
       _textFormat.font = "DefaultFont";

@@ -194,10 +194,14 @@ plotaxis = (
 
 data = element data {
    element variables {
+      attribute missingvalue { text }?&
+      attribute missingop    { text }?&
       element variable {
-         attribute id     { text }&
-         attribute column { text }?&
-         attribute type   { text }?
+         attribute id           { text }&
+         attribute column       { text }?&
+         attribute type         { text }?&
+         attribute missingvalue { text }?&
+         attribute missingop    { text }?
       }+
    }?,
    (

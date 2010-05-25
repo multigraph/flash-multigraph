@@ -13,7 +13,9 @@ package multigraph.renderer {
 	
 	import multigraph.Axis;
 	import multigraph.MultigraphUIComponent;
-  import multigraph.parsecolor;
+    import multigraph.parsecolor;
+    import multigraph.data.Data;
+
 	
   public class PointLine extends Renderer
   {
@@ -134,8 +136,8 @@ package multigraph.renderer {
     }
 
 
-    public function PointLine(haxis:Axis, vaxis:Axis) {
-      super(haxis, vaxis);
+    public function PointLine(haxis:Axis, vaxis:Axis, data:Data, varids:Array) {
+      super(haxis, vaxis, data, varids);
       _pointsize         = 0;
       _pointcolor        = 0x000000;
       _pointopacity      = 1.0;
@@ -153,7 +155,7 @@ package multigraph.renderer {
     }
 
     override public function dataPoint(sprite:MultigraphUIComponent, datap:Array):void {
-      if (isMissing(datap[1])) {
+      if (isMissing(datap[1],1)) {
         prevPoint = null;
       } else {
         var p:Array = [];

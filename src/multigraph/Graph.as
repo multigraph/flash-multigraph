@@ -428,42 +428,28 @@ package multigraph {
       }
 
       for (i=0; i<nplots; ++i) {
-        // set the horizontal axis to the graph's one horizontal axis
+        // 
+        // get the plot's horizontal axis
+        //
         var haxis:Axis = _haxes[0];
 
-        // set the plot's vertical axis to the one specified in the xml file (<plot><verticalaxis ref="...">),
+        //
+        // get the plot's vertical axis...
+        //
+        // ... to the one specified in the xml file (<plot><verticalaxis ref="...">),
         // if any, or default to the first vertical axis if none is specified
         var vaxis:Axis = Axis.getInstanceById( _config.xmlvalue('plot', i, 'verticalaxis', '@ref') );
         if (vaxis == null) {
           vaxis = _vaxes[0];
         }
          
-        var type:String = _config.value('plot', i, 'renderer', '@type');
-        var rendererType:Object = Renderer.getRenderer(type);
-        // create the renderer object
-        var renderer:Renderer = new rendererType(haxis, vaxis);
-
-        // set any renderer options
-        if (_config.value('plot', i, 'renderer', 'option') != null) {
-          var noptions:int = _config.value('plot', i, 'renderer', 'option').length();
-          for (var j:int=0; j<noptions; ++j) {
-            var name:String  = _config.value('plot', i, 'renderer', 'option', j, '@name');
-            var value:String = _config.value('plot', i, 'renderer', 'option', j, '@value');
-            var min:String   = _config.value('plot', i, 'renderer', 'option', j, '@min');
-            var max:String   = _config.value('plot', i, 'renderer', 'option', j, '@max');
-            if (min != null || max != null) {
-              renderer.setRangeOption(name, value, min, max);
-            } else {
-              renderer[name] = value;
-            }
-          }
-        }
-
+        //
+        // get the plot's data object (or constant)
+        //
         var plotIsConstant:Boolean = false;
         var constantValue:Number;
-        var data:Data;
+        var data:Data = null;
         var varids:Array = [];
-
         if (_config.xmlvalue('plot', i, 'verticalaxis', 'constant') != null) {
           plotIsConstant = true;
           constantValue = _config.xmlvalue('plot', i, 'verticalaxis', 'constant', '@value');
@@ -484,15 +470,8 @@ package multigraph {
             data = _data[0];
           }
           varids.push( hvarid );
-          if (!haxis.haveDataMin || !haxis.haveDataMax) {
-            var bounds:Array = data.getBounds(hvarid);
-            if (!haxis.haveDataMin) {
-              haxis.dataMin = bounds[0];
-            }
-            if (!haxis.haveDataMax) {
-              haxis.dataMax = bounds[1];
-            }
-          }
+          setAxisBoundsIfNeeded(haxis, data, hvarid);
+
           //   ... next comes a list of vertical variables (one or more), specified either
           //       by <plot><verticalaxis><variable ref="..."> elements, or...
           var vvarid;
@@ -510,22 +489,38 @@ package multigraph {
             vvarid = _data[0].getVariableId(1);
             varids.push( vvarid );
           }
+          setAxisBoundsIfNeeded(vaxis, data, vvarid);
 
-          if (!vaxis.haveDataMin || !vaxis.haveDataMax) {
-            var bounds:Array = data.getBounds(vvarid);
-            if (!vaxis.haveDataMin) {
-              vaxis.dataMin = bounds[0];
-            }
-            if (!vaxis.haveDataMax) {
-              vaxis.dataMax = bounds[1];
-            }
-          }
 
         }
-        
-        // Determine this plot's legend label
-        var legendLabel:String;
 
+        //
+        // create the plot's renderer
+        //
+        var type:String = _config.value('plot', i, 'renderer', '@type');
+        var rendererType:Object = Renderer.getRenderer(type);
+        // create the renderer object
+        var renderer:Renderer = new rendererType(haxis, vaxis, data, varids);
+
+        // set any renderer options
+        if (_config.value('plot', i, 'renderer', 'option') != null) {
+          var noptions:int = _config.value('plot', i, 'renderer', 'option').length();
+          for (var j:int=0; j<noptions; ++j) {
+            var name:String  = _config.value('plot', i, 'renderer', 'option', j, '@name');
+            var value:String = _config.value('plot', i, 'renderer', 'option', j, '@value');
+            var min:String   = _config.value('plot', i, 'renderer', 'option', j, '@min');
+            var max:String   = _config.value('plot', i, 'renderer', 'option', j, '@max');
+            if (min != null || max != null) {
+              renderer.setRangeOption(name, value, min, max);
+            } else {
+              renderer[name] = value;
+            }
+          }
+        }
+
+        //
+        // determine this plot's legend label
+        //
         var legendLabel:String = _config.value('plot', i, 'legend', '@label');
         if (legendLabel==null || legendLabel=="") {
           legendLabel = vvarid;
@@ -533,8 +528,10 @@ package multigraph {
         if (_config.value('plot', i, 'legend', '@visible')=="false") {
           legendLabel = null;
         }
-        
+
+        //
         // finally, create the plot object
+        //
         var plot:Plot;
         if (plotIsConstant) {
           plot = new ConstantPlot(_config.value('plot', i, '@id'),
@@ -555,7 +552,9 @@ package multigraph {
                               );
         }
         
+        //
         // and add it to our list
+        //
         _plots.push( plot );
 
       }
@@ -678,6 +677,18 @@ package multigraph {
 
       // phase3
       init_phase3();
+    }
+
+    private function setAxisBoundsIfNeeded(axis:Axis, data:Data, varid:String):void {
+      if (!axis.haveDataMin || !axis.haveDataMax) {
+        var bounds:Array = data.getBounds(varid);
+        if (!axis.haveDataMin) {
+          axis.dataMin = bounds[0];
+        }
+        if (!axis.haveDataMax) {
+          axis.dataMax = bounds[1];
+        }
+      }
     }
 
     private function init_phase3():void {
@@ -976,9 +987,21 @@ package multigraph {
           if (col == null) { col = i+''; }
           var id:String = _config.value('data', dataSection, 'variables', 'variable', i, '@id');
           if (id == null) { id = 'var' + col; }
+          var missingOp:String = _config.value('data', dataSection, 'variables', 'variable', i, '@missingop');
+          var missingValueString:String = _config.value('data', dataSection, 'variables', 'variable', i, '@missingvalue');
+          // if no missingValue was specified for this variable (or inherited from <variables>), set its missingOp to null
+          var missingValue:Number = 0;
+          if (missingValueString==null || missingValueString=="") {
+            missingOp=null;
+          } else {
+            missingValue = Number(missingValueString);
+          }
           vars.push(new DataVariable(id,
                                      int(col),
-                                     Axis.parseType(_config.value('data', dataSection, 'variables', 'variable', i, '@type'))));
+                                     Axis.parseType(_config.value('data', dataSection, 'variables', 'variable', i, '@type')),
+                                     missingValue,
+                                     missingOp)
+                    );
         }
       } else {
         trace('got no vars!');

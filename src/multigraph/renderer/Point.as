@@ -11,7 +11,8 @@ package multigraph.renderer {
 	
 	import multigraph.Axis;
 	import multigraph.MultigraphUIComponent;
-  import multigraph.parsecolor;
+    import multigraph.parsecolor;
+    import multigraph.data.Data;
 	
   public class Point extends PointLine
   {
@@ -51,8 +52,8 @@ package multigraph.renderer {
     public function set fillopacity(o:String):void { pointopacity = o; }
     public function get fillopacity():String { return pointopacity; }
 
-    public function Point(haxis:Axis, vaxis:Axis) {
-      super(haxis, vaxis);
+    public function Point(haxis:Axis, vaxis:Axis, data:Data, varids:Array) {
+      super(haxis, vaxis, data, varids);
       // force linewidth = 0 to suppress drawing of lines
       linewidth = "0";
       // default pointsize = 1

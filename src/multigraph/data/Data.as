@@ -90,6 +90,21 @@ package multigraph.data {
 	  }
 	  return -1;
 	}
+
+	/**
+     * Return one
+     * of this Data object's variables, given a string containing a
+     * variable id.  Returns null if there is no variable with the given
+     * id in this data object.
+	 */
+	public function varIdToVar(id:String):DataVariable {
+	  for (var j:int=0; j<_variables.length; ++j) {
+		if (id == _variables[j].id) {
+		  return _variables[j];
+		}
+	  }
+	  return null;
+	}
     	
 
   }

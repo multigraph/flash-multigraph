@@ -13,6 +13,7 @@ package multigraph.renderer
 	import multigraph.Axis;
 	import multigraph.MultigraphUIComponent;
     import multigraph.parsecolor;
+    import multigraph.data.Data;
 
 	public class Fill extends Renderer
 	{
@@ -62,9 +63,9 @@ package multigraph.renderer
 			_linethickness = uint(Number(thickness));
 		}
 		
-		public function Fill(haxis:Axis, vaxis:Axis)
+      public function Fill(haxis:Axis, vaxis:Axis, data:Data, varids:Array)
 		{
-			super(haxis, vaxis);
+          super(haxis, vaxis, data, varids);
 			_fillcolor = 0x000000;
 			_linecolor = 0x000000;
 			_linethickness = 1;

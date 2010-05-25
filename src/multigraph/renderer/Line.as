@@ -9,7 +9,8 @@
 package multigraph.renderer {
 	import multigraph.Axis;
 	import multigraph.MultigraphUIComponent;
-  import multigraph.parsecolor;
+    import multigraph.parsecolor;
+    import multigraph.data.Data;
 	
   public class Line extends PointLine
   {
@@ -24,8 +25,8 @@ package multigraph.renderer {
     public function set dotsize(s:String):void { pointsize = s; }
     public function get dotsize():String { return pointsize; }
 
-    public function Line(haxis:Axis, vaxis:Axis) {
-      super(haxis, vaxis);
+    public function Line(haxis:Axis, vaxis:Axis, data:Data, varids:Array) {
+      super(haxis, vaxis, data, varids);
     }
 
   }

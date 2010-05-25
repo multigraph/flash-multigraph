@@ -16,6 +16,7 @@ package multigraph.renderer
   import multigraph.NumberAndUnit;
   import multigraph.VerticalAxis;
   import multigraph.parsecolor;
+  import multigraph.data.Data;
     
   public class Bar extends Renderer
   {
@@ -113,9 +114,9 @@ the color to be used for the fill inside each bar; if barbase is specified, this
       _linethickness = Number(thickness);
     }
         
-    public function Bar (haxis:HorizontalAxis, vaxis:VerticalAxis)
+    public function Bar (haxis:HorizontalAxis, vaxis:VerticalAxis, data:Data, varids:Array)
     {
-      super(haxis, vaxis);
+      super(haxis, vaxis, data, varids);
       //_fillcolor = 0x000000;
       _downfillcolor_str = null;
       _linecolor = 0x000000;

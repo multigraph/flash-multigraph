@@ -8,13 +8,18 @@
  */
 package multigraph.renderer {
 	import multigraph.Axis;
+	import multigraph.data.Data;
 	import multigraph.MultigraphUIComponent;
 	import multigraph.parsecolor;
+    import multigraph.data.Data;
 
   public class Renderer
   {
   	protected var _haxis:Axis;
   	protected var _vaxis:Axis;
+    protected var _data:Data;
+    protected var _varids:Array;
+    protected var _dataVariables:Array;
 
     static protected var optionsMissing:String = '\
 <li><b>missingvalue</b>: value for "missing" data; default is none.  If either missingvalue or missingop are present, both must be present.\
@@ -64,9 +69,15 @@ package multigraph.renderer {
       return _missingop_str;
     }
     
-    public function Renderer(haxis:Axis, vaxis:Axis) {
+    public function Renderer(haxis:Axis, vaxis:Axis, data:Data, varids:Array) {
     	_haxis = haxis;
     	_vaxis = vaxis;
+        _data  = data;
+        _varids = varids;
+        _dataVariables = [];
+        for (var i:int=0; i<varids.length; ++i) {
+          _dataVariables[i] = data.varIdToVar(varids[i]);
+        }
     }
     
     public function begin(sprite:MultigraphUIComponent):void {}
@@ -140,14 +151,27 @@ package multigraph.renderer {
         }
   	}
 
-    protected function isMissing(x:Number):Boolean {
-      if (_missingop == _missingopNONE) { return false; }
-      if (_missingop == _missingopLT) { return x <  _missingvalue; }
-      if (_missingop == _missingopLE) { return x <= _missingvalue; }
-      if (_missingop == _missingopEQ) { return x == _missingvalue; }
-      if (_missingop == _missingopGE) { return x >= _missingvalue; }
-      if (_missingop == _missingopGT) { return x >  _missingvalue; }
-      return false;
+    protected function isMissing(x:Number, vi:int=-1):Boolean {
+      // x is the variable value that we want to test for missing
+      // vi is the index of the corresponding variable in our list of data variables, or -1 if we don't know it.
+      // (The only reason vi should ever be -1 is for backwards compatibility with old renderers that don't pass
+      // it in.  Once migration is complete and all renderers pass in vi, code dealing with the -1 case can
+      // be eliminated.)
+
+      // If this renderer has an individual setting for _missingOp, use it instead of calling the
+      // data variable's isMissing function.   This is for backwards compatibility to support old MUGL
+      // files that use "missingop" and "missingvalue" renderer settings, rather than the new style
+      // of associating missing info with the data variables.  This can be eliminated once we don't
+      // need to support that any more.  (Also elimate all the associated code in this file.)
+      if (_missingop != _missingopNONE) {
+        if (_missingop == _missingopLT) { return x <  _missingvalue; }
+        if (_missingop == _missingopLE) { return x <= _missingvalue; }
+        if (_missingop == _missingopEQ) { return x == _missingvalue; }
+        if (_missingop == _missingopGE) { return x >= _missingvalue; }
+        if (_missingop == _missingopGT) { return x >  _missingvalue; }
+      }
+      if (vi <= -1) { return false; }
+      return _dataVariables[vi].isMissing(x);
     }
 
 //    var rangeOptions:Object = {

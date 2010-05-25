@@ -11,6 +11,7 @@ package multigraph.renderer {
 	
 	import multigraph.Axis;
 	import multigraph.MultigraphUIComponent;
+    import multigraph.data.Data;
 	
   public class Point extends Renderer
   {
@@ -84,8 +85,8 @@ package multigraph.renderer {
     	return _linethickness;
     }
     
-    public function Point(haxis:Axis, vaxis:Axis) {
-      super(haxis, vaxis);
+    public function Point(haxis:Axis, vaxis:Axis, data:Data, varids:Array) {
+      super(haxis, vaxis, data, varids);
       _linecolor = 0x000000;
       _color  = 0x000000;
       _fillopacity = 1;
