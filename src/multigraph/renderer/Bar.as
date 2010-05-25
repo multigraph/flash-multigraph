@@ -199,7 +199,7 @@ the color to be used for the fill inside each bar; if barbase is specified, this
     }
     
     override public function dataPoint (sprite:MultigraphUIComponent, datap:Array):void {
-      if (isMissing(datap[1])) { return; }
+      if (isMissing(datap[1],1)) { return; }
       var p:Array = [];
       transformPoint(p, datap);
       var g:Graphics = sprite.graphics;
