@@ -97,7 +97,7 @@ package multigraph.renderer {
 	// this seems to work fine.
 	// mbp Sat Jan 31 2009  11:41pm    
     public static function rendererList():Array {
-      return [Line, Bar, Fill, /*RadarInv,*/ Point, LineError, BarError, PointLine];
+      return [Line, Bar, Fill, /*RadarInv,*/ Point, LineError, BarError, PointLine, Band, RangeBar];
       /*
       return [{'class': Bar,   'keyword': Bar.keyword,  'description': Bar.description,  'options': Bar.options  },
               {'class': Line,  'keyword': Line.keyword, 'description': Line.description, 'options': Line.options },
