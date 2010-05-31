@@ -25,7 +25,7 @@ package multigraph
       
       private var _lastTextLabelWidth:Number  = 25;
       private var _lastTextLabelHeight:Number = 25;
-    	
+
       public function NumberLabeler(spacing:Number, unit:String, formatString:String, start:Number,
                                     px:Number, py:Number, angle:Number, ax:Number, ay:Number,
                                     textFormat:TextFormat, boldTextFormat:TextFormat) {
@@ -54,7 +54,7 @@ package multigraph
 	    var labelPixels       = (axis.orientation == Axis.ORIENTATION_HORIZONTAL)
 	            ? _lastTextLabelHeight * Math.sin(absAngle) + _lastTextLabelWidth * Math.cos(absAngle)
 	            : _lastTextLabelHeight * Math.cos(absAngle) + _lastTextLabelWidth * Math.sin(absAngle);
-        var spacingPixels:Number     = _spacing * axis.axisToDataRatio;
+        var spacingPixels:Number     = _spacing * Math.abs(axis.axisToDataRatio);
         var density:Number           = labelPixels / spacingPixels;
         
         return density;
@@ -103,23 +103,25 @@ package multigraph
       override public function prepare(dataMin:Number, dataMax:Number):void {
 		var F:int = 1.0;
 		var f:Number;
-		if (dataMin >= _start) {
-		    f = Math.floor( (dataMin - _start) / _spacing );
-		    if (dataMin - _start > _spacing * f * F) {
+        var direction:int = (dataMax >= dataMin) ? 1 : -1;
+        var dataStart:Number = (direction > 0) ? dataMin : dataMax;
+		if (dataStart >= _start) {
+		    f = Math.floor( (dataStart - _start) / _spacing );
+		    if (dataStart - _start > _spacing * f * F) {
 				_current = _spacing * ( 1 + f ) + _start;
 		    } else {
 				_current = _spacing * f + _start;
 		    }
 		} else {
-		    f = Math.floor( (_start - dataMin) / _spacing );
-		    if (dataMin - _start > -_spacing * (f + 1) * F) {
+		    f = Math.floor( (_start - dataStart) / _spacing );
+		    if (dataStart - _start > -_spacing * (f + 1) * F) {
 				_current = -_spacing * (f) + _start;
 		    } else {
 				_current = -_spacing * (f - 1) + _start;
 		    }
 		}
 		
-		_end = dataMax;
+		_end = (direction > 0) ? dataMax : dataMin;
       }
 
       override public function hasNext():Boolean {

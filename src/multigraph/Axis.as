@@ -604,7 +604,9 @@ package multigraph {
             newMax = _panConfig.max;
         }
 
-        if (newMin < newMax) {
+        if ((_dataMin <= _dataMax && newMin < newMax)
+            ||
+            (_dataMin >= _dataMax && newMin > newMax)) {
 
           if (_zoomConfig.haveMax && (newMax - newMin > _zoomConfig.max)) {
             var d:Number = (newMax - newMin - _zoomConfig.max) / 2;

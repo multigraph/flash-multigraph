@@ -183,6 +183,13 @@ package multigraph.data
 	
     override public function getIterator(variableIds:Array, min:Number, max:Number, buffer:int):DataIterator {
 
+        // if min > max, swap them:
+        if (min > max) {
+          var tmp:Number = max;
+          max = min;
+          min = tmp;
+        }
+
       if (_cache.isEmpty()) {
         return null;
       } else {

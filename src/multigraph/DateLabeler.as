@@ -83,7 +83,7 @@ package multigraph
       var labelPixels:Number       = (axis.orientation == Axis.ORIENTATION_HORIZONTAL)
         ? _lastTextLabelHeight * Math.sin(absAngle) + _lastTextLabelWidth * Math.cos(absAngle)
         : _lastTextLabelHeight * Math.cos(absAngle) + _lastTextLabelWidth * Math.sin(absAngle);
-      var spacingPixels:Number     = _msSpacing * axis.axisToDataRatio;
+      var spacingPixels:Number     = _msSpacing * Math.abs(axis.axisToDataRatio);
       var density:Number           = labelPixels / spacingPixels;
       
       return density;
@@ -111,36 +111,37 @@ package multigraph
     }
     
     override public function prepare(dataMin:Number, dataMax:Number):void {
-      var dataMinTurboDate:TurboDate = new TurboDate(dataMin);
+      var direction:int = (dataMax >= dataMin) ? 1 : -1;
+      var dataStartTurboDate:TurboDate = (direction > 0) ? new TurboDate(dataMin) : new TurboDate(dataMax);
       switch (_unit) {
       case "m":
-        _firstTickTurboDate = dataMinTurboDate.firstMinuteSpacingTickAtOrAfter(_startTurboDate, _spacing);
+        _firstTickTurboDate = dataStartTurboDate.firstMinuteSpacingTickAtOrAfter(_startTurboDate, _spacing);
         _msSpacing = _spacing * TurboDate.millisecondsInOneMinute;
         break;
       case "H":
-        _firstTickTurboDate = dataMinTurboDate.firstHourSpacingTickAtOrAfter(_startTurboDate, _spacing);
+        _firstTickTurboDate = dataStartTurboDate.firstHourSpacingTickAtOrAfter(_startTurboDate, _spacing);
         _msSpacing = _spacing * TurboDate.millisecondsInOneHour;
         break;
       case "D":
-        _firstTickTurboDate = dataMinTurboDate.firstDaySpacingTickAtOrAfter(_startTurboDate, _spacing);
+        _firstTickTurboDate = dataStartTurboDate.firstDaySpacingTickAtOrAfter(_startTurboDate, _spacing);
         _msSpacing = _spacing * TurboDate.millisecondsInOneDay;
         break;
       case "M":
-        _firstTickTurboDate = dataMinTurboDate.firstMonthSpacingTickAtOrAfter(_startTurboDate, _spacing);
+        _firstTickTurboDate = dataStartTurboDate.firstMonthSpacingTickAtOrAfter(_startTurboDate, _spacing);
         _msSpacing = _spacing * TurboDate.millisecondsInOneDay * 30;
         break;
       case "Y":
-        _firstTickTurboDate = dataMinTurboDate.firstYearSpacingTickAtOrAfter(_startTurboDate, _spacing);
+        _firstTickTurboDate = dataStartTurboDate.firstYearSpacingTickAtOrAfter(_startTurboDate, _spacing);
         _msSpacing = _spacing * TurboDate.millisecondsInOneDay * 365;
         break;
       default:
-        _firstTickTurboDate = dataMinTurboDate.firstMillisecondSpacingTickAtOrAfter(_startTurboDate, _spacing);
+        _firstTickTurboDate = dataStartTurboDate.firstMillisecondSpacingTickAtOrAfter(_startTurboDate, _spacing);
         _msSpacing = _spacing;
         break;
       }
       _currentTurboDate = _firstTickTurboDate.clone();
       _currentUTCms = _currentTurboDate.getUTCMilliseconds();
-      _end = dataMax;
+      _end = (direction > 0) ? dataMax : dataMin;
       _step = 0;
     }
     

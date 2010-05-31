@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<mugl>
+  <horizontalaxis id="x" min="0" max="10"/>
+  <verticalaxis   id="y" min="-10" max="10">
+    <labels format="%1d" function="abs"/>
+  </verticalaxis>
+  <plot>
+    <horizontalaxis ref="x">
+      <variable ref="x" />
+    </horizontalaxis>
+    <verticalaxis ref="y">
+      <variable ref="x" factor="-1"/>
+    </verticalaxis>
+    <renderer type="line">
+    </renderer>
+  </plot>
+  <data>
+    <variables>
+      <variable column="0" id="x" />
+      <variable column="1" id="y" />
+    </variables>
+    <values>
+      1,2
+      2,3
+      3,4
+      4,6
+      5,2
+      6,7
+      7,3
+      8,2
+    </values>
+  </data>
+</mugl>

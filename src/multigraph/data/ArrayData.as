@@ -85,6 +85,14 @@ package multigraph.data
 		* @return The array data iterator for this data set
 		*/
     override public function getIterator(variableIds:Array, min:Number, max:Number, buffer:int):DataIterator {
+
+        // if min > max, swap them:
+        if (min > max) {
+          var tmp:Number = max;
+          max = min;
+          min = tmp;
+        }
+
 	  var columnIndices:Array = [];
 	  for (var i:int=0; i<variableIds.length; ++i) {
 		for (var j:int=0; j<_variables.length; ++j) {
