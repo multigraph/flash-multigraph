@@ -88,6 +88,8 @@
 	import mx.managers.PopUpManager;
 
 	import mx.controls.Alert;
+	
+//	import mx.printing.*;
 
 	private var _swfname:String;
     private var aboutWindow:TitleWindow;
@@ -144,15 +146,32 @@
 		myMenu = new ContextMenu();
 		myMenu.hideBuiltInItems();
 		myMenu.builtInItems.print = true;
+
 		var item:ContextMenuItem = new ContextMenuItem("About Multigraph");
 		item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, showAboutWindow);
 		myMenu.customItems.push(item);
+
+/*		
+		item = new ContextMenuItem("Print Multigraph");
+		item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, doPrint);
+		myMenu.customItems.push(item);
+*/
+		
 		this.contextMenu = myMenu;
 //		stage.scaleMode = StageScaleMode.NO_SCALE;
 //    	stage.align = StageAlign.TOP_LEFT;
 	}
 
 
+/*
+	private function doPrint(evt:Event):void {
+		var printJob:FlexPrintJob = new FlexPrintJob();
+		printJob.start();
+		printJob.addObject(multigraphContainer, FlexPrintJobScaleType.NONE); 
+		printJob.send();
+    }
+*/
+            
 	private function showAboutWindow(evt:Event):void {
 	   aboutWindow = new AboutMultigraph();
        PopUpManager.addPopUp(aboutWindow, this.parent, true);
@@ -229,7 +248,7 @@
       }    
     }
 
-    public static function createPopUp(mugl:String, width:int, height:int, title:String, parent:DisplayObject, proxy:String=null, modal:Boolean=false) {
+    public static function createPopUp(mugl:String, width:int, height:int, title:String, parent:DisplayObject, proxy:String=null, modal:Boolean=false):ClosableTitleWindow {
         var titleWindow:ClosableTitleWindow = new ClosableTitleWindow();
         titleWindow.title = title;
 

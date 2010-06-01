@@ -1,0 +1,74 @@
+spacing="10Y,5Y,1Y,6M,2M,1M,..."
+spacing="100,10,5,2,1,0.5,0.25"
+
+start alternatives:
+    sample
+    member
+    point
+!   offset
+    registration
+    align
+    alignat
+!   anchor
+
+labelevery="100,10,5,2,1,0.5,0.25"
+labelat="0"
+
+every="100,10,5,2,1,0.5,0.25"
+at="0"
+
+
+current axis attributes:
+
+   minoffset,maxoffset: pixel amounts
+   pregap,postgap: pixel amounts
+
+new axis attributes:
+
+   minoffset,maxoffset: deprecated
+   pregap,postgap: deprecated
+   minpos,maxpos: expression of the form "AoNp" where A = axis length fraction, o = "+" or "-", N = pixel displacement, p = "p"
+      Examples:
+                maxpos="1-5p": max position is at far end of axis, minus 5 pixels
+                maxpos="0+5p": max position is at near end of axis, plus 5 pixels
+                maxpos="0": max position is at near end of axis (plus 0 pixels)
+      so old style minoffset="S" is same as minpos="0+Sp"
+               and maxoffset="T" is same as maxpos="1-Tp"
+   offset,length: expression of the form "AoNp", similar to above, where A = plotbox length/width fraction, N = pixel displacement,
+               "offset" gives position of "near" end of axis, and "length" gives axis length.
+               Default is offset="0+0p", length="1+0p".
+               old style pregap="S", postgap="T" are same as offset="0+Sp", length="1-Up", where U=T+S.
+
+*** check for consistency in use of the terms "position", "base", "offset", etc. with attributes associated with other MUGL tags.
+
+
+
+<mugl>
+  <horizontalaxis id="x"/>
+  <verticalaxis id="yupper" 
+                min="0"              max="10"
+                minrelpos="0"        maxrelpos="1"
+                relpregap=".5"       relpostgap="0"
+                >
+  </verticalaxis>
+  <verticalaxis id="ylower" 
+                min="0"              max="10"
+                minrelpos="1"        maxrelpos="0"
+                relpregap="0"        relpostgap=".5"
+                >
+    <labels format="..." spacing="..." start="..."
+            omit="...">
+      <label format="..." spacing="..." start="..."/>
+      <label format="..." spacing="..." start="..."/>
+      <label format="..." spacing="..." start="..."/>
+    </labels>
+  </verticalaxis>
+  <plot>
+    <horizontalaxis ref="x">
+    </horizontalaxis>
+    <verticalaxis ref="y">
+    </verticalaxis>
+  </plot>
+  <data>
+  </data>
+</mugl>
