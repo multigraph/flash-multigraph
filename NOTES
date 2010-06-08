@@ -19,9 +19,27 @@ at="0"
 
 
 current axis attributes:
-
+   min,max
    minoffset,maxoffset: pixel amounts
    pregap,postgap: pixel amounts
+   position
+
+new axis attributes:
+   min,max: same as before
+   minposition,maxposition: location of min/max point along axis, as expression of the form 'A[oN]', where A
+   							is a number from -1 to 1, o is '+' or '-', and N is a nonnegative integer indicating
+							a number of pixels.
+   anchor = location rel to axis length ([-1,1]) of anchor point
+   base = point rel to plot box ([-1,1] X [-1,1]) where anchor is attached
+   position = pixel offset as coord pair or single number; if single number, defaults to displacement in perp direction,
+              for consistency with old meaning of "position"
+   length = AoN, where A = fraction of plot box dimension, N = pixel offset
+
+
+
+
+
+
 
 new axis attributes:
 

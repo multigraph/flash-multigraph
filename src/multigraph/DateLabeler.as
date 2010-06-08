@@ -94,11 +94,11 @@ package multigraph
       
       var px:Number, py:Number;
       if(axis.orientation == Axis.ORIENTATION_VERTICAL) {
-        px = axis.position + _px;
+        px = axis.perpOffset + _px;
         py = a + _py;
       } else {
         px = a + _px;
-        py = axis.position + _py;
+        py = axis.perpOffset + _py;
       }
       var tLabel:TextLabel = new TextLabel(_formatter.format(value),
                                            _useBold ? _boldTextFormat :_textFormat,

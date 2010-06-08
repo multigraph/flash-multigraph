@@ -20,7 +20,12 @@ package multigraph
   {
 	private static var _s_instance_number:int = 0;
 	
-    public function HorizontalAxis(id:String, graph:Graph, length:int, offset:int, position:int, type:int,
+    public function HorizontalAxis(id:String,
+    							   graph:Graph, 
+    							   length:int, 
+    							   offset:int, 
+    							   position:int, 
+    							   type:int,
                                    color:uint,
 								   min:String, minoffset:int, max:String, maxoffset:int,
                                    title:String,

@@ -34,37 +34,35 @@ package multigraph {
 	public function get length():int { return _length; }
 
 	
-	// position and offset give the location of the axis in the graph,
-	// relative to the plot area.  For a horizontal axis, position is
-	// the pixel distance between the axis and the bottom edge of the
-	// plot area, and offset is the pixel distance of the left
-	// endpoint of the axis from the left edge of the plot area.  For
-	// a vertical axis, position is the distance between the axis and
-	// the plot area's left edge, and offset is the distance between
-	// the bottom endpoint of the axis and the plot area's bottom
-	// edge.  For both position and offset, positive values are toward
-	// the interior of the plot area.  Note that axes are specified in
+	// perpOffset and parallelOffset give the location of the axis in the graph,
+	// relative to the plot area.  perpOffset and parallelOffset are pixel
+	// values, and give the location of the lower left endpoint of the axis,
+	// as a coordinate offset from the lower left corner of the plot area.
+	// For a horizontal axis the lower left (i.e. left) endpoint of the
+	// axis is (parallelOffset, perpOffset), and for a vertical axis the lower
+	// left (i.e. lower) endpoint is (perpOffset, parallelOffset).
+	// Note that axes are specified in
 	// mugl files in terms of the "position", "positionbase",
 	// "pregap", and "postgap" attributes; these are converted to
-	// _length, _position, and _offset before the Axis() constructor
+	// _length, _perpOffset, and _parallelOffset before the Axis() constructor
 	// is called.
-    private var _position:int;
-	public function get position():int { return _position; }
-    private var _offset:int;   
-	public function get offset():int { return _offset; }
+    private var _perpOffset:int;
+	public function get perpOffset():int { return _perpOffset; }
+    private var _parallelOffset:int;   
+	public function get parallelOffset():int { return _parallelOffset; }
 	
 	
 	// pixel offset, relative to the left or bottom end of the axis, of the point
 	// on the axis corresponding to the min data point.  Positive offsets are
 	// towards the center of the axis.
     private var _minOffset:int;
-	public function get minOffset():int { return _minOffset; }
+	//public function get minOffset():int { return _minOffset; }
 
 	// pixel offset, relative to the right or top end of the axis, of the point
 	// on the axis corresponding to the max data point.   Positive offsets are
 	// towards the center of the axis.
     private var _maxOffset:int;
-	public function get maxOffset():int { return _maxOffset; }
+	//public function get maxOffset():int { return _maxOffset; }
 
 	//
 	// _dataMin is the min data value; access through dataMin getter/setter property in order to keep
@@ -201,12 +199,22 @@ package multigraph {
     private var _titleTextFormat:TextFormat;
     private var _titleBoldTextFormat:TextFormat;
 
-    public function Axis(id:String, graph:Graph, length:int, offset:int, position:int, type:int,
+    public function Axis(id:String,
+						 graph:Graph,
+						 length:int,
+						 parallelOffset:int,
+						 perpOffset:int,
+						 type:int,
 		   				 _color:uint,
-						 min:String, minoffset:int, max:String, maxoffset:int,
+						 min:String,
+						 minoffset:int,
+						 max:String,
+						 maxoffset:int,
                          title:String,
-                         titlePx:Number, titlePy:Number,
-                         titleAx:Number, titleAy:Number,
+                         titlePx:Number,
+						 titlePy:Number,
+                         titleAx:Number,
+						 titleAy:Number,
                          titleAngle:Number,
 						 grid:Boolean,
 						 gridColor:uint,
@@ -220,8 +228,8 @@ package multigraph {
       _id              = id;
       _s_instances[id] = this;
       _length          = length;
-      _offset          = offset;
-      _position        = position;
+      _parallelOffset          = parallelOffset;
+      _perpOffset        = perpOffset;
       _type            = type;
       _minOffset       = minoffset;
       _maxOffset       = maxoffset;
@@ -317,11 +325,11 @@ package multigraph {
     }
 
     public function dataValueToAxisValue(v:Number):Number {
-      return _axisToDataRatio * ( v - _dataMin ) + _minOffset + _offset;
+      return _axisToDataRatio * ( v - _dataMin ) + _minOffset + _parallelOffset;
     }
 
     public function axisValueToDataValue(V:Number):Number {
-      return (V - _minOffset - _offset) / _axisToDataRatio + _dataMin;
+      return (V - _minOffset - _parallelOffset) / _axisToDataRatio + _dataMin;
     }
 
     public function render(sprite:MultigraphUIComponent, step:int):void {
@@ -355,11 +363,11 @@ package multigraph {
               var a:Number = dataValueToAxisValue(v);
               g.lineStyle(1, gridColor, 1);
               if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-                g.moveTo(a, position);
-                g.lineTo(a, graph.plotBox.height - position);
+                g.moveTo(a, perpOffset);
+                g.lineTo(a, graph.plotBox.height - perpOffset);
               } else {
-                g.moveTo(position, a);
-                g.lineTo(graph.plotBox.width - position, a);
+                g.moveTo(perpOffset, a);
+                g.lineTo(graph.plotBox.width - perpOffset, a);
               }
             }
           }
@@ -376,11 +384,11 @@ package multigraph {
             g.lineStyle(_lineWidth,0,1);
           }
           if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-            g.moveTo(offset, position);
-            g.lineTo(offset + length, position);
+            g.moveTo(_parallelOffset, _perpOffset);
+            g.lineTo(_parallelOffset + _length, _perpOffset);
           } else {
-            g.moveTo(position, offset);
-            g.lineTo(position, offset + length);
+            g.moveTo(_perpOffset, _parallelOffset);
+            g.lineTo(_perpOffset, _parallelOffset + _length);
           }
         }
 
@@ -389,13 +397,13 @@ package multigraph {
           if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
             sprite.addChild(new TextLabel(title,
                                           titleTextFormat,
-                                          offset + length / 2 + titlePx,  position + titlePy,
+                                          _parallelOffset + _length / 2 + titlePx,  _perpOffset + titlePy,
                                           titleAx, titleAy,
                                           titleAngle));
           } else {
             sprite.addChild(new TextLabel(title,
                                           titleTextFormat,
-                                          position + titlePx,  offset + length / 2 + titlePy,
+                                          _perpOffset + titlePx,  _parallelOffset + _length / 2 + titlePy,
                                           titleAx, titleAy,
                                           titleAngle));
           }
@@ -414,11 +422,11 @@ package multigraph {
             var a:Number = dataValueToAxisValue(v);
             g.lineStyle(tickThickness,0,1);
             if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-              g.moveTo(a, position+_tickMax);
-              g.lineTo(a, position+_tickMin);
+              g.moveTo(a, perpOffset+_tickMax);
+              g.lineTo(a, perpOffset+_tickMin);
             } else {
-              g.moveTo(position+_tickMin, a);
-              g.lineTo(position+_tickMax, a);
+              g.moveTo(perpOffset+_tickMin, a);
+              g.lineTo(perpOffset+_tickMax, a);
             }
             _labeler.renderLabel(sprite, this, v);
           }
@@ -455,9 +463,9 @@ package multigraph {
         // this is a real 'move' event --- not a 'drag'
         var d:Number;
         if (_orientation == Axis.ORIENTATION_VERTICAL) {
-          d = p.x - _position;
+          d = p.x - _perpOffset;
         } else {
-          d = p.y - _position;
+          d = p.y - _perpOffset;
         }
         if ( ((d >= 0) && (d < _pixelSelectionDistance)) || ((d < 0) && (d > -_pixelSelectionDistance)) ) {
 		  if (_graph != null) { _graph.selectAxis(this); }

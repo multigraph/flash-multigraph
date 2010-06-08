@@ -136,14 +136,14 @@ package multigraph
 			_width = (_orientation) ? _axis.length: 45;
 			_height = (_orientation) ? 30 : _axis.length;
 			_xPos = (_orientation) ? 
-					Number(config.value('plotarea', '@marginleft')) + _paddingBorder + _axis.offset :
+					Number(config.value('plotarea', '@marginleft')) + _paddingBorder + _axis.parallelOffset :
 					Number(config.value('plotarea', '@marginleft'))
-				  	+ _paddingBorder + _axis.position - (_width / 2);
+				  	+ _paddingBorder + _axis.perpOffset - (_width / 2);
 			_xEndPos = _xPos + _width;
 			_yPos = (_orientation) ? 
 					Number(config.value('plotarea', '@marginbottom')) 
-				  	+ _paddingBorder + _axis.position - (_height / 2) :
-				  	Number(config.value('plotarea', '@marginbottom')) + _paddingBorder + _axis.offset;
+				  	+ _paddingBorder + _axis.perpOffset - (_height / 2) :
+				  	Number(config.value('plotarea', '@marginbottom')) + _paddingBorder + _axis.parallelOffset;
 			_yEndPos = _yPos + _height;
 			
 			_sprite.addChild(_newSprite);

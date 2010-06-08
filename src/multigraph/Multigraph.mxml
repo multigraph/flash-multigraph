@@ -47,12 +47,12 @@
       @font-face
       {
 		font-family: arial;
-        src: url("../../fonts/Arial.ttf");
+        src: url("../../fonts/ARIAL.TTF");
       }
       @font-face
       {
 		font-family: arialBold;
-        src: url("../../fonts/Arial_Bold.ttf");
+        src: url("../../fonts/ARIALBD.TTF");
         font-weight: bold; 
       }
 
