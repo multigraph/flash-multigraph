@@ -78,6 +78,7 @@
     	import mx.containers.TitleWindow;
     	import mx.controls.Label;
     	import mx.events.CloseEvent;
+    	import mx.utils.URLUtil;
 
 	import multigraph.Graph;
 	import multigraph.renderer.RendererList;
@@ -133,6 +134,10 @@
 			new RendererList();
 		} else {
 			this._swfname = swfname;
+			hostname = mx.utils.URLUtil.getServerName(this.parentApplication.url);
+			var parentAppPort:String = String(mx.utils.URLUtil.getPort(this.parentApplication.url));
+			if (parentAppPort != "0") port = parentAppPort; // if no port is specified in URL, getPort sets it to 0
+			
   			var loader:URLLoader = new URLLoader();
     		loader.dataFormat = "text";
     		loader.addEventListener( Event.COMPLETE, 
