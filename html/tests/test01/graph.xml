@@ -5,7 +5,7 @@
     <icon width="20" height="20" />
   </legend>
   <horizontalaxis id="xaxis"
-                  position="20"
+                  position="0"
                   pregap="0"
                   postgap="0"
                   min="0"

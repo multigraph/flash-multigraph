@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="350" height="225"
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="375" height="250"
 	showCloseButton="true"
 	close="closeMe()"
-	styleName="myStyle">
+	styleName="myStyle"
+    creationComplete="init()"
+    >
 
     <mx:Style>
         .myStyle { fontSize: 12; fontWeight: bold; textAlign: center; horizontalAlign: center; }
     </mx:Style>
-    <mx:Text width="100%">
-        <mx:htmlText>
-            <![CDATA[Multigraph is a tool for displaying<br>interactive data plots.  See<br><br><a target="_blank" href="http://www.multigraph.org">www.multigraph.org</a><br><br>for details.<br> <br>]]>
-        </mx:htmlText>
+    <mx:Text width="100%" id="textField">
     </mx:Text>
     <mx:Button label="OK" click="closeMe()"/>
 
@@ -19,6 +18,11 @@
     private function closeMe():void {
     	PopUpManager.removePopUp(this);
     }
+    private function init():void {
+//This is Multigraph version '+Multigraph.getVersion()+'.<br>\
+        textField.htmlText = 'Multigraph is a tool for displaying<br>interactive data plots.  See<br>\
+<a target="_blank" href="http://www.multigraph.org">www.multigraph.org</a> for details.<br> <br>';
+   }
   ]]></mx:Script>
 	    
 	

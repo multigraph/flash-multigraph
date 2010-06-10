@@ -127,6 +127,10 @@
        return m;
     }
 
+    public static function getVersion():String {
+        return "1.2.3.4";
+    }
+
 	public function init():void {
 		if (test=="true") {
 		} else if (rendererlist=="true") {

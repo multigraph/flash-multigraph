@@ -153,7 +153,7 @@
       <variable id="temp"/>
       <variable id="precip"/>
     </variables>
-    <service location="http://www.multigraph.org/examples/testcrn/crndata.cgi/1026/T5,P5"/>
+    <service location="http://services.multigraph.org/crn/data.cgi/1026/T5,P5"/>
   </data>
 
   <data>
@@ -163,7 +163,7 @@
       <variable id="sur_temp"/>
       <variable id="windspd"/>
     </variables>
-    <service location="http://www.multigraph.org/examples/testcrn/crndata.cgi/1026/SOLARAD,SUR_TEMP,WINDSPD"/>
+    <service location="http://services.multigraph.org/crn/data.cgi/1026/SOLARAD,SUR_TEMP,WINDSPD"/>
   </data>
 
 </mugl>

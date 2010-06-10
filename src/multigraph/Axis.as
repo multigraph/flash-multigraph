@@ -199,13 +199,20 @@ package multigraph {
     private var _titleTextFormat:TextFormat;
     private var _titleBoldTextFormat:TextFormat;
 
+
+    // this gets set to true in the constructor if the data direction
+    // of this axis is reversed from what you'd usually expect,
+    // i.e. the location of the "min" data value is to the right, or
+    // above, the location of the "max" data value.
+    private var _reversed:Boolean = false;
+
     public function Axis(id:String,
 						 graph:Graph,
 						 length:int,
 						 parallelOffset:int,
 						 perpOffset:int,
 						 type:int,
-		   				 _color:uint,
+		   				 color:uint,
 						 min:String,
 						 minoffset:int,
 						 max:String,
@@ -228,8 +235,8 @@ package multigraph {
       _id              = id;
       _s_instances[id] = this;
       _length          = length;
-      _parallelOffset          = parallelOffset;
-      _perpOffset        = perpOffset;
+      _parallelOffset  = parallelOffset;
+      _perpOffset      = perpOffset;
       _type            = type;
       _minOffset       = minoffset;
       _maxOffset       = maxoffset;
@@ -247,6 +254,8 @@ package multigraph {
       _tickMin		   = tickMin;
       _tickMax		   = tickMax;
       _highlightStyle  = highlightStyle;
+
+      _reversed = (_minOffset > _length - _maxOffset);
 
 	  if (title == null) { _title = _id; }
       if (_title == '') { _title = null; }
@@ -462,12 +471,19 @@ package multigraph {
       if(_mouseDragBase == null) {
         // this is a real 'move' event --- not a 'drag'
         var d:Number;
+        var e:Number;
         if (_orientation == Axis.ORIENTATION_VERTICAL) {
           d = p.x - _perpOffset;
+          e = p.y - _parallelOffset;
         } else {
           d = p.y - _perpOffset;
+          e = p.x - _parallelOffset;
         }
-        if ( ((d >= 0) && (d < _pixelSelectionDistance)) || ((d < 0) && (d > -_pixelSelectionDistance)) ) {
+        if (
+            ((e >= 0) && (e <= _length))
+            &&
+            (((d >= 0) && (d < _pixelSelectionDistance)) || ((d < 0) && (d > -_pixelSelectionDistance)))
+            ) {
 		  if (_graph != null) { _graph.selectAxis(this); }
 	/*
           // change the mouse cursor
@@ -597,6 +613,7 @@ package multigraph {
             dataBase = _zoomConfig.anchor;
         }
         var factor:Number = 10 * Math.abs(pixelDisplacement / (_length - _maxOffset - _minOffset));
+        if (_reversed) { factor = -factor; }
         var newMin:Number, newMax:Number;
         if (pixelDisplacement <= 0) {
             newMin = (_dataMin - dataBase) * ( 1 + factor ) + dataBase;

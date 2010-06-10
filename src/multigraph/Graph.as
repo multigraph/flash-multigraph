@@ -715,6 +715,7 @@ package multigraph {
       var axes:Array = [];
 
       for(var i:int = 0; i < numAxes; ++i){
+        /*
         var position:Number = _config.value(axistag, i, '@position');
         var positionbase:String = _config.value(axistag, i, '@positionbase');
         if (positionbase == 'right') {
@@ -722,6 +723,8 @@ package multigraph {
         } else if (positionbase == 'top') {
           position = _plotBox.height + position;
         }
+        */
+
         var titletext:String;
         if (_config.xmlvalue(axistag, i, '@title') == null) {
           titletext = null;
@@ -744,19 +747,95 @@ package multigraph {
         
         var id:String        = _config.value(axistag, i, '@id');
         var min:String       = _config.value(axistag, i, '@min');
-        var minoffset:String = _config.value(axistag, i, '@minoffset');
         var max:String       = _config.value(axistag, i, '@max');
-        var maxoffset:String = _config.value(axistag, i, '@maxoffset');
-        var pregap:Number = _config.value(axistag,i,'@pregap');
-        var postgap:Number = _config.value(axistag,i,'@postgap');
+        //var minoffset:String = _config.value(axistag, i, '@minoffset');
+        //var maxoffset:String = _config.value(axistag, i, '@maxoffset');
+        //var pregap:Number = _config.value(axistag,i,'@pregap');
+        //var postgap:Number = _config.value(axistag,i,'@postgap');
+
+        var minPosition:Displacement = Displacement.parse( _config.value(axistag, i, '@minposition') );
+        var maxPosition:Displacement = Displacement.parse( _config.value(axistag, i, '@maxposition') );
+
+        var position:String   = _config.value(axistag, i, '@position');
+        var axisPosition:PixelPoint = PixelPoint.parse(position, (axisType==HorizontalAxis) ? 1 : 0);
+
+        var base:String       = _config.value(axistag, i, '@base');
+
+        //
+        // code to handle deprecated "@positionbase" attribute; only has effect if "@base" is not specifed in xml
+        //
+        var xmlbase:String = _config.xmlvalue(axistag, i, '@base');
+        if (xmlbase==null || xmlbase=="") {
+          var positionbase:String = _config.xmlvalue(axistag, i, '@positionbase');
+          if (positionbase == 'right') {
+            base = "1 -1";
+          }
+          if (positionbase == 'top') {
+            base = "-1 1";
+          }
+        }
+        //
+        // end of code to handle deprecated "@positionbase" attribute
+        //
+
+        var axisBase:PixelPoint = PixelPoint.parse(base);
+
+        var anchor:Number     = Number(_config.value(axistag, i, '@anchor'));
+
+        var lengthDisplacement:Displacement = Displacement.parse( _config.value(axistag,i,'@length') );
+        var length:Number = lengthDisplacement.calculateLength((axisType == HorizontalAxis) ? _plotBox.width : _plotBox.height );
+        
+        var parallelOffset:Number = 0;
+		var perpOffset:Number = 0;
+
+        if (axisType == HorizontalAxis) {
+          parallelOffset = axisPosition.x + (axisBase.x + 1) * _plotBox.width/2 - (anchor + 1) * length / 2;
+          perpOffset = axisPosition.y + (axisBase.y + 1) * _plotBox.height/2;
+        } else {
+          parallelOffset = axisPosition.y + (axisBase.y + 1) * _plotBox.height/2 - (anchor + 1) * length / 2;
+          perpOffset = axisPosition.x + (axisBase.x + 1) * _plotBox.width/2;
+        }
 
         var title:String  = _config.xmlvalue(axistag,i,'title');
-        var titlePosition:PixelPoint = PixelPoint.parse(_config.value(axistag,i,'title','@position'));
-        var titleAnchor:PixelPoint = PixelPoint.parse(_config.value(axistag,i,'title','@anchor'));
+
+        var titlePositionString:String = _config.xmlvalue(axistag,i,'title','@position');
+        if (titlePositionString==null || titlePositionString=="") {
+          if (axisType == HorizontalAxis) {
+            if (perpOffset > _plotBox.height/2) {
+              titlePositionString = _config.value(axistag,i,'title','@position_horiz_top');
+            } else {
+              titlePositionString = _config.value(axistag,i,'title','@position_horiz_bot');
+            }
+          } else {
+            if (perpOffset > _plotBox.width/2) {
+              titlePositionString = _config.value(axistag,i,'title','@position_vert_right');
+            } else {
+              titlePositionString = _config.value(axistag,i,'title','@position_vert_left');
+            }
+          }
+        }
+        var titlePosition:PixelPoint = PixelPoint.parse( titlePositionString );
+
+        var titleAnchorString:String = _config.xmlvalue(axistag,i,'title','@anchor');
+        if (titleAnchorString==null || titleAnchorString=="") {
+          if (axisType == HorizontalAxis) {
+            if (perpOffset > _plotBox.height/2) {
+              titleAnchorString = _config.value(axistag,i,'title','@anchor_horiz_top');
+            } else {
+              titleAnchorString = _config.value(axistag,i,'title','@anchor_horiz_bot');
+            }
+          } else {
+            if (perpOffset > _plotBox.width/2) {
+              titleAnchorString = _config.value(axistag,i,'title','@anchor_vert_right');
+            } else {
+              titleAnchorString = _config.value(axistag,i,'title','@anchor_vert_left');
+            }
+          }
+        }
+        var titleAnchor:PixelPoint = PixelPoint.parse( titleAnchorString );
+
         var titleAngle:Number = parseFloat(_config.value(axistag,i,'title','@angle'));
 
-        var labelPosition:PixelPoint;
-        var labelAnchor:PixelPoint;
 
         var grid:Boolean = (_config.xmlvalue(axistag,i,'grid') != null);
         var gridColor:uint = parsecolor( _config.value(axistag,i,'grid','@color') );
@@ -788,15 +867,15 @@ package multigraph {
 
         axes[i] = new axisType(id,
                                this,
-                               ((axisType == HorizontalAxis) ? _plotBox.width : _plotBox.height) - pregap - postgap,
-                               pregap,
-                               position,
+                               length,
+                               parallelOffset,
+                               perpOffset,
                                type,
                                0x000000,
                                min,
-                               minoffset,
+                               minPosition.calculateCoordinate(length), //minoffset,
                                max,
-                               maxoffset,
+                               length - maxPosition.calculateCoordinate(length), //maxoffset,
                                title,
                                titlePosition.x,
                                titlePosition.y,
@@ -828,9 +907,43 @@ package multigraph {
           axes[i].hasAxisControls = true;
           axes[i].axisControl = new AxisControls(_axisControlSprite, axes[i], _config);
         }
-                                               
-        labelPosition  = PixelPoint.parse(_config.value(axistag, i, 'labels', '@position'));
-        labelAnchor = PixelPoint.parse(_config.value(axistag, i, 'labels', '@anchor'));
+
+        var labelPositionString:String = _config.xmlvalue(axistag, i, 'labels', '@position');
+        if (labelPositionString==null || labelPositionString=="") {
+          if (axisType == HorizontalAxis) {
+            if (perpOffset > _plotBox.height/2) {
+              labelPositionString = _config.value(axistag,i,'labels','@position_horiz_top');
+            } else {
+              labelPositionString = _config.value(axistag,i,'labels','@position_horiz_bot');
+            }
+          } else {
+            if (perpOffset > _plotBox.width/2) {
+              labelPositionString = _config.value(axistag,i,'labels','@position_vert_right');
+            } else {
+              labelPositionString = _config.value(axistag,i,'labels','@position_vert_left');
+            }
+          }
+        }
+        var labelPosition:PixelPoint = PixelPoint.parse( labelPositionString );
+
+        var labelAnchorString:String = _config.xmlvalue(axistag, i, 'labels', '@anchor');
+        if (labelAnchorString==null || labelAnchorString=="") {
+          if (axisType == HorizontalAxis) {
+            if (perpOffset > _plotBox.height/2) {
+              labelAnchorString = _config.value(axistag,i,'labels','@anchor_horiz_top');
+            } else {
+              labelAnchorString = _config.value(axistag,i,'labels','@anchor_horiz_bot');
+            }
+          } else {
+            if (perpOffset > _plotBox.width/2) {
+              labelAnchorString = _config.value(axistag,i,'labels','@anchor_vert_right');
+            } else {
+              labelAnchorString = _config.value(axistag,i,'labels','@anchor_vert_left');
+            }
+          }
+        }
+        var labelAnchor:PixelPoint = PixelPoint.parse( labelAnchorString );
+
         var labeler:Labeler;
         
         var labelerType:Object = (type == Axis.TYPE_DATETIME) ? DateLabeler : NumberLabeler;

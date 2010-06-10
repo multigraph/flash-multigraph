@@ -15,8 +15,8 @@ package multigraph.renderer
   import multigraph.MultigraphUIComponent;
   import multigraph.NumberAndUnit;
   import multigraph.VerticalAxis;
-  import multigraph.parsecolor;
   import multigraph.data.Data;
+  import multigraph.parsecolor;
     
   public class Bar extends Renderer
   {
@@ -330,7 +330,11 @@ the color to be used for the fill inside each bar; if barbase is specified, this
     	g.drawRect(0, 0, sprite.width, sprite.height);
     	g.endFill();
 
-        var fillcolor:uint = getRangeOption("fillcolor", 0);
+		var fc = getRangeOption("fillcolor", 0);
+		if (fc is String) {
+			fc = parsecolor(fc);
+		}
+        var fillcolor:uint = fc;
     	
     	g.beginFill(fillcolor, _fillopacity);
     	if (_barpixelWidth < 10) { 

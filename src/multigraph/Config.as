@@ -51,6 +51,26 @@ package multigraph
         args.length = i;
         return args;
       }
+
+      private var _axis_title_default_position_horiz_top  = '0 15';
+      private var _axis_title_default_position_horiz_bot  = '0 -18';
+      private var _axis_title_default_position_vert_right = '33 0';
+      private var _axis_title_default_position_vert_left  = '-25 0';
+
+      private var _axis_title_default_anchor_horiz_top    = '0 -1';
+      private var _axis_title_default_anchor_horiz_bot    = '0 1';
+      private var _axis_title_default_anchor_vert_right   = '-1 0';
+      private var _axis_title_default_anchor_vert_left    = '1 0';
+
+      private var _axis_label_default_position_horiz_top  = '0 5';
+      private var _axis_label_default_position_horiz_bot  = '0 -5';
+      private var _axis_label_default_position_vert_right = '5 0';
+      private var _axis_label_default_position_vert_left  = '-8 0';
+
+      private var _axis_label_default_anchor_horiz_top    = '0 -1';
+      private var _axis_label_default_anchor_horiz_bot    = '0 1';
+      private var _axis_label_default_anchor_vert_right   = '-1 0';
+      private var _axis_label_default_anchor_vert_left    = '1 0';
         
 		// The default values for an axis, to be used in place of xml specified configuration if it exists
         private var _axis_defaults:Object = {
@@ -60,12 +80,17 @@ package multigraph
               if (args[0]=='horizontalaxis') { return 'left'; }
               return 'bottom';
             },
+            base      : "-1 -1",
+            anchor    : -1,
+            length    : 1,
             pregap    : 0,
             postgap   : 0,
             min       : 'auto',
-            minoffset : 0,
+            //minoffset : 0,
+            minposition : "-1",
             max       : 'auto',
-            maxoffset : 0,
+            maxposition : "1",
+            //maxoffset : 0,
             linewidth : 1,
             tickmin   : -3,
             tickmax   : 3,
@@ -75,19 +100,28 @@ package multigraph
                 fontsize : 12,
                 fontcolor : '0x000000',
                 angle : 0,
+                position_horiz_top : _axis_title_default_position_horiz_top,
+                position_horiz_bot : _axis_title_default_position_horiz_bot,
+                position_vert_right : _axis_title_default_position_vert_right,
+                position_vert_left : _axis_title_default_position_vert_left,
+                anchor_horiz_top : _axis_title_default_anchor_horiz_top,
+                anchor_horiz_bot : _axis_title_default_anchor_horiz_bot,
+                anchor_vert_right : _axis_title_default_anchor_vert_right,
+                anchor_vert_left : _axis_title_default_anchor_vert_left
+                /*
                 position : function(...args):String {
                 	var positionbase:String = this.value.apply( this, this.relpath(args, '..', '..', '@positionbase') );
                     if (args[0]=='horizontalaxis') {
                       if (positionbase == 'top') {
-                        return '0 15';
+                        return _axis_title_default_position_horiz_top;
                       } else {
-                        return '0 -18';
+                        return _axis_title_default_position_horiz_bot;
                       }
                     } else {
                       if (positionbase == 'right') {
-                        return '33 0';
+                        return _axis_title_default_position_vert_right;
                       } else {
-                        return '-25 0';
+                        return _axis_title_default_position_vert_left;
                       }
                     }
                 },
@@ -95,18 +129,19 @@ package multigraph
                 	var positionbase:String = this.value.apply( this, this.relpath(args, '..', '..', '@positionbase') );
                     if (args[0]=='horizontalaxis') {
                       if (positionbase == 'top') {
-                        return '0 -1';
+                        return _axis_title_default_anchor_horiz_top;
                       } else {
-                        return '0 1';
+                        return _axis_title_default_anchor_horiz_bot;
                       }
                     } else {
                       if (positionbase == 'right') {
-                        return '-1 0';
+                        return _axis_title_default_anchor_vert_right;
                       } else {
-                        return '1 0';
+                        return _axis_title_default_anchor_vert_left;
                       }
                     }
                 }
+                */
             },
             labels : {
                 fontname : "default",
@@ -115,19 +150,28 @@ package multigraph
                 format   : '%1d',
                 start    : 0,
                 angle    : 0,
+                position_horiz_top  : _axis_label_default_position_horiz_top,
+                position_horiz_bot  : _axis_label_default_position_horiz_bot,
+                position_vert_right : _axis_label_default_position_vert_right,
+                position_vert_left  : _axis_label_default_position_vert_left,
+                anchor_horiz_top    : _axis_label_default_anchor_horiz_top,
+                anchor_horiz_bot    : _axis_label_default_anchor_horiz_bot,
+                anchor_vert_right   : _axis_label_default_anchor_vert_right,
+                anchor_vert_left    : _axis_label_default_anchor_vert_left,
+                /*
                 position : function(...args):String {
                 	var positionbase:String = this.value.apply( this, this.relpath(args, '..', '..', '@positionbase') );
                     if (args[0]=='horizontalaxis') {
 	        			if (positionbase == 'top') {
-                    		return '0 5';
+                    		return _axis_label_default_position_horiz_top;
             			} else {						
-                    		return '0 -5';
+                    		return _axis_label_default_position_horiz_bot;
                			}
                     } else { // vertical axis:
 						if (positionbase == 'right') {
-							return '5 0';
+							return _axis_label_default_position_vert_right;
 						} else {
-		                    return '-8 0';
+		                    return _axis_label_default_position_vert_left;
 	    				}
                     }
 
@@ -136,18 +180,19 @@ package multigraph
                 	var positionbase:String = this.value.apply( this, this.relpath(args, '..', '..', '@positionbase') );
                     if (args[0]=='horizontalaxis') {
 						if (positionbase == 'top') {
-                          return '0 -1';
+                          return _axis_label_default_anchor_horiz_top;
                         } else {
-                          return '0 1';
+                          return _axis_label_default_anchor_horiz_bot;
                         }
                     } else {
 						if (positionbase == 'right') {
-							return '-1 0';
+							return _axis_label_default_anchor_vert_right;
 						} else {
-		                    return '1 0';
+		                    return _axis_label_default_anchor_vert_left;
 	    				}
                     }
                 },
+                */
                 spacing : '10000 5000 2000 1000 500 200 100 50 20 10 5 2 1 0.1 0.01 0.001',
                 label : {
             		format    : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@format') ); },
