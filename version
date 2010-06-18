@@ -1,0 +1,57 @@
+#! /usr/bin/env perl
+
+=head1 NAME
+
+version - tell which version of multigraph this is
+
+=head1 SYNOPSIS
+
+version [-c]
+
+=head1 OVERVIEW
+
+This short script simply prints out the version tag of this copy of
+multigraph. (It finds this version tag by examining the URL from which
+this copy of multigraph was checked out from subversion.)
+
+=head1 OPTIONS
+
+=over 4
+
+=item -c
+
+Concise output: just print the version tag, rather than a complete
+sentence.
+
+=back
+
+=cut
+
+# Subversion will automatically replace the following string with the
+# repository URL corresponding to this file (using keyword expansion):
+my $URL = '$URL$';
+
+my $concise = ($ARGV[0] eq "-c");
+
+my $version = "unknown";
+
+if ($URL =~ m|/trunk/|) {
+    $version = "trunk";
+} elsif ( my ($v) = ($URL =~ m|/tags/([^/]+)/|) ) {
+    $v =~ s/^multigraph-//i;
+    $version = $v;
+}
+
+if ($concise) {
+    if ($version eq "trunk") {
+	print "trunk\n";
+    } else {
+	print "$version\n";
+    }
+} else {
+    if ($version eq "trunk") {
+	print "This is the trunk version of multigraph.\n";
+    } else {
+	print "This is version $version of multigraph.\n";
+    }
+}

@@ -1,6 +1,6 @@
 #! /usr/bin/perl
 
-chomp($version = `./dist-version`);
+chomp($version = `./version -c`);
 sys("cp Multigraph.swc Multigraph-$version.swc");
 
 sub sys {

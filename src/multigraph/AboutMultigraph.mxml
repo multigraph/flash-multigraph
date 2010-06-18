@@ -19,8 +19,9 @@
     	PopUpManager.removePopUp(this);
     }
     private function init():void {
-//This is Multigraph version '+Multigraph.getVersion()+'.<br>\
-        textField.htmlText = 'Multigraph is a tool for displaying<br>interactive data plots.  See<br>\
+
+        textField.htmlText = 'This is Multigraph version '+Multigraph.getVersion()+'.<br>\
+Multigraph is a tool for displaying<br>interactive data plots.  See<br>\
 <a target="_blank" href="http://www.multigraph.org">www.multigraph.org</a> for details.<br> <br>';
    }
   ]]></mx:Script>

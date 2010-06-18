@@ -1,6 +1,6 @@
 #! /usr/bin/perl
 
-chomp($version = `./dist-version`);
+chomp($version = `./version -c`);
 $dist_name = "multigraph-$version-examples";
 
 sub sys {

@@ -128,9 +128,18 @@
        return m;
     }
 
+    // Subversion will automatically replace the following string with the
+    // repository URL corresponding to this file (using keyword expansion):
+    private static var _URL:String = "$URL$";
+
+    private static var _versionRegExp:RegExp = /^.*\/tags\/([^\/]+)\/.*$/;
+
     public static function getVersion():String {
-        // this function is not useful yet; it will be made useful in an upcoming version
-        return "1.2.3.4";
+        var a:Array = _versionRegExp.exec(_URL);
+        if (a != null) {
+            return a[1].replace(/^multigraph-/, "");
+        }
+        return "unknown";
     }
 
 	public function init():void {

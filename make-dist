@@ -1,6 +1,6 @@
 #! /usr/bin/perl
 
-chomp($version = `./dist-version`);
+chomp($version = `./version -c`);
 $dist_name = "multigraph-$version";
 
 sub sys {
@@ -30,6 +30,8 @@ sys("cp html/expressInstall.swf $dist_name/Multigraph");
 sys("cp LICENSE.txt $dist_name");
 open(OUT, ">$dist_name/README");
 print OUT <<EOF
+                     Multigraph $version
+
 This directory contains the Multigraph distribution.  To publish html
 pages containing Multigraph graphs on a web server, put the file
 "Multigraph.js", and the folder "Multigraph" (including everything it
@@ -54,7 +56,7 @@ For more information, see http://www.multigraph.org.
 
 ----------------------------------------------------------------------
 
-Copyright (c) 2009  University of North Carolina at Asheville
+Copyright (c) 2010  University of North Carolina at Asheville
 
 Multigraph is distributed under the terms of the RENCI Open Source
 Software License v. 1.0.  For details, see the file LICENSE.txt, or

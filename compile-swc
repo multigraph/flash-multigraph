@@ -20,6 +20,7 @@ $classes = join(" ", @classes);
 $cmd = "compc"
     . " -use-network=false"
     . " -compiler.show-actionscript-warnings=false"
+    . " -managers flash.fonts.AFEFontManager"
     . " -source-path src"
     . " -output='bin-debug/Multigraph.swc'"
     . " -include-classes $classes"

@@ -1,5 +1,0 @@
-#! /usr/bin/perl
-
-chomp($VERSION = `cat VERSION`);
-chomp($SEQUENCE = `cat SEQUENCE`);
-printf("%s-%s", $VERSION, $SEQUENCE);

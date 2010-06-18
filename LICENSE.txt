@@ -1,4 +1,4 @@
-    Copyright (c) 2009  University of North Carolina at Asheville
+    Copyright (c) 2009,2010  University of North Carolina at Asheville
     Licensed under the RENCI Open Source Software License v. 1.0.
 
 The University of North Carolina at Asheville and the University of

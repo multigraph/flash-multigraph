@@ -1,6 +1,6 @@
 #! /usr/bin/perl
 
-chomp($version = `./dist-version`);
+chomp($version = `./version -c`);
 $dist_name = "multigraph-$version-src";
 
 sub sys {
@@ -13,6 +13,7 @@ sys("/bin/rm -f $dist_name.zip");
 sys("/bin/rm -rf $dist_name");
 sys("mkdir $dist_name");
 sys("tar -c -f - --exclude $dist_name . | (cd $dist_name ; tar xf -)");
+sys("rm -rf $dist_name/bin-debug");
 sys("find $dist_name -name .svn -print | xargs /bin/rm -rf");
 sys("zip -r $dist_name.zip $dist_name");
 sys("/bin/rm -rf $dist_name");
