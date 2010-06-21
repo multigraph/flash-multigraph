@@ -20,6 +20,9 @@ at="0"
 
 current axis attributes:
    min,max
+   position: offset of the axis, in pixels, relative to bottom (for horiz axes) or left (for vertical) edge of plot box
+   positionbase: if "right", change meaning of "position" attribute to be relative to right rather than left edge of plot box
+                 if "top", change meaning of "position" attribute to be relative to top rather than bottom edge of plot box
    minoffset,maxoffset: pixel amounts
    pregap,postgap: pixel amounts
    position
@@ -45,6 +48,14 @@ new axis attributes:
 
    minoffset,maxoffset: deprecated
    pregap,postgap: deprecated
+   positionbase: deprecated
+   base: plot box relative coordinates [(-1,-1) to (1,1)] of base point where axis is attached
+   anchor: axis-relative coordinate [-1 to 1] of point on axis where attached to base point
+   position: pixel offset amounts; accepts a coordinate pair of pixels, but if just one number is specified, defaults
+             to using that number as the vertical coordinate for horizontal axes, or the horizontal coordinate for
+             vertical axes.  For example, position="5" is the same as position="0 5" for a horizontal axis, or
+	     position="5 0" for a vertical axis.  This gives consistency with the old (original) meaning of
+	     the position attribute.
    minpos,maxpos: expression of the form "AoNp" where A = axis length fraction, o = "+" or "-", N = pixel displacement, p = "p"
       Examples:
                 maxpos="1-5p": max position is at far end of axis, minus 5 pixels

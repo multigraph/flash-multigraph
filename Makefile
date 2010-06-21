@@ -20,6 +20,9 @@ dist-examples: _always
 dist-docs: _always
 	@./make-dist-docs
 
+dist-wordpress-plugin: _always
+	@./make-dist-wordpress-plugin
+
 dist-src: _always
 	@./make-dist-src
 

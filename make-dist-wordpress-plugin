@@ -1,0 +1,36 @@
+#! /usr/bin/perl
+
+chomp($version = `./version -c`);
+$dist_name = "multigraph-$version-wordpress-plugin";
+
+sub sys {
+    my $cmd = shift;
+    print("$cmd\n");
+    return system($cmd);
+}
+
+sys("/bin/rm -f $dist_name.zip");
+sys("/bin/rm -rf $dist_name");
+sys("mkdir $dist_name");
+sys("(cd wordpress-plugin ; tar cf - multigraph) | (cd $dist_name ; tar xvf -)");
+sys("find $dist_name -name '.svn' -print | xargs /bin/rm -rf");
+sys("cp Multigraph.swf $dist_name/multigraph/Multigraph-$version.swf");
+replace_in_file("$dist_name/multigraph/multigraph.php", "Multigraph.swf", "Multigraph-$version.swf");
+replace_in_file("$dist_name/multigraph/multigraph.php", "Version:\\s*[0-9\\.]+", "Version: $version");
+sys("(cd $dist_name ; zip -r ../$dist_name.zip multigraph)");
+sys("/bin/rm -rf $dist_name");
+
+sub replace_in_file {
+    my $file = shift;
+    my $pattern = shift;
+    my $replacement = shift;
+    open(IN, "<$file");
+    open(OUT, ">$file.new");
+    while (my $line=<IN>) {
+	$line =~ s|$pattern|$replacement|g;
+	print OUT $line;
+    }
+    close(OUT);
+    close(IN);
+    rename("$file.new", "$file");
+}

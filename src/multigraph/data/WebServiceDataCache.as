@@ -12,47 +12,47 @@ package multigraph.data
   {
     private var _head:WebServiceDataCacheBlock;
     private var _tail:WebServiceDataCacheBlock;
-
+    
     public function WebServiceDataCache() {
-	  _head = null;
-	  _tail = null;
-	}
-
-	public function isEmpty():Boolean {
-	  return _head==null;
-	}
-
+      _head = null;
+      _tail = null;
+    }
+    
+    public function isEmpty():Boolean {
+      return _head==null;
+    }
+    
     public function dataHead():WebServiceDataCacheBlock {
       if (_head.hasData()) { return _head; }
       return _head.dataNext;
     }
-
+    
     public function dataTail():WebServiceDataCacheBlock {
       if (_tail.hasData()) { return _tail; }
       return _tail.dataPrev;
     }
-
+    
     public function get coveredMin():Number {
-    	/*
+      /*
     	if (_head == null) { return NaN; }
     	return _head.coveredMin;
     	*/
-    	var b:WebServiceDataCacheBlock = dataHead();
-      	if (b==null) { return NaN; }
-      	return b.coveredMin;
+      var b:WebServiceDataCacheBlock = dataHead();
+      if (b==null) { return NaN; }
+      return b.coveredMin;
     }
 
     public function get coveredMax():Number {
-    	/*
+      /*
     	if (_tail == null) { return NaN; }
     	return _tail.coveredMax;
     	*/
-    	var b:WebServiceDataCacheBlock = dataTail();
-      	if (b==null) { return NaN; }
-      	return b.coveredMax;
+      var b:WebServiceDataCacheBlock = dataTail();
+      if (b==null) { return NaN; }
+      return b.coveredMax;
     }
 
-	public function insertBlock(block:WebServiceDataCacheBlock):void {
+    public function insertBlock(block:WebServiceDataCacheBlock):void {
       if (_head==null) {
         _head = block;
         _tail = block;
@@ -68,16 +68,16 @@ package multigraph.data
         }
       }
     }
-
-	public function getIterator(columnIndices:Array, min:Number, max:Number, buffer:int):WebServiceDataIterator {
-
+    
+    public function getIterator(columnIndices:Array, min:Number, max:Number, buffer:int):WebServiceDataIterator {
+      
       var initialBlock:WebServiceDataCacheBlock;
       var initialIndex:int;
       var n:int;
       var finalBlock:WebServiceDataCacheBlock;
       var finalIndex:int;
       var b:WebServiceDataCacheBlock;
-
+      
       // find the data block containing the 'min' value
       initialBlock = dataHead();
       while ((initialBlock != null)
@@ -87,8 +87,8 @@ package multigraph.data
              (min > initialBlock.dataMax)) {
         initialBlock = initialBlock.dataNext;
       }
-
-
+      
+      
       if (initialBlock==null || !initialBlock.hasData()) {
         initialIndex = -1;
       } else {
@@ -99,7 +99,7 @@ package multigraph.data
                (initialBlock.data[initialIndex][columnIndices[0]] < min)) {
           ++initialIndex;
         }
-
+	
         // back up 'buffer' steps, being careful not to go further back than the first element of the head block
         n = 0;
         while (n<buffer) {
@@ -116,8 +116,8 @@ package multigraph.data
           }
           ++n;
         }
-
-
+	
+	
         // find the data block containing the 'max' value
         finalBlock = initialBlock;
         while ( (max > finalBlock.dataMax)
@@ -125,7 +125,7 @@ package multigraph.data
                 (finalBlock.dataNext != null) ) {
           finalBlock = finalBlock.dataNext;
         }
-
+	
         // find the index within the final block corresponding to the 'max' value
         finalIndex = 0;
         if (finalBlock == initialBlock) {
@@ -136,7 +136,7 @@ package multigraph.data
                (finalBlock.data[finalIndex][columnIndices[0]] < max)) {
           ++finalIndex;
         }
-
+	
         // go forward 'buffer' more steps, being careful not to go further than the last element of the tail
         n = 0;
         //while (n<buffer && !(finalBlock==_tail && finalIndex<finalBlock.data.length)) {
@@ -154,13 +154,13 @@ package multigraph.data
           }
           ++n;
         }
-
+	
       }
-
+      
       return new WebServiceDataIterator(columnIndices, initialBlock, initialIndex, finalBlock, finalIndex);
-
-	}
-
+      
+    }
+    
     public function getStatus():Array {
       var stati:Array = [];
       var b:WebServiceDataCacheBlock = _head;
@@ -174,7 +174,7 @@ package multigraph.data
       }
       return stati;
     }
-
-
+    
+    
   }
 }
