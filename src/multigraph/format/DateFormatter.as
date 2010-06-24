@@ -29,7 +29,7 @@ package multigraph.format
 		        case "m": // Month (numerical) without leading zeros
 		            return date.getUTCMonth() + 1 + '';
 		        case "M": // Month (numerical) with leading zeros
-		            return (date.getUTCMonth() <= 9) ? "0" + (date.getUTCMonth() + 1) + '' : (date.getUTCMonth() + 1) + '';
+		            return (date.getUTCMonth() < 9) ? "0" + (date.getUTCMonth() + 1) + '' : (date.getUTCMonth() + 1) + '';
 		        case "Y": // Four digit year
 		            return date.getUTCFullYear() + '';
 		        case "y": // Two digit year
