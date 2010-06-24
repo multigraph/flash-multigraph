@@ -151,8 +151,8 @@ axis = (
    }?&
    element zoom {
       attribute allowed { text }?&		# 'yes' or 'no'; default: 'yes'
-      attribute in { text }?&			# default: null
-      attribute out { text }?&			# default: null
+      attribute min { text }?&			# default: null
+      attribute max { text }?&			# default: null
       attribute anchor { text }?		# number; default: null
    }?&
    element binding {
