@@ -170,7 +170,7 @@ package multigraph.renderer {
         if (_missingop == _missingopGE) { return x >= _missingvalue; }
         if (_missingop == _missingopGT) { return x >  _missingvalue; }
       }
-      if (vi <= -1) { return false; }
+      if (vi <= -1 || vi >= _dataVariables.length) { return false; }
       return _dataVariables[vi].isMissing(x);
     }
 
