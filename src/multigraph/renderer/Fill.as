@@ -18,33 +18,38 @@ package multigraph.renderer
   public class Fill extends Renderer
   {
     static public var keyword:String = 'fill';
-    static public var description:String = 'Plot lines connecting data points, with a solid fill between the lines and the horizontal axis';
+    static public var description:String = 'Plot lines connecting data points, with a solid fill between the lines and the horizontal axis, or between the lines and a specified horizontal base line';
     static public var options:String = '<ul>\
-<li><b>linecolor</b>: the color to be used for the lines\
-<li><b>linewidth</b>: the width of the lines, in pixels\
+<li><b>linecolor</b>: the color to be used for the lines; default is black\
+<li><b>linewidth</b>: the width of the lines, in pixels; default is 1\
 <li><b>linethickness</b>: deprecated; same as linewidth\
-<li><b>fillcolor</b>: the color to be used for the fill area\
+<li><b>fillcolor</b>: the color to be used for the fill area; the default is grey\
+<li><b>downfillcolor</b>: the color to be used for fill area that is below the fillbase, if a fillbase is specified.  If no downfillcolor is specifed, fillcolor will be used for all fill areas\
 <li><b>fillopacity</b>: the opacity to be used for the fill area\
-<li><b>fillbase</b>: the location, relative to the plot\'s vertical axis, of the bottom of the fill region; if no fillbase is specified, the fill will extend down to the bottom of the plot area'
-      +optionsMissing+
-      '</ul>';
+<li><b>fillbase</b>: the location along the plot\'s vertical axis of the horizontal line that defines the bottom (or top) of the filled region; if no fillbase is specified, the fill will extend down to the bottom of the plot area\
+</ul>';
 		
     // Mugl properties
     private var _fillcolor:uint;
+    private var _downfillcolor:uint;
     private var _linecolor:uint;
+    private var _downlinecolor:uint;
     private var _linewidth:uint;
     private var _fillopacity:Number;
     private var _fillbase:Number;
 		
     // Accessible color properties
     public var _linecolor_str:String;   
+    public var _downlinecolor_str:String = null;   
     public var _fillcolor_str:String;   
+    public var _downfillcolor_str:String = null;   
 
     private var _points:Array;
-    private var _points_fillcolor:uint;
-    private var _points_linecolor:uint;
     private var _fillbaseIsSet:Boolean;
     private var _fillpixelBase:Number;
+    private var _prevp:Array = null;
+    private var _currentfillcolor:uint;
+    private var _currentlinecolor:uint;
     private var _g:Graphics;
 		
     public function get fillcolor ():String { return _fillcolor_str; }
@@ -53,10 +58,22 @@ package multigraph.renderer
       _fillcolor = parsecolor(color);
     }
 
+    public function get downfillcolor ():String { return _downfillcolor_str; }
+    public function set downfillcolor (color:String):void {
+      _downfillcolor_str = color; 
+      _downfillcolor = parsecolor(color);
+    }
+
     public function get linecolor ():String { return _linecolor_str; }
     public function set linecolor (color:String):void {
       _linecolor_str = color; 
       _linecolor = parsecolor(color);
+    }
+
+    public function get downlinecolor ():String { return _downlinecolor_str; }
+    public function set downlinecolor (color:String):void {
+      _downlinecolor_str = color; 
+      _downlinecolor = parsecolor(color);
     }
 
     public function get fillopacity ():String { return _fillopacity+''; }
@@ -82,31 +99,29 @@ package multigraph.renderer
       _linewidth = 1;
       _fillopacity = 1;
       _fillbaseIsSet = false;
+      _fillcolor_str = "0x999999";
+      _fillcolor = parsecolor(_fillcolor_str);
+      _linecolor_str = "0x000000";
+      _linecolor = parsecolor(_linecolor_str);
     }
 		
-    override public function initialize():void {
-    	
-      var option:String;
-      for (option in _rangeOptions) {
-        if (option == "fillcolor" || option == "linecolor") {
-          for (var i:int=0; i<_rangeOptions[option].length; ++i) {
-            if (_rangeOptions[option][i].value is String) {
-              _rangeOptions[option][i].value = parsecolor(_rangeOptions[option][i].value);
-            }
-          }
-        }
-      }
-
-    }    
-
     private function clearPoints(nsave:int=1):void {
       var oldpoints:Array = _points;
       _points = [];
       for (var i:int=0; i<nsave; ++i) {
         _points[i] = oldpoints[oldpoints.length-nsave+i];
       }
-      _points_fillcolor = 0x000000;
-      _points_linecolor = 0x000000;
+    }
+
+    override public function initialize():void {
+      if (_downfillcolor_str == null) {
+        _downfillcolor_str = _fillcolor_str;
+        _downfillcolor = _fillcolor;
+      }
+      if (_downlinecolor_str == null) {
+        _downlinecolor_str = _linecolor_str;
+        _downlinecolor = _linecolor;
+      }
     }
 
     override public function begin(sprite:MultigraphUIComponent):void {
@@ -116,15 +131,22 @@ package multigraph.renderer
       if (_fillbaseIsSet) {
         _fillpixelBase = _vaxis.dataValueToAxisValue(_fillbase);
       }
+      _prevp = null;
+    }
+
+    private function interpolate(x1:Number, y1:Number, x2:Number, y2:Number, y:Number):Number {
+      if (y1 == y2) { return (x1 + x2) / 2; }
+      return x1 + ( y - y1 ) * ( x2 - x1 ) / ( y2 - y1 );
     }
 
     override public function dataPoint(sprite:MultigraphUIComponent, datap:Array):void {
-      // The _points array holds a "run" of consecutive data points.  When/if we hit a missing value,
-      // we render that run and reset the _points array to empty.
+
       if (isMissing(datap[1],1)) {
-        if (_points.length > 0) {
-          renderPoints();
+        if (_prevp != null) {
+          _points.push( [_prevp[0], _fillpixelBase] );
+          renderPoints(_currentfillcolor, _currentlinecolor);
           clearPoints(0);
+          _prevp = null;
         }
         return;
       }
@@ -132,21 +154,40 @@ package multigraph.renderer
       var p:Array = [];
       transformPoint(p, datap);
 
-      // if this value is not missing, for now we just add it to the _points array
-      var fillcolor:uint = getRangeOption("fillcolor", datap[1]);
-      var linecolor:uint = getRangeOption("linecolor", datap[1]);
-      if (_points.length > 0 && (_points_linecolor != linecolor || _points_fillcolor != fillcolor)) {
-        renderPoints();
-        clearPoints(1);
+      var fillcolor:uint;
+      var linecolor:uint;
+      if (datap[1] >= _fillbase) {
+        fillcolor = _fillcolor;
+        linecolor = _linecolor;
+      } else {
+        fillcolor = _downfillcolor;
+        linecolor = _downlinecolor;
       }
+      if (_points.length == 0) {
+        _points.push( [p[0], _fillpixelBase] );
+      } else {
+        if (fillcolor != _currentfillcolor) {
+          var x:Number = interpolate(_prevp[0], _prevp[1], p[0], p[1], _fillpixelBase);
+          _points.push( [x, _fillpixelBase] );
+          _points.push( [x, _fillpixelBase] );
+          renderPoints(_currentfillcolor, _currentlinecolor);
+          clearPoints(0);
+          _points.push( [x, _fillpixelBase] );
+          _points.push( [x, _fillpixelBase] );
+        }
+      }
+      _currentfillcolor = fillcolor;
+      _currentlinecolor = linecolor;
       _points.push(p);
-      _points_linecolor = linecolor;
-      _points_fillcolor = fillcolor;
+      _prevp = p;
+
     }
+
 
     override public function end(sprite:MultigraphUIComponent):void {
       // render any points currently in the _points array
-      renderPoints();
+      _points.push( [_points[_points.length-1][0], _fillpixelBase] );
+      renderPoints(_currentfillcolor, _currentlinecolor);
     }
 
     // render a "run" of points in the _points array.  This consists of drawing the fill region
@@ -154,23 +195,22 @@ package multigraph.renderer
     // fill region with lineTo() calls, using our specified line style when drawing between
     // the actual data points, and an invisible line style when drawing the vertical lines to/from
     // the horizontal axis, and along the horizontal axis.
-    private function renderPoints():void {
+    private function renderPoints(fillcolor:uint, linecolor:uint):void {
       if (_points.length <= 0) { return; }
-      _g.beginFill(_points_fillcolor, _fillopacity);
-      // move to the position on the horiz axis under the first point in the run
-      _g.moveTo(_points[0][0], _fillpixelBase);
-      // draw (using invisible line style) vertical line up to the first point in the run
+      _g.beginFill(fillcolor, _fillopacity);
+      // move to the first point, which is on the base line
+      _g.moveTo(_points[0][0], _points[0][1]);
+      // draw (using invisible line style) vertical line to the 2nd point
       _g.lineStyle(0, 0, 0);
-      _g.lineTo(_points[0][0], _points[0][1]);
-      // change to our specified line style and draw to each subsequent point in the run
-      _g.lineStyle(_linewidth, _points_linecolor, 1);
-      for (var i:int=1; i<_points.length; ++i) {
+      _g.lineTo(_points[1][0], _points[1][1]);
+      // change to our specified line style and draw to each subsequent point in the run, up to but not including the last one
+      _g.lineStyle(_linewidth, linecolor, _linewidth > 0 ? 1 : 0);
+      for (var i:int=2; i<_points.length-1; ++i) {
         _g.lineTo(_points[i][0], _points[i][1]);
       }
-      // change back to invisible line style and draw vertical line down to position
-      // on horizontal axis under the last point of the run
+      // change back to invisible line style and draw vertical line to last point, which is on base line
       _g.lineStyle(0, 0, 0);
-      _g.lineTo(_points[_points.length-1][0], _fillpixelBase);
+      _g.lineTo(_points[_points.length-1][0], _points[_points.length-1][1]);
       // draw (still using invisible line style) horiz line along axis back to starting position
       _g.lineTo(_points[0][0], _fillpixelBase);
       // end the fill

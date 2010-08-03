@@ -1,8 +1,12 @@
 package multigraph
 {
+	import mx.graphics.codec.PNGEncoder;
+	
 	public class Export
 	{
-		import com.adobe.images.PNGEncoder;
+CONFIG::player10 {
+		import mx.graphics.codec.PNGEncoder;
+}				
 		import mx.core.UIComponent;
 		import flash.display.DisplayObject;
 		import flash.net.FileReference;
@@ -20,8 +24,9 @@ package multigraph
 			var fr:FileReference = new FileReference();
 			var bitmapdata:BitmapData = new BitmapData(w, h, false, 0xFFFFFF);
 			bitmapdata.draw(obj);
-			var bytes:ByteArray = PNGEncoder.encode(bitmapdata);
-			fr.save(bytes, "image-" + w  + "x" + h + ".png");
+			var e:PNGEncoder = new PNGEncoder();
+			var bytes:ByteArray = e.encode(bitmapdata);
+			fr.save(bytes, "multigraph.png");
           }
         }
 	}

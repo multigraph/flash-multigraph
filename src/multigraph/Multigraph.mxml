@@ -79,8 +79,9 @@
     	import mx.controls.Label;
     	import mx.events.CloseEvent;
     	import mx.utils.URLUtil;
-		import com.adobe.images.PNGEncoder;
-
+CONFIG::player10 {    	
+		import mx.graphics.codec.PNGEncoder;
+}
 	import multigraph.Graph;
 	import multigraph.renderer.RendererList;
     import flash.external.ExternalInterface;
