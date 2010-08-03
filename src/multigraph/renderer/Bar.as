@@ -27,16 +27,13 @@ package multigraph.renderer
 <li><b>baroffset</b>: the offset of the left edge of each bar from the corresponding data value\
 <li><b>barbase</b>: the location, relative to the plot\'s vertical axis, of the bottom of the bar; if no barbase is specified, the bars will extend down to the bottom of the plot area\
 <li><b>fillcolor</b>: the color to be used for the fill inside each bar; if barbase is specified, this color is used only for bars that extend above the base\
-<li><b>downfillcolor</b>: if a barbase is specified, this color is used for bars that extend below the base; if no barbase is specified, downfillcolor is ignored because the base is the bottom of the plot area, so no bars extend below that\
-the color to be used for the fill inside each bar; if barbase is specified, this color is used for the part of the bar above the base\
 <li><b>linecolor</b>: the color to be used for the outline around each bar\
 <li><b>hidelines</b>: hide bar outlines when the bars are less wide than this number of pixels; default is 2'
 +optionsMissing+
 '</ul>';
 
     // mugl properties
-    public  var fillcolor;
-    private var _downfillcolor:uint;
+    private var fillcolor;
     private var _linecolor:uint;
     private var _barwidth:String;
     private var _baroffset:Number;
@@ -50,8 +47,6 @@ the color to be used for the fill inside each bar; if barbase is specified, this
         
     // Accessible color properties
     public var _linecolor_str:String;   
-    //public var _fillcolor_str:String;
-    public var _downfillcolor_str:String;
         
     private var _trueWidth:Number;
     private var _barpixelWidth:uint;
@@ -71,18 +66,6 @@ the color to be used for the fill inside each bar; if barbase is specified, this
         
     private var _numberAndUnit:Object;
     
-    //public function get fillcolor ():String { return _fillcolor_str; }
-    //    public function set fillcolor (color:String):void {
-    //      _fillcolor_str = color;
-    //      fillcolor = parsecolor(color); 
-    //    }
-        
-    public function get downfillcolor ():String { return _downfillcolor_str; }
-    public function set downfillcolor (color:String):void {
-      _downfillcolor_str = color;
-      _downfillcolor = parsecolor(color); 
-    }
-        
     public function get linecolor ():String { return _linecolor_str; }
     public function set linecolor (color:String):void {
       _linecolor_str = color; 
@@ -117,8 +100,6 @@ the color to be used for the fill inside each bar; if barbase is specified, this
     public function Bar (haxis:HorizontalAxis, vaxis:VerticalAxis, data:Data, varids:Array)
     {
       super(haxis, vaxis, data, varids);
-      //_fillcolor = 0x000000;
-      _downfillcolor_str = null;
       _linecolor = 0x000000;
       _barwidth = "1";
       _baroffset = 0;
@@ -127,8 +108,8 @@ the color to be used for the fill inside each bar; if barbase is specified, this
       _barbaseIsSet = false;
     }
         
-    override public function begin (sprite:MultigraphUIComponent):void {
-
+    override public function initialize():void {
+    	
       if (fillcolor is String) {
         fillcolor = parsecolor(fillcolor);
       }
@@ -144,18 +125,9 @@ the color to be used for the fill inside each bar; if barbase is specified, this
         }
       }
 
-      /*
-      for (var i:int=0; i<_rangeOptions.length; ++i) {
-        if ((_rangeOptions[i].name == "fillcolor"
-             ||
-             _rangeOptions[i].name == "linecolor")) {
-          for (var j:int=0; j<
-             && (_rangeOptions[i].value is String) ) {
-          _rangeOptions[i].value = parsecolor(_rangeOptions[i].value);
-        }
-      }
-      }
-      */
+    }    
+        
+    override public function begin (sprite:MultigraphUIComponent):void {
 
       var g:Graphics = sprite.graphics;
       _numberAndUnit = NumberAndUnit.parse(_barwidth);
@@ -204,13 +176,6 @@ the color to be used for the fill inside each bar; if barbase is specified, this
       transformPoint(p, datap);
       var g:Graphics = sprite.graphics;
 
-      /*            
-      if (_barbaseIsSet && _downfillcolor_str != null && p[1] < _barpixelBase) {
-        g.beginFill(_downfillcolor, _fillopacity);
-      } else {
-        g.beginFill(_fillcolor, _fillopacity);
-      }
-      */
       var fillcolor:uint = getRangeOption("fillcolor", datap[1]);
       g.beginFill(fillcolor, _fillopacity);
 

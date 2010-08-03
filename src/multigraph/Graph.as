@@ -517,6 +517,7 @@ package multigraph {
             }
           }
         }
+        renderer.initialize();
 
         //
         // determine this plot's legend label

@@ -18,7 +18,6 @@
   xmlns:multigraph="multigraph.*"
   layout="absolute"
   backgroundColor="0xFFFFFF"
-  backgroundGradientColors="undefined"
   applicationComplete="init()"
   horizontalAlign="left"
   paddingLeft="0"

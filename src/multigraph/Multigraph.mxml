@@ -79,6 +79,7 @@
     	import mx.controls.Label;
     	import mx.events.CloseEvent;
     	import mx.utils.URLUtil;
+		import com.adobe.images.PNGEncoder;
 
 	import multigraph.Graph;
 	import multigraph.renderer.RendererList;
@@ -170,11 +171,11 @@
 		item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, showAboutWindow);
 		myMenu.customItems.push(item);
 
-/*		
-		item = new ContextMenuItem("Print Multigraph");
-		item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, doPrint);
+CONFIG::player10 {
+		item = new ContextMenuItem("Save Current Graph as PNG Image");
+		item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, saveAsPNG);
 		myMenu.customItems.push(item);
-*/
+}
 		
 		this.contextMenu = myMenu;
 //		stage.scaleMode = StageScaleMode.NO_SCALE;
@@ -182,14 +183,11 @@
 	}
 
 
-/*
-	private function doPrint(evt:Event):void {
-		var printJob:FlexPrintJob = new FlexPrintJob();
-		printJob.start();
-		printJob.addObject(multigraphContainer, FlexPrintJobScaleType.NONE); 
-		printJob.send();
+CONFIG::player10 {
+	private function saveAsPNG(evt:Event):void {
+		Export.savePNG(this);
     }
-*/
+}
             
 	private function showAboutWindow(evt:Event):void {
 	   aboutWindow = new AboutMultigraph();

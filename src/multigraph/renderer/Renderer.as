@@ -79,6 +79,10 @@ package multigraph.renderer {
           _dataVariables[i] = data.varIdToVar(varids[i]);
         }
     }
+
+	// 'initialize()' is called after all the renderer's options are set; subclasses that need to do some processing
+	// with option values can override this
+    public function initialize():void {}
     
     public function begin(sprite:MultigraphUIComponent):void {}
     public function dataPoint(sprite:MultigraphUIComponent, p:Array):void {}
