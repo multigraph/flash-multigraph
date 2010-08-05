@@ -33,7 +33,7 @@ package multigraph.renderer
 '</ul>';
 
     // mugl properties
-    private var fillcolor;
+    public var fillcolor;
     private var _linecolor:uint;
     private var _barwidth:String;
     private var _baroffset:Number;

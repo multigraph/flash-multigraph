@@ -391,13 +391,17 @@ package multigraph {
         }
       }
       
-      if (!haveCsv) {
+      // temporarily disable delayed phase2 initialization because it does not seem to work when compiled with Flex 4 SDK.
+      //    When fixing this, be sure to remove the early 'return' from finishCsv() below!
+      //if (!haveCsv) {
         init_phase2();
-      }
+      //}
       
     }
     
     private function finishCsv(data:CSVFileArrayData):void {
+    	// temporarily disable delayed phase2 initialization because it does not seem to work when compiled with Flex 4 SDK
+    	return;
     	--_numCsvOutstanding;
     	if (_numCsvOutstanding == 0) {
           init_phase2();
