@@ -33,8 +33,8 @@
       </verticalaxis>
       <renderer type="bar">
         <option name="linecolor" value="black"/>
-        <option name="fillcolor" value="red"/>
-        <option name="downfillcolor" value="blue"/>
+        <option name="fillcolor" value="red" min="0"/>
+        <option name="fillcolor" value="blue" max="0"/>
         <option name="barwidth"  value="1.0"/>
         <option name="baroffset" value="0.5"/>
         <option name="barbase"   value="0.0"/>
@@ -81,8 +81,8 @@
       </verticalaxis>
       <renderer type="bar">
         <option name="linecolor" value="black"/>
-        <option name="fillcolor" value="red"/>
-        <option name="downfillcolor" value="blue"/>
+        <option name="fillcolor" value="red" min="0"/>
+        <option name="fillcolor" value="blue" max="0"/>
         <option name="barwidth"  value="1.0"/>
         <option name="baroffset" value="0.5"/>
         <option name="barbase"   value="0.0"/>
