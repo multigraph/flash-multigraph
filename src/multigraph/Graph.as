@@ -521,6 +521,33 @@ package multigraph {
             }
           }
         }
+
+        // set the data filter, if any
+        var filterType:String = _config.value('plot', i, 'filter', '@type');
+        if (filterType == "grid") {
+          var rows:int    = 100;
+          var columns:int = 100;
+          var visible:Boolean = false;
+          var noptions:int = _config.value('plot', i, 'filter', 'option').length();
+          for (var j:int=0; j<noptions; ++j) {
+            var name:String  = _config.value('plot', i, 'filter', 'option', j, '@name');
+            var value:String = _config.value('plot', i, 'filter', 'option', j, '@value');
+            if (name=="rows") { rows = int(value); }
+            if (name=="columns") { columns = int(value); }
+            if (name=="visible") { visible = (value=="true"); }
+          }
+          renderer.dataFilter = new GridDataFilter(rows, columns, _plotBox.width, _plotBox.height, visible);
+        } else if (filterType == "consecutivedistance") {
+          var distance:int    = 5;
+          var noptions:int = _config.value('plot', i, 'filter', 'option').length();
+          for (var j:int=0; j<noptions; ++j) {
+            var name:String  = _config.value('plot', i, 'filter', 'option', j, '@name');
+            var value:String = _config.value('plot', i, 'filter', 'option', j, '@value');
+            if (name=="distance") { distance = int(value); }
+          }
+          renderer.dataFilter = new ConsecutiveDistanceDataFilter(distance);
+        }
+
         renderer.initialize();
 
         //
