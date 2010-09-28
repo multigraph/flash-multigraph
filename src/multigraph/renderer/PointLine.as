@@ -25,7 +25,7 @@ package multigraph.renderer {
 <li><b>linecolor</b> color to use for the lines; default is 0x000000 (black)\
 <li><b>linewidth</b> width, in pixels, to use for the lines; default is 1\
 <li><b>pointsize</b> radius of the markers, in pixels; default is 0, which means do not draw markers\
-<li><b>pointshape</b> shape to use for the markers; must be one of "circle", "square", "triangle", "diamond", or "star"; default is "circle"\
+<li><b>pointshape</b> shape to use for the markers; must be one of "circle", "square", "triangle", "diamond", "star", "+", or "x"; default is "circle"\
 <li><b>pointcolor</b> color to use for the markers; default is 0x000000 (black)\
 <li><b>pointopacity</b> opacity of points, in range 0.0 (completely transparent) to 1.0 (completely opaque); default is 1.0\
 <li><b>pointoutlinewidth</b> width, in pixels, of outline to draw around markers; default is 0, which means draw no outline\
@@ -44,14 +44,16 @@ package multigraph.renderer {
     private var _pointoutlinecolor:uint;
 
 	private var _linecolor_str:String;
-    private var _pointcolor_str:String;
-    private var _pointoutlinecolor_str:String;
+    private var _pointcolor_str:String = null;;
+    private var _pointoutlinecolor_str:String = null;
 
     private static var CIRCLE_SHAPE:int   = 1;
     private static var SQUARE_SHAPE:int   = 2;
     private static var TRIANGLE_SHAPE:int = 3;
     private static var DIAMOND_SHAPE:int  = 4;
     private static var STAR_SHAPE:int     = 5;
+    private static var PLUS_SHAPE:int     = 6;
+    private static var X_SHAPE:int        = 7;
 
 
     private var points:Array;
@@ -122,6 +124,10 @@ package multigraph.renderer {
         _pointshape = DIAMOND_SHAPE;
       } else if (s == "star") {
         _pointshape = STAR_SHAPE;
+      } else if (s == "+") {
+        _pointshape = PLUS_SHAPE;
+      } else if (s == "x") {
+        _pointshape = X_SHAPE;
       } else {
         _pointshape = CIRCLE_SHAPE;
       }
@@ -132,6 +138,8 @@ package multigraph.renderer {
       if (_pointshape == TRIANGLE_SHAPE) { return "triangle"; }
       if (_pointshape == DIAMOND_SHAPE) { return "diamond"; }
       if (_pointshape == STAR_SHAPE) { return "star"; }
+      if (_pointshape == PLUS_SHAPE) { return "+"; }
+      if (_pointshape == X_SHAPE) { return "x"; }
       return "(unknown)";
     }
 
@@ -152,6 +160,7 @@ package multigraph.renderer {
     override public function begin(sprite:MultigraphUIComponent):void {
       this.prevPoint = null;
       this.points      = [];
+      if (_dataFilter != null) { _dataFilter.reset(_haxis, _vaxis); }
     }
 
     override public function dataPoint(sprite:MultigraphUIComponent, datap:Array):void {
@@ -160,6 +169,7 @@ package multigraph.renderer {
       } else {
         var p:Array = [];
         transformPoint(p, datap);
+        if (_dataFilter != null && _dataFilter.filter(datap, p)) { return; }
         if (_linewidth > 0 && prevPoint != null) {
           var g:Graphics = sprite.graphics;
           g.lineStyle(_linewidth, _linecolor, 1);
@@ -180,15 +190,46 @@ package multigraph.renderer {
           drawPoint(g, p[0], p[1]);
         }
       }
+      if (_dataFilter != null) { _dataFilter.draw(g); }
     }
 
     private function drawPoint(g:Graphics, x:Number, y:Number) {
-      g.beginFill(_pointcolor, _pointopacity);
       if (_pointoutlinewidth > 0) {
         g.lineStyle(_pointoutlinewidth, _pointoutlinecolor, 1);
       } else {
         g.lineStyle(0,0,0);
       }
+
+      //
+      // handle these shapes separately, since they involve no fill:
+      //
+      if (_pointshape == PLUS_SHAPE || _pointshape == X_SHAPE) {
+        // With these shapes, if a pointcolor was specified and a
+        // pointoutlinecolor was not, use pointcolor as the color for
+        // the lines.
+        if (_pointoutlinecolor_str == null && _pointcolor_str != null) {
+          var w:int = _pointoutlinewidth > 0 ? _pointoutlinewidth : 1;
+          g.lineStyle(w, _pointcolor, 1);
+        }
+        if (_pointshape == PLUS_SHAPE) {
+          g.moveTo(x, y-_pointsize);
+          g.lineTo(x, y+_pointsize);
+          g.moveTo(x-_pointsize, y);
+          g.lineTo(x+_pointsize, y);
+        } else if (_pointshape == X_SHAPE) {
+          var p:Number = 0.70710 * _pointsize;
+          g.moveTo(x-p, y-p);
+          g.lineTo(x+p, y+p);
+          g.moveTo(x-p, y+p);
+          g.lineTo(x+p, y-p);
+        }
+        return;
+      }
+
+      //
+      // Other shapes involve fill, so start with beginFill() and end with endFill():
+      //
+      g.beginFill(_pointcolor, _pointopacity);
       if (_pointshape == SQUARE_SHAPE) {
         g.drawRect(x - _pointsize, y - _pointsize, 2*_pointsize, 2*_pointsize);
       } else if (_pointshape == TRIANGLE_SHAPE) {
@@ -205,6 +246,18 @@ package multigraph.renderer {
         g.lineTo(x+_pointsize, y);
         g.lineTo(x, y-p);
       } else if (_pointshape == STAR_SHAPE) {
+        var p:Number = 1.5*_pointsize;
+        g.moveTo(x-p*0.0000, y+p*1.0000);
+        g.lineTo(x+p*0.3536, y+p*0.3536);
+        g.lineTo(x+p*0.9511, y+p*0.3090);
+        g.lineTo(x+p*0.4455, y-p*0.2270);
+        g.lineTo(x+p*0.5878, y-p*0.8090);
+        g.lineTo(x-p*0.0782, y-p*0.4938);
+        g.lineTo(x-p*0.5878, y-p*0.8090);
+        g.lineTo(x-p*0.4938, y-p*0.0782);
+        g.lineTo(x-p*0.9511, y+p*0.3090);
+        g.lineTo(x-p*0.2270, y+p*0.4455);
+      } else if (_pointshape == PLUS_SHAPE) {
         var p:Number = 1.5*_pointsize;
         g.moveTo(x-p*0.0000, y+p*1.0000);
         g.lineTo(x+p*0.3536, y+p*0.3536);
