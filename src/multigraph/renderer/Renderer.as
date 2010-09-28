@@ -12,6 +12,7 @@ package multigraph.renderer {
 	import multigraph.MultigraphUIComponent;
 	import multigraph.parsecolor;
     import multigraph.data.Data;
+    import multigraph.DataFilter;
 
   public class Renderer
   {
@@ -20,6 +21,7 @@ package multigraph.renderer {
     protected var _data:Data;
     protected var _varids:Array;
     protected var _dataVariables:Array;
+    protected var _dataFilter:DataFilter;
 
     static protected var optionsMissing:String = '\
 <li><b>missingvalue</b>: value for "missing" data; default is none.  If either missingvalue or missingop are present, both must be present.\
@@ -42,6 +44,13 @@ package multigraph.renderer {
     }
     public function get missingvalue():Number {
       return _missingvalue;
+    }
+
+    public function set dataFilter(filter:DataFilter) {
+      _dataFilter = filter;
+    }
+    public function get dataFilter():DataFilter {
+      return _dataFilter;
     }
 
     public function set missingop(op_str:String):void {
@@ -70,11 +79,12 @@ package multigraph.renderer {
     }
     
     public function Renderer(haxis:Axis, vaxis:Axis, data:Data, varids:Array) {
-    	_haxis = haxis;
-    	_vaxis = vaxis;
-        _data  = data;
-        _varids = varids;
+    	_haxis         = haxis;
+    	_vaxis         = vaxis;
+        _data          = data;
+        _varids        = varids;
         _dataVariables = [];
+        _dataFilter    = null;
         for (var i:int=0; i<varids.length; ++i) {
           _dataVariables[i] = data.varIdToVar(varids[i]);
         }
