@@ -1,0 +1,37 @@
+<mugl>
+  <horizontalaxis id="xaxis" min="0" max="10"/>
+  <verticalaxis id="yaxis" min="0" max="10"/>
+  <plot>
+    <horizontalaxis ref="xaxis"/>
+    <verticalaxis ref="yaxis">
+      <variable ref="yvar" />
+    </verticalaxis>
+    <filter type="grid">
+      <option name="rows"    value="50"/>
+      <option name="columns" value="50"/>
+      <option name="visible" value="true"/>
+    </filter>
+    <renderer type="point">
+      <option name="pointshape" value="circle"/>
+      <option name="pointoutlinecolor" value="black"/>
+      <option name="linewidth" value="1"/>
+      <option name="pointcolor"  value="blue"/>
+      <option name="pointsize"   value="4"/>
+    </renderer>
+  </plot>
+<data>
+<variables>
+  <variable id="xvar" column="0"/>
+  <variable id="yvar" column="1"/>
+</variables>
+<values>
+3,3
+4,4
+5,5
+5.2,5.2
+6,6
+7,7
+8,8
+</values>
+</data>
+</mugl>
