@@ -50,6 +50,7 @@ package multigraph
 	  public function next():Number { return 0; }
       public function set useBold(b:Boolean):void { _useBold = b; }
       //public function set textFormat(newTextFormat:TextFormat) { _textFormat = newTextFormat; }
+      public function get spacing():Number { return _spacing; }
 
 	}
 }
