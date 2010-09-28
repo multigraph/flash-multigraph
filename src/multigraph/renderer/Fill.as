@@ -186,8 +186,10 @@ package multigraph.renderer
 
     override public function end(sprite:MultigraphUIComponent):void {
       // render any points currently in the _points array
-      _points.push( [_points[_points.length-1][0], _fillpixelBase] );
-      renderPoints(_currentfillcolor, _currentlinecolor);
+      if (_points.length > 0) {
+        _points.push( [_points[_points.length-1][0], _fillpixelBase] );
+        renderPoints(_currentfillcolor, _currentlinecolor);
+      }
     }
 
     // render a "run" of points in the _points array.  This consists of drawing the fill region
