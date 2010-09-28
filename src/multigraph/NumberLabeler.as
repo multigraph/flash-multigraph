@@ -101,10 +101,10 @@ package multigraph
       }
 
       override public function prepare(dataMin:Number, dataMax:Number):void {
+        /*
 		var F:int = 1.0;
 		var f:Number;
-        var direction:int = (dataMax >= dataMin) ? 1 : -1;
-        var dataStart:Number = (direction > 0) ? dataMin : dataMax;
+        var dataStart:Number = (dataMax >= dataMin) ? dataMin : dataMax;
 		if (dataStart >= _start) {
 		    f = Math.floor( (dataStart - _start) / _spacing );
 		    if (dataStart - _start > _spacing * f * F) {
@@ -120,8 +120,30 @@ package multigraph
 				_current = -_spacing * (f - 1) + _start;
 		    }
 		}
-		
-		_end = (direction > 0) ? dataMax : dataMin;
+        */
+        _current = firstTick(dataMin, dataMax, _spacing, _start);
+		_end = (dataMax >= dataMin) ? dataMax : dataMin;
+      }
+
+      public static function firstTick(dataMin:Number, dataMax:Number, spacing:Number, start:Number):Number {
+		var F:int = 1.0;
+		var f:Number;
+        var dataStart:Number = (dataMax >= dataMin) ? dataMin : dataMax;
+		if (dataStart >= start) {
+		    f = Math.floor( (dataStart - start) / spacing );
+		    if (dataStart - start > spacing * f * F) {
+              return spacing * ( 1 + f ) + start;
+		    } else {
+              return spacing * f + start;
+		    }
+		} else {
+		    f = Math.floor( (start - dataStart) / spacing );
+		    if (dataStart - start > -spacing * (f + 1) * F) {
+              return -spacing * (f) + start;
+		    } else {
+              return -spacing * (f - 1) + start;
+		    }
+		}
       }
 
       override public function hasNext():Boolean {
