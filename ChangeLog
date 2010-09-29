@@ -1,0 +1,77 @@
+* release 3.0
+	
+r230 | mphillips | 2010-08-05 12:43:53 -0400 (Thu, 05 Aug 2010) | 1 line
+Changed paths:
+   M /FlexMultigraph/trunk/src/multigraph/Graph.as
+   M /FlexMultigraph/trunk/src/multigraph/renderer/Bar.as
+
+fix Bar renderer and temporarily disable delayed phase2 init because broken with Flex 4 SDK
+------------------------------------------------------------------------
+r232 | mphillips | 2010-08-05 13:19:59 -0400 (Thu, 05 Aug 2010) | 1 line
+Changed paths:
+   M /FlexMultigraph/trunk/html/tests/demo2/graph.xml
+   M /FlexMultigraph/trunk/html/tests/demo4/graph.xml
+   M /FlexMultigraph/trunk/html/tests/paper/Figure05/figure05.xml
+
+
+------------------------------------------------------------------------
+r240 | mphillips | 2010-09-28 09:16:37 -0400 (Tue, 28 Sep 2010) | 1 line
+Changed paths:
+   M /FlexMultigraph/trunk/src/multigraph/Labeler.as
+
+add public getter for spacing attribute
+------------------------------------------------------------------------
+r241 | mphillips | 2010-09-28 09:17:30 -0400 (Tue, 28 Sep 2010) | 1 line
+Changed paths:
+   A /FlexMultigraph/trunk/src/multigraph/ConsecutiveDistanceDataFilter.as
+   A /FlexMultigraph/trunk/src/multigraph/DataFilter.as
+   A /FlexMultigraph/trunk/src/multigraph/GridDataFilter.as
+
+add DataFilter classes
+------------------------------------------------------------------------
+r242 | mphillips | 2010-09-28 09:18:51 -0400 (Tue, 28 Sep 2010) | 1 line
+Changed paths:
+   M /FlexMultigraph/trunk/src/multigraph/NumberLabeler.as
+
+create public static firstTick() function for computing location of first tick mark
+------------------------------------------------------------------------
+r243 | mphillips | 2010-09-28 09:19:55 -0400 (Tue, 28 Sep 2010) | 1 line
+Changed paths:
+   M /FlexMultigraph/trunk/src/multigraph/Graph.as
+
+parse optional <filter> section of mugl for creating data filter
+------------------------------------------------------------------------
+r244 | mphillips | 2010-09-28 09:21:40 -0400 (Tue, 28 Sep 2010) | 3 lines
+Changed paths:
+   M /FlexMultigraph/trunk/src/multigraph/renderer/PointLine.as
+
+add + and x point shapes
+enable this renderer to use optional data filter
+
+------------------------------------------------------------------------
+r245 | mphillips | 2010-09-28 09:24:46 -0400 (Tue, 28 Sep 2010) | 1 line
+Changed paths:
+   M /FlexMultigraph/trunk/src/multigraph/renderer/Fill.as
+
+bug fix: only fill region in end() if there are > 0 points
+------------------------------------------------------------------------
+r246 | mphillips | 2010-09-28 09:25:47 -0400 (Tue, 28 Sep 2010) | 1 line
+Changed paths:
+   M /FlexMultigraph/trunk/src/multigraph/renderer/Renderer.as
+
+add protected dataFilter attribute & public getter/setter
+------------------------------------------------------------------------
+r247 | mphillips | 2010-09-28 09:26:09 -0400 (Tue, 28 Sep 2010) | 1 line
+Changed paths:
+   M /FlexMultigraph/trunk/html/tests/test12/graph.xml
+   A /FlexMultigraph/trunk/html/tests/test12/graph.xml.test
+
+
+------------------------------------------------------------------------
+r248 | mphillips | 2010-09-28 10:26:04 -0400 (Tue, 28 Sep 2010) | 1 line
+Changed paths:
+   A /FlexMultigraph/trunk/html/tests/test12/doit
+   M /FlexMultigraph/trunk/html/tests/test12/graph.xml
+   A /FlexMultigraph/trunk/html/tests/test12/paleo.csv
+   A /FlexMultigraph/trunk/html/tests/test12/paleo1000.csv
+
