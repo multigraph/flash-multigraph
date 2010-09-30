@@ -1,0 +1,51 @@
+#! /usr/bin/perl
+
+chomp($version = `./version -c`);
+
+make_dist_drupal_module($version, "drupal-module-6.x");
+
+sub sys {
+    my $cmd = shift;
+    print("$cmd\n");
+    return system($cmd);
+}
+
+sub make_dist_drupal_module {
+    my $version = shift;
+    my $drupal_module = shift;
+    my $dist_name = "multigraph-$version-$drupal_module";
+    sys("/bin/rm -f $dist_name.zip");
+    sys("/bin/rm -rf $dist_name");
+    sys("mkdir $dist_name");
+    sys("(cd $drupal_module ; tar cf - multigraph) | (cd $dist_name ; tar xvf -)");
+    sys("find $dist_name -name '.svn' -print | xargs /bin/rm -rf");
+    sys("cp Multigraph.swf $dist_name/multigraph/Multigraph-$version.swf");
+    edit_file_byline("$dist_name/multigraph/multigraph.module", sub {
+	my $line = shift; 
+	$line =~ s|Multigraph.swf|Multigraph-$version.swf|;
+	return $line;
+		     }
+	);
+    edit_file_byline("$dist_name/multigraph/multigraph.info", sub {
+	my $line = shift; 
+	$line =~ s|version\s*=\s*"([^\.\"]+\.[^\.\"]+)-([^\.\"]+\.[^\.\"]+)"|version = "\1-$version"|;
+	return $line;
+		     }
+	);
+    sys("(cd $dist_name ; tar cvfz ../$dist_name.tar.tz multigraph)");
+    sys("/bin/rm -rf $dist_name");
+}
+
+sub edit_file_byline {
+    my $file = shift;
+    my $func = shift;
+    open(IN, "<$file");
+    open(OUT, ">$file.new");
+    while (my $line=<IN>) {
+	$line = &{$func}($line);
+	print OUT $line;
+    }
+    close(OUT);
+    close(IN);
+    rename("$file.new", "$file");
+}

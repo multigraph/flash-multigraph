@@ -23,6 +23,9 @@ dist-docs: _always
 dist-wordpress-plugin: _always
 	@./make-dist-wordpress-plugin
 
+dist-drupal-module: _always
+	@./make-dist-drupal-module
+
 dist-src: _always
 	@./make-dist-src
 
