@@ -1,8 +1,19 @@
 [title]
-tutorial example 5: multiple plots
+Multiple Plots
+
+[tag]
+multiple-plots
+
+[width]
+400
+
+[height]
+300
+
+[weight]
+105
 
 [description]
 This example shows two plots in one graph; one plot uses
 bars and the other uses lines.  Multigraph automatically adds
 a legend when there is more than one plot in a graph.
-

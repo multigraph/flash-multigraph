@@ -1,7 +1,30 @@
 [title]
-tutorial example 6: datetime axis
+Datetime Axis
+
+[tag]
+datetime-axis
+
+[width]
+400
+
+[height]
+300
+
+[weight]
+106
 
 [description]
 This examples shows a plot in which the horizontal
-axis represents a date/time variable.
+axis represents a date/time variable.  Note the use of the empty &lt;title/&gt; element
+to suppress the title for the horizontal axis, and the "angle" and "anchor" attributes
+in the vertical axis's &lt;title&gt; element, which arrange for the "Temperature" title
+to be centered vertically along the vertical axis.
+<p>
+Also note the "spacing" attribute on the &lt;labels&gt; tag.  Its value is a (space-separated)
+list of time intervals, "1D 12H 6H 4H 2H 1H", where "D" stands for "day", and "H" stands for "hour".
+These are the allowed spacings that Multigraph will use between successive labes (and tick marks) on
+the axis.  As the user zooms in or out on the horizontal axis, Multigraph will always
+choose the spacing from this list that results in the greatest number
+of labels being drawn without having the labels overlap each other.  Try zooming in and out
+on the horizontal axis in the graph below, and notice how the labeling changes as you do so.
 

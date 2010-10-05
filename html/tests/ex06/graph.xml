@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <mugl>
   <horizontalaxis type="datetime" min="2008110100" max="2008110200">
-    <labels format="%d %n %H:00" spacing="1D 12H 6H 4H 2H 1H" />
-    <title>Date/Time</title>
+    <labels format="%d %n%L%H:00" spacing="1D 12H 6H 4H 2H 1H" />
+    <title/>
   </horizontalaxis>
   <verticalaxis   min="20" max="80">
-    <title angle="90">Temperature</title>
+    <title angle="90" anchor="0 -1">Temperature</title>
   </verticalaxis>
   <plot>
     <renderer type="line">

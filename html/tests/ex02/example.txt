@@ -1,10 +1,19 @@
 [title]
-tutorial example 2: explicit initial axis ranges
+Explicit Initial Axis Ranges
+
+[tag]
+explicit-ranges
+
+[width]
+400
+
+[height]
+200
+
+[weight]
+102
 
 [description]
-This example adds explicit x- and y-axis ranges to
-the previous example.  
-the initial display ranges are specified in
-the mugl file.  Once the graph appears,
-the user can still pan and zoom
+This example shows how to specify explicit x- and y-axis minimum and maximum values, which
+determine the initial display ranges. Once the graph appears, the user can still pan and zoom
 arbitrarily.

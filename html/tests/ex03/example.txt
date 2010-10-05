@@ -1,7 +1,18 @@
 [title]
-tutorial example 3: line plot style
+Specifying a Plot Style
+
+[tag]
+plot-style
+
+[width]
+400
+
+[height]
+200
+
+[weight]
+103
 
 [description]
-This example adds an explicit plot style (renderer) to the previous example:
-blue lines with black dots.
-
+This example shows how to customize the plot style by using the "pointline"
+renderer, with black points and blue lines.

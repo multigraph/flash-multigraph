@@ -1,8 +1,21 @@
 [title]
-CRN Station Data
+Data from a REST Web Service
+
+[tag]
+rest-data
+
+[width]
+600
+
+[height]
+300
+
+[weight]
+240
 
 [description]
-This example shows five weather variables from the Climate
+This example shows a graph that pulls data from a REST web service.
+The data in this graph is fom the Climate
 Reference Network weather station at the North Carolina Arboretum in
 Asheville, NC.  It combines multiple plot styles in a single graph,
 using several parallel vertical axes.  It uses a REST web service to

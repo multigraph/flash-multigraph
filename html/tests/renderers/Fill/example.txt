@@ -1,5 +1,24 @@
 [title]
-Renderers/Fill
+Fill Plot Style + Customized Legend
+
+[tag]
+fill-style
+
+[width]
+600
+
+[height]
+300
+
+[weight]
+200
 
 [description]
-Description for Renderers/Fill yet to be written.
+This example shows an interesting use of multiple "fill" style plots in the same graph.  The "fill"
+renderer fills the region between the plotted data line and the horizontal axis with a single color.
+Multigraph draws each of the plots in the order in which they appear in the MUGL file, so later
+plots are drawn on top of earlier ones.
+<p>
+This graph uses the &lt;legend&gt; tag to explicitly center the legend along the top
+of the graph, and to customize its appearance.  Note in particular the use of the "opacity" attribute
+to allow the data to be visible behind the legend.

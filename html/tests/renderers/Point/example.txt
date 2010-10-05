@@ -1,5 +1,18 @@
 [title]
-Renderers/Point
+Point Styles
+
+[tag]
+point-styles
+
+[width]
+400
+
+[height]
+300
+
+[weight]
+230
 
 [description]
-Description for Renderers/Point yet to be written.
+This example shows some of the point shapes available in the "point" style.  Note that the "point" style
+is the same as the "pointline" style with a line width of 0.

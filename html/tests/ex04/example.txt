@@ -1,7 +1,18 @@
 [title]
-tutorial example 4: bar plot style
+Bar Plot Style
+
+[tag]
+bar-style
+
+[width]
+400
+
+[height]
+200
+
+[weight]
+103
 
 [description]
-Here is the same data from the previous example, but plotted
-with bars instead of lines and dots.
-
+This example shows how to customize the plot style by using the "bar"
+renderer, with green bars and black outlines.
