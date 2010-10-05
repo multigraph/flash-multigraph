@@ -13,7 +13,6 @@ package multigraph.renderer {
   {
     public function RendererList() {
     	var htmlText:String = '';
-    	htmlText += '<b>Multigraph Renderers:</b><p>';
     	htmlText += '<table border="1"><tr>';
     	htmlText += '<td><b>keyword</b></td>';
     	htmlText += '<td><b>description</b></td>';
