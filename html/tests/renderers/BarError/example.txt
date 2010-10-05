@@ -1,5 +1,17 @@
 [title]
-Renderers/BarError
+Bar with Error Lines
+
+[tag]
+barerror-style
+
+[width]
+400
+
+[height]
+300
+
+[weight]
+210
 
 [description]
-Description for Renderers/BarError yet to be written.
+This example shows the "barerror" plot style
