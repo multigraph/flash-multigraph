@@ -23,17 +23,18 @@ graphcontents = (
       attribute padding { xsd:integer }?                # default: 5
    }?&
    element legend {
-      attribute visible     { text }?&
-      attribute frame       { text }?&
-      attribute base        { text }?&
-      attribute anchor      { text }?&
-      attribute position    { text }?&
-      attribute color       { text }?&
-      attribute bordercolor { text }?&
-      attribute opacity     { text }?&
-      attribute border      { xsd:integer }?&
-      attribute rows        { xsd:integer }?&
-      attribute columns     { xsd:integer }?&
+      attribute visible      { text }?&
+      attribute frame        { text }?&
+      attribute base         { text }?&
+      attribute anchor       { text }?&
+      attribute position     { text }?&
+      attribute color        { text }?&
+      attribute bordercolor  { text }?&
+      attribute opacity      { text }?&
+      attribute border       { xsd:integer }?&
+      attribute rows         { xsd:integer }?&
+      attribute columns      { xsd:integer }?&
+      attribute cornerradius { xsd:integer }?&
       element icon {
          attribute height      { xsd:integer }?&
          attribute width       { xsd:integer }?&
