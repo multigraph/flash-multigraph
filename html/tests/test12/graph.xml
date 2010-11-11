@@ -1,42 +1,92 @@
 <mugl>
-  <horizontalaxis id="xaxis" min="-70" max="0">
-    <title>Time (Millions of Years)</title>
-    <labels>
-      <label format="%1d"  spacing="100 50 20 10 5 2 1"/>
-      <label format="%.1f" spacing="0.5 0.2 0.1"/>
-      <label format="%.2f" spacing="0.05 0.02 0.01"/>
-      <label format="%.3f" spacing="0.005 0.002 0.001"/>
-    </labels>
-    <pan min="-100" max="50"/>
-    <zoom min="0.01"/>
+  <plotarea margintop="18"/>
+  <legend rows="1" border="0" opacity="0.0" base="0 1" anchor="0 1" position="0 25">
+    <icon border="0" width="30" height="30"/>
+  </legend>
+  <horizontalaxis id="date"
+                  type="datetime"
+                  min="20101104"
+                  max="20101111">
+    <labels spacing="100Y 50Y 20Y 10Y 5Y 1Y 6M 3M 2M 1M 7D 1D" format="%n %d%L%Y"/>
+    <title/>
+    <binding id="timebinding" min="2010010100" max="2010020100"/>
+    <grid/>
   </horizontalaxis>
-  <verticalaxis id="yaxis" min="-1" max="5">
-    <labels format="%.1f" spacing="5 2 1 0.5 0.2 0.1 0.05 0.02 0.01"/>
-    <title angle="90">O^16</title>
+  <verticalaxis id="temp"
+                min="0"
+                max="100">
+    <title anchor="0 -1" angle="90" position="-25 0">Degrees (F)</title>
+    <binding id="tempbinding" min="32" max="212"/>
+    <grid/>
   </verticalaxis>
+
   <plot>
-    <legend label="circle"/>
-    <horizontalaxis ref="xaxis"/>
-    <verticalaxis ref="yaxis">
-      <variable ref="yvar" />
+    <legend label="Normal Temperature"/>
+    <horizontalaxis ref="date">
+      <variable ref="date"/>
+    </horizontalaxis>
+    <verticalaxis ref="temp">
+      <variable ref="normal_mint"/>
+      <variable ref="normal_maxt"/>
     </verticalaxis>
-    <filter type="consecutivedistance">
-      <option name="distance" value="10"/>
-      <option name="visible" value="false"/>
-    </filter>
-    <renderer type="point">
-      <option name="pointshape" value="+"/>
-      <option name="pointoutlinecolor" value="black"/>
-      <option name="linewidth" value="0"/>
-      <option name="pointcolor"  value="black"/>
-      <option name="pointsize"   value="2"/>
+    <renderer type="band">
+      <option name="fillcolor" value="0x99ff99"/>
+    <option name="linewidth" value="0"/>
+    <option name="linecolor" value="0x99ff99"/>
     </renderer>
   </plot>
-<data>
-<variables>
-  <variable id="xvar" column="0"/>
-  <variable id="yvar" column="1"/>
-</variables>
-<csv location="paleo.csv"/>
-</data>
+
+  <plot>
+    <legend label="Actual Temperature"/>
+    <horizontalaxis ref="date">
+      <variable ref="date"/>
+    </horizontalaxis>
+    <verticalaxis ref="temp">
+      <variable ref="mint"/>
+      <variable ref="maxt"/>
+    </verticalaxis>
+    <renderer type="rangebar">
+      <option name="fillcolor" value="0x0000cc"/>
+    <option name="barwidth" value="20H"/>
+    <option name="baroffset" value="0.5"/>
+    </renderer>
+  </plot>
+
+    <data>
+    <variables missingvalue="-9000" missingop="le">
+      <variable id="date" type="datetime"/>
+      <variable id="maxt"/>
+      <variable id="mint"/>
+      <variable id="normal_maxt"/>
+      <variable id="normal_mint"/>
+    </variables>
+    <values>                                                                                                                       
+20101016,68,30,60,28                                                                                                               
+20101017,67,28,59,28                                                                                                               
+20101018,64,30,59,27                                                                                                               
+20101019,58,30,58,27                                                                                                               
+20101020,50,26,58,27                                                                                                               
+20101021,64,23,57,26                                                                                                               
+20101022,68,19,56,26                                                                                                               
+20101023,58,25,56,26                                                                                                               
+20101024,56,37,55,26                                                                                                               
+20101025,53,34,55,25                                                                                                               
+20101026,39,27,54,25                                                                                                               
+20101027,38,23,53,24                                                                                                               
+20101028,41,22,53,24                                                                                                               
+20101029,55,24,52,24                                                                                                               
+20101030,62,32,51,23                                                                                                               
+20101031,61,34,50,23                                                                                                               
+20101101,61,30,50,23                                                                                                               
+20101102,52,26,49,22                                                                                                               
+20101103,54,24,48,22                                                                                                               
+20101104,54,16,47,22                                                                                                               
+20101105,58,15,47,21                                                                                                               
+20101106,70,20,46,21                                                                                                               
+20101107,68,35,46,21                                                                                                               
+20101108,60,30,45,20                                                                                                               
+20101109,65,31,44,20                                                                                                               
+    </values>
+  </data>
+
 </mugl>

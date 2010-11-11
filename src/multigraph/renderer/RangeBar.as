@@ -139,12 +139,50 @@ package multigraph.renderer
     override public function end(sprite:MultigraphUIComponent):void {
     }
     
-    override public function renderLegendIcon(sprite:MultigraphUIComponent, legendLabel:String, opacity:Number):void {   	
-    	var g:Graphics = sprite.graphics;
-    	g.lineStyle(0, 0, 0);
-    	g.beginFill(_fillcolor, opacity);
-    	g.drawRect(0, 0, sprite.width, sprite.height);
-    	g.endFill();
-    }
+  override public function renderLegendIcon(sprite:MultigraphUIComponent, legendLabel:String, opacity:Number):void {   	
+	  var g:Graphics = sprite.graphics;
+	  
+	  // Draw icon background (with opacity)
+	  g.lineStyle(1, 0xFFFFFF, opacity);
+	  g.beginFill(0xFFFFFF, opacity);
+	  g.drawRect(0, 0, sprite.width, sprite.height);
+	  g.endFill();
+	  
+	  var fc = getRangeOption("fillcolor", 0);
+	  if (fc is String) {
+		  fc = parsecolor(fc);
+	  }
+	  var fillcolor:uint = fc;
+	  
+	  g.beginFill(fillcolor, _fillopacity);
+	  if (_barpixelWidth < 10) { 
+		  g.lineStyle(_linethickness, fillcolor, _fillopacity);
+	  } else {
+		  g.lineStyle(_linethickness, _linecolor, 1);
+	  }
+	  
+	  // Adjust the width of the icons bars based upon the width and height of the icon Ranges: {20, 10, 0}
+	  var barwidth:Number;
+	  if (sprite.width > 20 || sprite.height > 20) {
+		  barwidth = sprite.width / 6;	
+	  } else if(sprite.width > 10 || sprite.height > 10) {
+		  barwidth = sprite.width / 4;
+	  } else {
+		  barwidth = sprite.width / 4;
+	  }
+
+	  // If the icon is large enough draw extra bars
+	  if (sprite.width > 20 && sprite.height > 20) {
+		  g.drawRect(sprite.width/4 - barwidth/2,                    sprite.height/8,  barwidth,  sprite.height/2);
+		  g.drawRect(sprite.width - sprite.width/4 - barwidth/2,     sprite.height/4,  barwidth,  sprite.height/3);
+	  }
+	  
+	  g.drawRect(sprite.width/2 - barwidth/2,                    0,  barwidth,  sprite.height-sprite.height/4);
+	  
+	  
+	  g.endFill();
+	  
   }
+}
+  
 }

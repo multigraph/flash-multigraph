@@ -181,31 +181,15 @@ package multigraph.renderer
     	
       g.lineStyle(_line2width, _line2color, 1);
       g.beginFill(_fillcolor, _fillopacity);
-      g.moveTo(0, 0);
+
+	  g.moveTo(0,            2*sprite.height/8);
+	  g.lineTo(0,            6*sprite.height/8);
+	  g.lineTo(sprite.width, 7*sprite.height/8);
+	  g.lineTo(sprite.width, 3*sprite.height/8);
+	  g.lineTo(0,            2*sprite.height/8);
+	  
+	  g.endFill();
 	    	
-      // Draw the middle range icon or the large range icon if the width and height allow it
-      if (sprite.width > 10 || sprite.height > 10) {
-        // Draw a more complex icon if the icons width and height are large enough
-        if (sprite.width > 20 || sprite.height > 20) {
-          g.lineTo(sprite.width / 6, sprite.height / 2);
-          g.lineTo(sprite.width / 3, sprite.height / 4);
-        }
-        g.lineTo(sprite.width / 2, sprite.height - sprite.height / 4);
-	    			
-        if (sprite.width > 20 || sprite.height > 20) {
-          g.lineTo(sprite.width - sprite.width / 3, sprite.height / 4);
-          g.lineTo(sprite.width - sprite.width / 6, sprite.height / 2);
-        }
-      }
-	    	
-      g.lineTo(sprite.width, 0);
-      g.endFill();
-	    	
-      // Draw the icon border    	
-      //g.lineStyle(1, 0x000000, 1);
-      //g.beginFill(0xFFFFFF, 0);
-      //g.drawRect(0, 0, sprite.width, sprite.height);
-      //g.endFill();
     }
   }
 }
