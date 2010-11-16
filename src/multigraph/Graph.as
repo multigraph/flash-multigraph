@@ -7,7 +7,9 @@
  * See http://www.multigraph.org/LICENSE.txt for details.
  */
 package multigraph {
+  import flash.display.BitmapData;
   import flash.display.Graphics;
+  import flash.display.Loader;
   import flash.display.Shape;
   import flash.events.*;
   import flash.geom.Matrix;
@@ -102,6 +104,9 @@ package multigraph {
     private var _proxy:String;
     public function get port():String { return _port; }
     private var _numCsvOutstanding = 0;
+	
+    private var backgroundBitmapLoader:Loader = new Loader();
+    private var backgroundBitmap:BitmapData = null;
 
     // icon asset
     [Embed(source="assets/plus.PNG")]
@@ -232,6 +237,7 @@ package multigraph {
 
     private function init_phase1():void {
       _config = new Config(_xml);
+	  
       
       var diagnosticsVisible:String = _config.xmlvalue('diagnostics', '@visible');
       if (diagnosticsVisible=='true') {
@@ -293,6 +299,28 @@ package multigraph {
       
       _divSprite.filters = [shadow];
       */
+
+
+/*
+	  var bgURL:String = "NOAA100.jpg";
+	  backgroundBitmapLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, 
+		  function(divSprite:Sprite, loader:Loader):Function {
+			  return function (event:Event):void {
+				  var mybitmap:BitmapData = new BitmapData(loader.width, loader.height, false);
+				  mybitmap.draw(loader, new Matrix());
+				  graph.backgroundBitmap = mybitmap; 
+			  }
+		  }(_divSprite,this.backgroundBitmapLoader)
+	  );
+	  backgroundBitmapLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,
+		  function(errmsg:String):Function {
+			  return function(event:IOErrorEvent):void {
+				  trace(errmsg);
+			  }
+		  }("Unable to load background image: " + bgURL)
+	  );
+	  backgroundBitmapLoader.load(new URLRequest(bgURL));
+*/	  
       
       _eventSprite = new MultigraphUIComponent();
       _eventSprite.transform.matrix = new Matrix(1, 0, 0, -1, 0, _graphHeight);
@@ -1341,7 +1369,8 @@ package multigraph {
     public function onKeyUp(event:KeyboardEvent):void {
     	if (!event.shiftKey && _toolbar != null) _toolbar.resetZoomIcon();
     }
-
+	
+	
     public function paint():void {
       var i:int;
       var j:int;
@@ -1349,13 +1378,21 @@ package multigraph {
       _divSprite.graphics.clear();
       if (_border.left > 0) {
         _divSprite.graphics.lineStyle(_border.left,0,1);
-        _divSprite.graphics.drawRect(_windowMargin.left, _windowMargin.bottom,
-                                    _graphWidth - _windowMargin.left - _windowMargin.right,
-                                    _graphHeight - _windowMargin.bottom - _windowMargin.top);
+		_divSprite.graphics.drawRect(_windowMargin.left, _windowMargin.bottom,
+			_graphWidth - _windowMargin.left - _windowMargin.right,
+			_graphHeight - _windowMargin.bottom - _windowMargin.top);
       }
-
-
-
+	  
+	  /*
+	  if (this.backgroundBitmap != null) {
+		var matrix:Matrix = new Matrix();
+		//matrix.scale(1,-1);
+		_divSprite.graphics.beginBitmapFill(this.backgroundBitmap, null, false, false);
+		_divSprite.graphics.drawRect(50, _windowMargin.bottom, 100, 100);
+	  	_divSprite.graphics.endFill();
+	  }
+      */
+	  
       var statusLists:Array = [];
       if (_networkDots) {
         for (i=0; i<_data.length; ++i) {
