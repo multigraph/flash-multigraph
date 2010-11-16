@@ -7,10 +7,12 @@
  * See http://www.multigraph.org/LICENSE.txt for details.
  */
 package multigraph {
+  import flash.display.Bitmap;
   import flash.display.BitmapData;
   import flash.display.Graphics;
   import flash.display.Loader;
   import flash.display.Shape;
+  import flash.display.Sprite;
   import flash.events.*;
   import flash.geom.Matrix;
   import flash.net.*;
@@ -74,6 +76,7 @@ package multigraph {
     // user stops zooming with keyboard shortcuts:
     private var _keyTimerDelay:int = 500;
 
+    private var _bgSprite:MultigraphUIComponent;
     private var _divSprite:MultigraphUIComponent;
     private var _eventSprite:MultigraphUIComponent;
     private var _axisControlSprite:MultigraphUIComponent;
@@ -105,9 +108,6 @@ package multigraph {
     public function get port():String { return _port; }
     private var _numCsvOutstanding = 0;
 	
-    private var backgroundBitmapLoader:Loader = new Loader();
-    private var backgroundBitmap:BitmapData = null;
-
     // icon asset
     [Embed(source="assets/plus.PNG")]
       [Bindable]
@@ -290,7 +290,7 @@ package multigraph {
                          _paddingBox.height - ( _plotMargin.top + _plotMargin.bottom ));
 
       _divSprite = new MultigraphUIComponent();
-      _divSprite.transform.matrix = new Matrix(1, 0, 0, -1, 0, _graphHeight);
+	  _divSprite.transform.matrix = new Matrix(1, 0, 0, -1, 0, _graphHeight);
       
       /* Dropshadow filter over div sprite
       var shadow:DropShadowFilter = new DropShadowFilter();
@@ -299,28 +299,13 @@ package multigraph {
       
       _divSprite.filters = [shadow];
       */
+	  
+	  _bgSprite = new MultigraphUIComponent();
+	  //_bgSprite.transform.matrix = new Matrix(1, 0, 0, -1, 0, _graphHeight);
+	  //this.addChild(_bgSprite);
 
 
-/*
-	  var bgURL:String = "NOAA100.jpg";
-	  backgroundBitmapLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, 
-		  function(divSprite:Sprite, loader:Loader):Function {
-			  return function (event:Event):void {
-				  var mybitmap:BitmapData = new BitmapData(loader.width, loader.height, false);
-				  mybitmap.draw(loader, new Matrix());
-				  graph.backgroundBitmap = mybitmap; 
-			  }
-		  }(_divSprite,this.backgroundBitmapLoader)
-	  );
-	  backgroundBitmapLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,
-		  function(errmsg:String):Function {
-			  return function(event:IOErrorEvent):void {
-				  trace(errmsg);
-			  }
-		  }("Unable to load background image: " + bgURL)
-	  );
-	  backgroundBitmapLoader.load(new URLRequest(bgURL));
-*/	  
+
       
       _eventSprite = new MultigraphUIComponent();
       _eventSprite.transform.matrix = new Matrix(1, 0, 0, -1, 0, _graphHeight);
@@ -385,7 +370,57 @@ package multigraph {
       _axisSprite2.y = _plotMargin.bottom;
       _paddingBoxSprite.addChild(_axisSprite2);
 
-      
+	  var bgColorString:String = _config.xmlvalue('background', '@color');	 
+	  if (bgColorString!=null && bgColorString!='') {
+		  var bgColor:uint = parsecolor( bgColorString );
+		  _bgSprite.graphics.beginFill(bgColor, 1);
+		  _bgSprite.graphics.drawRect(_windowMargin.left, _windowMargin.bottom,
+			  						  _graphWidth - _windowMargin.left - _windowMargin.right,
+			  						  _graphHeight - _windowMargin.bottom - _windowMargin.top);		  
+		  _bgSprite.graphics.endFill();
+	  }
+	  
+	  var bgImageURL:String = _config.xmlvalue('background','img','@src');
+	  
+	  if (bgImageURL!=null && bgImageURL!='') {
+		  var bgAnchor:Array    = _config.value('background', 'img', '@anchor').split(" ");
+		  var bgBase:Array      = _config.value('background', 'img', '@base').split(" ");
+		  var bgPosition:Array  = _config.value('background', 'img', '@position').split(" ");
+		  var bgFrame:String    = _config.value('background', 'img', '@frame');
+		  
+		  var loader:Loader = new Loader();
+		  loader.contentLoaderInfo.addEventListener(Event.COMPLETE, 
+			  function(sprite:Sprite, anchor:Array, base:Array, position:Array, frameIsPlot:Boolean, windowMargin:Insets, border:Insets, plotMargin:Insets, plotBox:Box, paddingBox:Box):Function {
+				  return function (event:Event):void {
+					  var loader:Loader = Loader(event.target.loader);
+					  var image:Bitmap = Bitmap(loader.content);
+					  
+					  var ax:Number = (Number(anchor[0])+1)*image.width/2;
+					  var ay:Number = image.height - ((Number(anchor[1])+1)*image.height/2);
+					  var bx:Number=0, by:Number=0;
+					  if (frameIsPlot) {
+						  bx = plotMargin.left + (Number(base[0])+1)*plotBox.width/2;
+						  by = plotMargin.top + plotBox.height - ((Number(base[1])+1)*plotBox.height/2);
+					  } else {
+						  bx = windowMargin.left + border.left + (Number(base[0])+1)*paddingBox.width/2; 
+						  by = windowMargin.top  + border.top + paddingBox.height - ((Number(base[1])+1)*paddingBox.height/2);
+					  }
+					  image.x = bx + Number(position[0]) - ax;
+					  image.y = by + Number(position[1]) - ay;		  
+					  sprite.addChild(image);
+				  }
+			  }(_bgSprite, bgAnchor, bgBase, bgPosition, bgFrame=="plot", _windowMargin, _border, _plotMargin, _plotBox, _paddingBox)
+		  );
+		  loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,
+			  function(errmsg:String):Function {
+				  return function(event:IOErrorEvent):void {
+					  trace(errmsg);
+				  }
+			  }("Unable to load background image: " + bgImageURL)
+		  );
+		  loader.load(new URLRequest(bgImageURL));
+	  }	  
+	  
       var numDataSections:int = _config.xmlvalue('data').length();
       var vars:Array;
       var haveCsv:Boolean = false;
@@ -626,13 +661,13 @@ package multigraph {
       // Positioning
       
       var legendPosition:Array   = _config.value('legend', 0, '@position').split(" ");
-      var legendAnchor:Array     = _config.value('legend', 0, '@anchor').split(" ");
+	  var legendAnchor:Array     = _config.value('legend', 0, '@anchor').split(" ");
       var legendBase:Array       = _config.value('legend', 0, '@base').split(" ");
       var legendFrame:String     = _config.value('legend', 0, '@frame');
       var legendBorder:Number    = _config.value('legend', 0, '@border');    
       var legendRows:Number      = _config.value('legend', 0, '@rows');     
       var legendColumns:Number   = _config.value('legend', 0, '@columns');
-      var legendBgColor:uint     = parsecolor( _config.value('legend', 0, '@color') );
+	  var legendBgColor:uint     = parsecolor( _config.value('legend', 0, '@color') );
       var legendBorderColor:uint = parsecolor( _config.value('legend', 0, '@bordercolor') );
       var legendOpacity:Number   = _config.value('legend', 0, '@opacity');
       var legendRadius:Number    = _config.value('legend', 0, '@cornerradius');
@@ -752,7 +787,8 @@ package multigraph {
     }
 
     private function init_phase3():void {
-      addChild(_divSprite);
+	  addChild(_bgSprite);
+	  addChild(_divSprite);
       addChild(_eventSprite);  
       addChild(_axisControlSprite);
       

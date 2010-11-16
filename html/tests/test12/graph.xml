@@ -1,4 +1,5 @@
 <mugl>
+  <background color="0xfafffa"><img frame="plot" anchor="0 0" base="0 0" src="NOAA100-transparent.png"/></background>
   <plotarea margintop="18"/>
   <legend rows="1" border="0" opacity="0.0" base="0 1" anchor="0 1" position="0 25">
     <icon border="0" width="30" height="30"/>

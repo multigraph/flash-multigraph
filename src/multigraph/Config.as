@@ -223,6 +223,14 @@ package multigraph
 
 		// The graph specific defaults
         private var _defaults:Object = {
+			background : {
+				img : {
+					base     : "-1 -1",
+					anchor   : "-1 -1",
+					position : "0 0",
+					frame    : "padding"
+				}
+			},
             window : {
                 margin   : 2,
                 border   : 2,
