@@ -1,0 +1,20 @@
+[title]
+Background Image/Color
+
+[tag]
+background-image-color
+
+[width]
+400
+
+[height]
+200
+
+[weight]
+270
+
+[description]
+By default, graphs have a white background with no image.  You can use
+the <background color=""/> tag to specify a different background
+color, and/or the <img> subtag to specify a background image.  This
+example illustrates the use of both a background color and image.
