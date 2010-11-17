@@ -26,6 +26,10 @@ package multigraph {
   import multigraph.debug.NetworkMonitor;
   import multigraph.format.*;
   import multigraph.renderer.*;
+  import multigraph.saui.SelectedAxisUIAxisController;
+  import multigraph.saui.SelectedAxisUIEventHandler;
+  import multigraph.naui.NearestAxisUIAxisController;
+  import multigraph.naui.NearestAxisUIEventHandler;
   
   import mx.controls.*;
   import mx.core.UIComponent;
@@ -53,7 +57,7 @@ package multigraph {
     private var _haxes        : Array = [];
     private var _vaxes        : Array = [];
     private var _axes         : Array = [];
-    private var _selectedAxis : Axis = null;
+	public  function get axes():Array { return _axes; } 
     private var _legend      : Legend;
     private var _title       : Title;
     private var _toolbar	 : ToolBar;
@@ -66,15 +70,15 @@ package multigraph {
     private var _plots       : Array = [];
     private var _data        : Array = [];
     private var _paintNeeded : Boolean = false;
-    private var _mouseLocation : PixelPoint = null;
     public function set paintNeeded(needed:Boolean):void { _paintNeeded = needed; }
 
-    // Timer used to arrange for a call to prepareData() after user stops
+/*    // Timer used to arrange for a call to prepareData() after user stops
     // zooming with keyboard shortcuts:
     private var _keyTimer    : Timer = null;
     // Delay, in milliseconds, before prepareData() should be called after
     // user stops zooming with keyboard shortcuts:
     private var _keyTimerDelay:int = 500;
+	*/
 
     private var _bgSprite:MultigraphUIComponent;
     private var _divSprite:MultigraphUIComponent;
@@ -90,6 +94,9 @@ package multigraph {
     // data.
     private var _axisSprite1:MultigraphUIComponent;
     private var _axisSprite2:MultigraphUIComponent;
+	
+	private var _uiEventHandler:UIEventHandler;
+	public function get uiEventHandler():UIEventHandler { return _uiEventHandler; }
 
     private var _graphWidth:Number;
     private var _graphHeight:Number;
@@ -107,7 +114,7 @@ package multigraph {
     private var _proxy:String;
     public function get port():String { return _port; }
     private var _numCsvOutstanding = 0;
-	
+
     // icon asset
     [Embed(source="assets/plus.PNG")]
       [Bindable]
@@ -117,16 +124,6 @@ package multigraph {
       [Bindable]
       private var minusIcon:Class;
       
-    // Mouse cursor assets
-    [Embed(source="assets/cursors/HandOpen.png")]
-      [Bindable]
-      private var mouseCursorGrab:Class;
-
-    [Embed(source="assets/cursors/HandClosed.png")]
-      [Bindable]
-      private var mouseCursorGrabbing:Class;
-
-    
     public function displayMessage(msg:String):void {
       //_app.displayMessage(msg);
     }
@@ -208,7 +205,7 @@ package multigraph {
         PopUpManager.addPopUp(_networkMonitor, this, false);    
       }
     }
-    
+	
     private function showDebugger():void {
       _debugger = new Debugger();
       _debugger.width = _graphHeight;
@@ -234,7 +231,7 @@ package multigraph {
         _networkMonitor.endRequest(networkable);
       }
     }
-
+	
     private function init_phase1():void {
       _config = new Config(_xml);
 	  
@@ -313,18 +310,19 @@ package multigraph {
       _eventSprite.graphics.beginFill(0xffffff, 0);
       _eventSprite.graphics.drawRect(0,0,_graphWidth,_graphHeight);
       _eventSprite.graphics.endFill();
-      _eventSprite.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-      _eventSprite.addEventListener(MouseEvent.MOUSE_UP,   onMouseUp);
-      _eventSprite.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
-      _eventSprite.addEventListener(MouseEvent.MOUSE_OUT,  onMouseOut);
-
+/*
+	  if (_uiEventHandler['onMouseDown']) { _eventSprite.addEventListener(MouseEvent.MOUSE_DOWN, _uiEventHandler['onMouseDown']); }
+	  if (_uiEventHandler['onMouseUp'])   { _eventSprite.addEventListener(MouseEvent.MOUSE_UP,   _uiEventHandler['onMouseUp']);   }
+	  if (_uiEventHandler['onMouseMove']) { _eventSprite.addEventListener(MouseEvent.MOUSE_MOVE, _uiEventHandler['onMouseMove']); }
+	  if (_uiEventHandler['onMouseOut'])  { _eventSprite.addEventListener(MouseEvent.MOUSE_OUT,  _uiEventHandler['onMouseOut']);  }
+	  if (_uiEventHandler['onKeyDown'])   { addEventListener(KeyboardEvent.KEY_DOWN, _uiEventHandler['onKeyDown']); }
+	  if (_uiEventHandler['onKeyUp'])     { addEventListener(KeyboardEvent.KEY_UP,   _uiEventHandler['onKeyUp']);   }
+*/
 	  // Remove the cursor if it moves outside of the graph window
 	  _divSprite.addEventListener(MouseEvent.MOUSE_OUT, function (event:MouseEvent):void {
 	  	CursorManager.removeAllCursors();
 	  });
 	  
-      addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-      addEventListener(KeyboardEvent.KEY_UP,   onKeyUp);
 
       _axisControlSprite = new MultigraphUIComponent();
       _axisControlSprite.transform.matrix = new Matrix(1, 0, 0, -1, 0, _graphHeight);
@@ -459,7 +457,16 @@ package multigraph {
       //if (!haveCsv) {
         init_phase2();
       //}
-      
+
+      this._uiEventHandler = new SelectedAxisUIEventHandler(this);
+      //this._uiEventHandler = new NearestAxisUIEventHandler(this);
+
+	  if ('onMouseDown' in _uiEventHandler) { _eventSprite.addEventListener(MouseEvent.MOUSE_DOWN, _uiEventHandler['onMouseDown']); }
+	  if ('onMouseUp'   in _uiEventHandler) { _eventSprite.addEventListener(MouseEvent.MOUSE_UP,   _uiEventHandler['onMouseUp']);   }
+	  if ('onMouseMove' in _uiEventHandler) { _eventSprite.addEventListener(MouseEvent.MOUSE_MOVE, _uiEventHandler['onMouseMove']); }
+	  if ('onMouseOut'  in _uiEventHandler) { _eventSprite.addEventListener(MouseEvent.MOUSE_OUT,  _uiEventHandler['onMouseOut']);  }
+	  if ('onKeyDown'   in _uiEventHandler) { addEventListener(KeyboardEvent.KEY_DOWN,             _uiEventHandler['onKeyDown']);   }
+	  if ('onKeyUp'     in _uiEventHandler) { addEventListener(KeyboardEvent.KEY_UP,               _uiEventHandler['onKeyUp']);     }
     }
     
     private function finishCsv(data:CSVFileArrayData):void {
@@ -767,8 +774,9 @@ package multigraph {
       bindAxes(_vaxes, _config, 'verticalaxis', _swfname);
       bindAxes(_haxes, _config, 'horizontalaxis', _swfname);
 
-      _keyTimer = new Timer(_keyTimerDelay, 1);
+/*      _keyTimer = new Timer(_keyTimerDelay, 1);
       _keyTimer.addEventListener("timer", keyTimerHandler);
+	  */
 
       // phase3
       init_phase3();
@@ -797,9 +805,9 @@ package multigraph {
       _paintNeeded = true;
     }
 
-    private function keyTimerHandler(event:TimerEvent):void {
+/*    private function keyTimerHandler(event:TimerEvent):void {
       prepareData();
-    }
+    }*/
 
     private function createAxes(axistag:String, axisType:Object):Array {
       var formatter:Formatter;
@@ -942,13 +950,13 @@ package multigraph {
         var tickMax:int = _config.value(axistag,i,'@tickmax');
 
         var highlightStyleString:String = _config.value(axistag,i,'@highlightstyle');
-        var highlightStyle:int = Axis.HIGHLIGHT_AXIS;
+        var highlightStyle:int = SelectedAxisUIAxisController.HIGHLIGHT_AXIS;
         if (highlightStyleString == "labels") {
-          highlightStyle = Axis.HIGHLIGHT_LABELS;
+          highlightStyle = SelectedAxisUIAxisController.HIGHLIGHT_LABELS;
         } else if (highlightStyleString == "all") {
-          highlightStyle = Axis.HIGHLIGHT_ALL;
+          highlightStyle = SelectedAxisUIAxisController.HIGHLIGHT_ALL;
         }
-
+		
         var titleTextFormat:TextFormat = new TextFormat();
         titleTextFormat.font  = _config.value(axistag,i,'title','@fontname');
         titleTextFormat.size  = _config.value(axistag,i,'title','@fontsize');
@@ -983,9 +991,10 @@ package multigraph {
                                lineWidth,
                                tickMin,
                                tickMax,
-                               highlightStyle,
+                               /*highlightStyle,*/
                                titleTextFormat,
-                               titleBoldTextFormat
+                               titleBoldTextFormat,
+                               highlightStyle
                                );
 
         axes[i].panConfig.setConfig(_config.value(axistag, i, 'pan', '@allowed'),
@@ -1217,195 +1226,6 @@ package multigraph {
       }
       return vars;
     }
-
-    public function axisXY(axis:Axis, event:MouseEvent):PixelPoint {
-      return new PixelPoint(event.localX - ( _windowMargin.left
-                                             + _border.left
-                                             + _padding.left
-                                             + _plotMargin.left ),
-                            event.localY - ( _border.bottom
-                                             + _windowMargin.bottom
-                                             + _padding.bottom
-                                             + _plotMargin.bottom )
-                            )
-        }
-    
-    public function selectAxis(axis:Axis):void {
-      if (_selectedAxis == axis) { return; }
-      if (_selectedAxis != null) {
-        _selectedAxis.selected = false;
-      }
-      axis.selected = true;
-      _selectedAxis = axis;
-      _paintNeeded = true;
-    }
-
-    public function delegateMouseEventToAxis(method:String, event:MouseEvent):void {     
-      var i:int;
-      _mouseLocation = axisXY(_axes[i], event);
-      var done:Boolean = false;
-      for (i=0; i<_axes.length; ++i) {
-        if (_axes[i].selected) {
-          if (_axes[i][method](_mouseLocation, event)) {
-            done = true;
-          }
-          break;
-        }
-      }
-      if (!done) {
-        for (i=0; i<_axes.length; ++i) {
-          if (!_axes[i].selected) {
-            if (_axes[i][method](_mouseLocation, event)) {
-              done = true;
-              break;
-            }
-          }
-        }
-      }
-    }
-  
-    public function delegateKeyEventToAxis(method:String, event:KeyboardEvent):void {
-      if (_mouseLocation == null) { return; }
-      // only delegate key events to the selected axis
-      if (_selectedAxis != null) {
-        _selectedAxis[method](_mouseLocation, event);
-      }
-    }
-    
-    public function onMouseDown(event:MouseEvent):void {
-      stage.focus = this;
-      delegateMouseEventToAxis('handleMouseDown', event);
-      
-      if (_toolbarState != "zoom") {
-      	this.cursorManager.removeAllCursors();
-      	if (event.localX > _axisSprite1.x && event.localX < _plotBox.width + _plotMargin.left) {
-      		if (event.localY > _axisSprite1.y && event.localY < _plotBox.height + _plotMargin.bottom) {
-            	this.cursorManager.setCursor(mouseCursorGrabbing);
-      		} 
-      	}
-      }
-    }
-        
-    public function onMouseUp(event:MouseEvent):void {
-      delegateMouseEventToAxis('handleMouseUp', event);
-      
-      if (_toolbarState != "zoom") {
-      	this.cursorManager.removeAllCursors();
-      	if (event.localX > _axisSprite1.x && event.localX < _plotBox.width + _plotMargin.left) {
-      		if (event.localY > _axisSprite1.y && event.localY < _plotBox.height + _plotMargin.bottom) {
-            	this.cursorManager.setCursor(mouseCursorGrab);
-      		} 
-      	}
-      } 
-    }
-
-    public function onMouseMove(event:MouseEvent):void {
-      delegateMouseEventToAxis('handleMouseMove', event);
-     
-      if (!event.buttonDown && _toolbarState != "zoom") {
-      	this.cursorManager.removeAllCursors();
-      	if (event.localX > _axisSprite1.x && event.localX < _plotBox.width + _plotMargin.left) {
-          if (event.localY > _axisSprite1.y && event.localY < _plotBox.height + _plotMargin.bottom) {
-          	if (event.buttonDown)
-              this.cursorManager.setCursor(mouseCursorGrabbing);
-          	else 
-      	      this.cursorManager.setCursor(mouseCursorGrab);
-      	  } else {
-      	  	this.cursorManager.removeAllCursors();
-      	  }	
-      	} else {
-      	  this.cursorManager.removeAllCursors();
-      	}	
-      }
-    }
-
-    public function onMouseOut(event:MouseEvent):void {
-      delegateMouseEventToAxis('handleMouseOut', event);
-    }
-
-    private var _aCharCode:uint = 'a'.charCodeAt();
-    private var _zCharCode:uint = 'z'.charCodeAt();
-    private var _ACharCode:uint = 'A'.charCodeAt();
-    private var _ZCharCode:uint = 'Z'.charCodeAt();
-    private var _qCharCode:uint = 'q'.charCodeAt();
-    private var _QCharCode:uint = 'Q'.charCodeAt();
-    private var _plusCharCode:uint = '+'.charCodeAt();
-    private var _minusCharCode:uint = '-'.charCodeAt();
-    private var _dCharCode:uint = 'd'.charCodeAt();
-    private var _lessCharCode:uint = '<'.charCodeAt();
-    private var _greaterCharCode:uint = '>'.charCodeAt();
-
-    private var _upKeyCode:uint    = 38;
-    private var _leftKeyCode:uint  = 37;
-    private var _downKeyCode:uint  = 40;
-    private var _rightKeyCode:uint = 39;
-
-    public function onKeyDown(event:KeyboardEvent):void { 
-     if (event.shiftKey && _toolbar != null) {
-      	_toolbar.updateZoomIcon();
-      }
-      
-      //trace('key down event: ' + event);
-
-     if (event.charCode==0) {
-
-       if (_selectedAxis != null && _selectedAxis.orientation==Axis.ORIENTATION_VERTICAL) {
-         switch (event.keyCode) {
-         case _upKeyCode:
-           event.charCode = _greaterCharCode;
-           break;
-         case _downKeyCode:
-           event.charCode = _lessCharCode;
-           break;
-         case _leftKeyCode:
-           event.charCode = _minusCharCode;
-           break;
-         case _rightKeyCode:
-           event.charCode = _plusCharCode;
-           break;
-         }
-       } else {
-         switch (event.keyCode) {
-         case _upKeyCode:
-           event.charCode = _plusCharCode;
-           break;
-         case _downKeyCode:
-           event.charCode = _minusCharCode;
-           break;
-         case _leftKeyCode:
-           event.charCode = _lessCharCode;
-           break;
-         case _rightKeyCode:
-           event.charCode = _greaterCharCode;
-           break;
-         }
-       }
-     }
-
-      switch (event.charCode) {
-      case _aCharCode:
-      case _zCharCode:
-      case _ACharCode:
-      case _ZCharCode:
-      case _qCharCode:
-      case _QCharCode:
-      case _plusCharCode:
-      case _minusCharCode:
-      case _lessCharCode:
-      case _greaterCharCode:
-        _keyTimer.reset(); // reset to stop any already-started timer run
-        delegateKeyEventToAxis('handleKeyDown', event); // act on the keystroke
-        _keyTimer.start(); // start timer run to call prepareData() after delay
-        break;
-      default:
-        break;
-      }
-    }
-    
-    public function onKeyUp(event:KeyboardEvent):void {
-    	if (!event.shiftKey && _toolbar != null) _toolbar.resetZoomIcon();
-    }
-	
 	
     public function paint():void {
       var i:int;
@@ -1592,6 +1412,19 @@ package multigraph {
       return null;
     }
     
+	public function plotXY(x:Number, y:Number):PixelPoint {
+		return new PixelPoint(x - ( _windowMargin.left   + _border.left   + _padding.left   + _plotMargin.left   ),
+                              y - ( _windowMargin.bottom + _border.bottom + _padding.bottom + _plotMargin.bottom ));
+	}	
+
+
+    public function inPlotBox(x:Number, y:Number):Boolean {
+      return ( (x > _axisSprite1.x                       ) &&
+               (x < _plotBox.width + _plotMargin.left    ) &&
+               (y > _axisSprite1.y                       ) &&
+               (y < _plotBox.height + _plotMargin.bottom ) );
+    }
+	
     /*
     import mx.graphics.codec.PNGEncoder;
     import mx.utils.Base64Encoder;

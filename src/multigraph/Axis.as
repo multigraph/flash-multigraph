@@ -119,6 +119,14 @@ package multigraph {
     private var _titleAngle:Number;
     public function get titleAngle():Number { return _titleAngle; }
 
+    private var _controller : AxisController = null;
+    public function set controller(newcontroller:AxisController) { this._controller = newcontroller; }
+    public function get controller():AxisController { return _controller; }
+    //private function controllerUseBold():Boolean { return _controller!=null && _controller.useBold(); }
+
+    private var _clientData : Object = null;
+    public function get clientData():Object { return _clientData; }
+
     public static function parseType(string:String):int {
       switch (string) {
       case "number": return TYPE_NUMBER;
@@ -144,15 +152,13 @@ package multigraph {
     private var _graph:Graph;
     public function get graph():Graph { return _graph; }
 
-    private var _selected:Boolean = false;
-    public function get selected():Boolean { return _selected; }
-    public function set selected(v:Boolean):void { _selected = v; }
+//c    private var _selected:Boolean = false;
+//c    public function get selected():Boolean { return _selected; }
+//c    public function set selected(v:Boolean):void { _selected = v; }
     
-    private var _mouseDragBase:PixelPoint = null;
-    
-    private var _mouseLast:PixelPoint = null;
-    
-    private var _pixelSelectionDistance:int = 30;
+//c    private var _mouseDragBase:PixelPoint = null;
+//c    private var _mouseLast:PixelPoint = null;
+//c    private var _pixelSelectionDistance:int = 30;
 
     private var _panConfig:PanConfig;
     public function get panConfig():PanConfig { return _panConfig; }
@@ -181,12 +187,12 @@ package multigraph {
     private var _tickMax:int;
     public function get tickMax():int { return _tickMax; }
 	
-    public static var HIGHLIGHT_AXIS:int = 1;
-    public static var HIGHLIGHT_LABELS:int = 2;
-    public static var HIGHLIGHT_ALL:int = 3;
+//c    public static var HIGHLIGHT_AXIS:int = 1;
+//c    public static var HIGHLIGHT_LABELS:int = 2;
+//c    public static var HIGHLIGHT_ALL:int = 3;
 
-    private var _highlightStyle:int;
-    public function get highlightStyle():int { return _highlightStyle; }
+//c    private var _highlightStyle:int;
+//c    public function get highlightStyle():int { return _highlightStyle; }
 	
 	private var _axisControl:AxisControls = null;
 	public function get axisControl():AxisControls { return _axisControl; }
@@ -228,9 +234,10 @@ package multigraph {
                          lineWidth:int,
                          tickMin:int,
                          tickMax:int,
-                         highlightStyle:int,
+                         /*highlightStyle:int,*/
                          titleTextFormat:TextFormat,
-                         titleBoldTextFormat:TextFormat
+                         titleBoldTextFormat:TextFormat,
+                         clientData
 						 )   {
       _id              = id;
       _s_instances[id] = this;
@@ -253,7 +260,8 @@ package multigraph {
       _lineWidth       = lineWidth;
       _tickMin		   = tickMin;
       _tickMax		   = tickMax;
-      _highlightStyle  = highlightStyle;
+      _clientData      = clientData;
+      /*_highlightStyle  = highlightStyle;*/
 
       _reversed = (_minOffset > _length - _maxOffset);
 
@@ -354,7 +362,8 @@ package multigraph {
 
       var titleTextFormat:TextFormat = _titleTextFormat;
 
-      var useBold:Boolean =  (this.selected && (_highlightStyle==Axis.HIGHLIGHT_LABELS || _highlightStyle==Axis.HIGHLIGHT_ALL));
+      //var useBold:Boolean =  (this.selected && (_highlightStyle==Axis.HIGHLIGHT_LABELS || _highlightStyle==Axis.HIGHLIGHT_ALL));
+      var useBold:Boolean =  _controller.useBoldLabels();
 
       if (useBold) {
         titleTextFormat = _titleBoldTextFormat;
@@ -387,7 +396,7 @@ package multigraph {
       case 1:  // in step 1, render everything else
         // render the axis itself:
         if (_lineWidth > 0) {
-          if (this.selected && (_highlightStyle==Axis.HIGHLIGHT_AXIS || _highlightStyle==Axis.HIGHLIGHT_ALL)) {
+          if (_controller.useBoldAxis()) {
             g.lineStyle(_lineWidth+3,0,1);
           } else {
             g.lineStyle(_lineWidth,0,1);
@@ -421,7 +430,7 @@ package multigraph {
         // render the tick marks and labels
         if (labelers.length > 0 && _density <= 1.5) {
           var tickThickness:int = 1;
-          if (this.selected && (_highlightStyle==Axis.HIGHLIGHT_LABELS || _highlightStyle==Axis.HIGHLIGHT_ALL)) {
+          if (_controller.useBoldLabels()) {
             tickThickness = 3;
           }
           _labeler.prepare(dataMin, dataMax);
@@ -450,145 +459,146 @@ package multigraph {
       _labelers.push(labeler);
     }
     
-    public function handleMouseDown(p:PixelPoint, event:MouseEvent):Boolean {
-      if(axisControl != null) axisControl.destroyAllControls();
-      _mouseDragBase = p;
-      _mouseLast     = _mouseDragBase;
-      return true;
-    }
-
-    public function handleMouseUp(p:PixelPoint, event:MouseEvent):Boolean {
-      _mouseDragBase = null;
-      _graph.prepareData();
-      return true;
-    }
-
-    public function handleMouseOut(p:PixelPoint, event:MouseEvent):Boolean {
-      return handleMouseUp(p, event);
-    }
-
-    public function handleMouseMove(p:PixelPoint, event:MouseEvent):Boolean {
-      if(_mouseDragBase == null) {
-        // this is a real 'move' event --- not a 'drag'
-        var d:Number;
-        var e:Number;
-        if (_orientation == Axis.ORIENTATION_VERTICAL) {
-          d = p.x - _perpOffset;
-          e = p.y - _parallelOffset;
-        } else {
-          d = p.y - _perpOffset;
-          e = p.x - _parallelOffset;
-        }
-        if (
-            ((e >= 0) && (e <= _length))
-            &&
-            (((d >= 0) && (d < _pixelSelectionDistance)) || ((d < 0) && (d > -_pixelSelectionDistance)))
-            ) {
-		  if (_graph != null) { _graph.selectAxis(this); }
-	/*
-          // change the mouse cursor
-          if (_orientation == Axis.VERTICAL) {
-            graph.div.style.cursor="n-resize";
-          } else {
-            graph.div.style.cursor="e-resize";
-          }
-    */
-          return true;
-        }
-      } else {
-        var dx:Number = p.x- _mouseLast.x;
-        var dy:Number = p.y- _mouseLast.y;
-        _mouseLast = p;
-        handleMouseDrag(dx, dy, event);
-        return true;
-      }
-      return false;
-    }
-
-    public function handleMouseDrag(dx:Number, dy:Number, event:MouseEvent):void {
-      if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-        if (event.shiftKey || _graph.toolbarState == "zoom") {
-          if (_zoomConfig.allowed) { zoom(_mouseDragBase.x, dx); }
-        } else {
-          if (_panConfig.allowed) {
-            pan(-dx);
-          } else {
-            //zoom(_mouseDragBase.x, dx);
-          }
-        }
-      } else {
-        if (event.shiftKey || _graph.toolbarState == "zoom") {
-          if (_zoomConfig.allowed) { zoom(_mouseDragBase.y, dy); }
-        } else {
-          if (_panConfig.allowed) {
-            pan(-dy);
-          } else {
-            //zoom(_mouseDragBase.y, dy);
-          }
-        }
-      }
-      /*
-      if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
-      	if(axisControl != null) axisControl.destroyAllControls();
-      }
-      */
-    }
-  
-	private var _aCharCode:uint = 'a'.charCodeAt();
-	private var _zCharCode:uint = 'z'.charCodeAt();
-	private var _ACharCode:uint = 'A'.charCodeAt();
-	private var _ZCharCode:uint = 'Z'.charCodeAt();
-	
-	private var _qCharCode:uint = 'q'.charCodeAt();
-	private var _QCharCode:uint = 'Q'.charCodeAt();
-	
-	private var _plusCharCode:uint = '+'.charCodeAt();
-	private var _minusCharCode:uint = '-'.charCodeAt();
-
-    private var _lessCharCode:uint = '<'.charCodeAt();
-    private var _greaterCharCode:uint = '>'.charCodeAt();
-
-    public function handleKeyDown(p:PixelPoint, event:KeyboardEvent):void {
-      var pixAmount = 3;
-      switch (event.charCode) {
-      case _aCharCode:
-      case _ACharCode:
-      case _minusCharCode:
-        if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-          zoom(p.x, -pixAmount);
-        } else {
-          zoom(p.y, -pixAmount);
-        }
-        break;
-      case _zCharCode:
-      case _ZCharCode:
-      case _plusCharCode:
-        if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-          zoom(p.x, pixAmount);
-        } else {
-          zoom(p.y, pixAmount);
-        }
-        break;
-
-      case _lessCharCode:
-          pan(5*pixAmount);
-          break;
-
-      case _greaterCharCode:
-          pan(-5*pixAmount);
-          break;
-        
-      // TODO: Should there be a way to pan by holding a key?
-      case _qCharCode:
-      case _QCharCode:
-      	if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-      		pan(10);
-      	} else {
-      		pan(10);
-      	}
-      	break;
-      }
-    }
+//c    public function handleMouseDown(p:PixelPoint, event:MouseEvent):Boolean {
+//c      if(axisControl != null) axisControl.destroyAllControls();
+//c      _mouseDragBase = p;
+//c      _mouseLast     = _mouseDragBase;
+//c      return true;
+//c    }
+//c
+//c    public function handleMouseUp(p:PixelPoint, event:MouseEvent):Boolean {
+//c      _mouseDragBase = null;
+//c      _graph.prepareData();
+//c      return true;
+//c    }
+//c
+//c    public function handleMouseOut(p:PixelPoint, event:MouseEvent):Boolean {
+//c      return handleMouseUp(p, event);
+//c    }
+//c
+//c    public function handleMouseMove(p:PixelPoint, event:MouseEvent):Boolean {
+//c      if(_mouseDragBase == null) {
+//c        // this is a real 'move' event --- not a 'drag'
+//c        var d:Number;
+//c        var e:Number;
+//c        if (_orientation == Axis.ORIENTATION_VERTICAL) {
+//c          d = p.x - _perpOffset;
+//c          e = p.y - _parallelOffset;
+//c        } else {
+//c          d = p.y - _perpOffset;
+//c          e = p.x - _parallelOffset;
+//c        }
+//c        if (
+//c            ((e >= 0) && (e <= _length))
+//c            &&
+//c            (((d >= 0) && (d < _pixelSelectionDistance)) || ((d < 0) && (d > -_pixelSelectionDistance)))
+//c            ) {
+//c		  if (_graph != null) { selectAxis(this); }   //(SelectedAxisUIEventHandler)(_graph.uiEventHandler).selectAxis(this); } 
+//c			  
+//c	/*
+//c          // change the mouse cursor
+//c          if (_orientation == Axis.VERTICAL) {
+//c            graph.div.style.cursor="n-resize";
+//c          } else {
+//c            graph.div.style.cursor="e-resize";
+//c          }
+//c    */
+//c          return true;
+//c        }
+//c      } else {
+//c        var dx:Number = p.x- _mouseLast.x;
+//c        var dy:Number = p.y- _mouseLast.y;
+//c        _mouseLast = p;
+//c        handleMouseDrag(dx, dy, event);
+//c        return true;
+//c      }
+//c      return false;
+//c    }
+//c
+//c    public function handleMouseDrag(dx:Number, dy:Number, event:MouseEvent):void {
+//c      if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
+//c        if (event.shiftKey || _graph.toolbarState == "zoom") {
+//c          if (_zoomConfig.allowed) { zoom(_mouseDragBase.x, dx); }
+//c        } else {
+//c          if (_panConfig.allowed) {
+//c            pan(-dx);
+//c          } else {
+//c            //zoom(_mouseDragBase.x, dx);
+//c          }
+//c        }
+//c      } else {
+//c        if (event.shiftKey || _graph.toolbarState == "zoom") {
+//c          if (_zoomConfig.allowed) { zoom(_mouseDragBase.y, dy); }
+//c        } else {
+//c          if (_panConfig.allowed) {
+//c            pan(-dy);
+//c          } else {
+//c            //zoom(_mouseDragBase.y, dy);
+//c          }
+//c        }
+//c      }
+//c      /*
+//c      if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
+//c      	if(axisControl != null) axisControl.destroyAllControls();
+//c      }
+//c      */
+//c    }
+//c  
+//c	private var _aCharCode:uint = 'a'.charCodeAt();
+//c	private var _zCharCode:uint = 'z'.charCodeAt();
+//c	private var _ACharCode:uint = 'A'.charCodeAt();
+//c	private var _ZCharCode:uint = 'Z'.charCodeAt();
+//c	
+//c	private var _qCharCode:uint = 'q'.charCodeAt();
+//c	private var _QCharCode:uint = 'Q'.charCodeAt();
+//c	
+//c	private var _plusCharCode:uint = '+'.charCodeAt();
+//c	private var _minusCharCode:uint = '-'.charCodeAt();
+//c
+//c    private var _lessCharCode:uint = '<'.charCodeAt();
+//c    private var _greaterCharCode:uint = '>'.charCodeAt();
+//c
+//c    public function handleKeyDown(p:PixelPoint, event:KeyboardEvent):void {
+//c      var pixAmount = 3;
+//c      switch (event.charCode) {
+//c      case _aCharCode:
+//c      case _ACharCode:
+//c      case _minusCharCode:
+//c        if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
+//c          zoom(p.x, -pixAmount);
+//c        } else {
+//c          zoom(p.y, -pixAmount);
+//c        }
+//c        break;
+//c      case _zCharCode:
+//c      case _ZCharCode:
+//c      case _plusCharCode:
+//c        if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
+//c          zoom(p.x, pixAmount);
+//c        } else {
+//c          zoom(p.y, pixAmount);
+//c        }
+//c        break;
+//c
+//c      case _lessCharCode:
+//c          pan(5*pixAmount);
+//c          break;
+//c
+//c      case _greaterCharCode:
+//c          pan(-5*pixAmount);
+//c          break;
+//c        
+//c      // TODO: Should there be a way to pan by holding a key?
+//c      case _qCharCode:
+//c      case _QCharCode:
+//c      	if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
+//c      		pan(10);
+//c      	} else {
+//c      		pan(10);
+//c      	}
+//c      	break;
+//c      }
+//c    }
 
     public function pan(pixelDisplacement:int):void {
         if (!_panConfig.allowed) { return; }
