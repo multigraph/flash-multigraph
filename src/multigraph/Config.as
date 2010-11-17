@@ -223,6 +223,9 @@ package multigraph
 
 		// The graph specific defaults
         private var _defaults:Object = {
+            ui : {
+                eventhandler : "saui"
+            },
 			background : {
 				img : {
 					base     : "-1 -1",

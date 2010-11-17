@@ -363,7 +363,7 @@ package multigraph {
       var titleTextFormat:TextFormat = _titleTextFormat;
 
       //var useBold:Boolean =  (this.selected && (_highlightStyle==Axis.HIGHLIGHT_LABELS || _highlightStyle==Axis.HIGHLIGHT_ALL));
-      var useBold:Boolean =  _controller.useBoldLabels();
+      var useBold:Boolean = _controller!=null && _controller.useBoldLabels();
 
       if (useBold) {
         titleTextFormat = _titleBoldTextFormat;
@@ -396,7 +396,7 @@ package multigraph {
       case 1:  // in step 1, render everything else
         // render the axis itself:
         if (_lineWidth > 0) {
-          if (_controller.useBoldAxis()) {
+          if (_controller!=null && _controller.useBoldAxis()) {
             g.lineStyle(_lineWidth+3,0,1);
           } else {
             g.lineStyle(_lineWidth,0,1);
@@ -430,7 +430,7 @@ package multigraph {
         // render the tick marks and labels
         if (labelers.length > 0 && _density <= 1.5) {
           var tickThickness:int = 1;
-          if (_controller.useBoldLabels()) {
+          if (_controller!=null && _controller.useBoldLabels()) {
             tickThickness = 3;
           }
           _labeler.prepare(dataMin, dataMax);

@@ -28,7 +28,7 @@ package multigraph {
   import multigraph.renderer.*;
   import multigraph.saui.SelectedAxisUIAxisController;
   import multigraph.saui.SelectedAxisUIEventHandler;
-  import multigraph.naui.NearestAxisUIAxisController;
+  //import multigraph.naui.NearestAxisUIAxisController;
   import multigraph.naui.NearestAxisUIEventHandler;
   
   import mx.controls.*;
@@ -458,8 +458,12 @@ package multigraph {
         init_phase2();
       //}
 
-      this._uiEventHandler = new SelectedAxisUIEventHandler(this);
-      //this._uiEventHandler = new NearestAxisUIEventHandler(this);
+      var uieh:String = _config.value('ui', '@eventhandler');
+      if (uieh == "naui") {
+        this._uiEventHandler = new NearestAxisUIEventHandler(this);
+      } else {
+        this._uiEventHandler = new SelectedAxisUIEventHandler(this);
+      }
 
 	  if ('onMouseDown' in _uiEventHandler) { _eventSprite.addEventListener(MouseEvent.MOUSE_DOWN, _uiEventHandler['onMouseDown']); }
 	  if ('onMouseUp'   in _uiEventHandler) { _eventSprite.addEventListener(MouseEvent.MOUSE_UP,   _uiEventHandler['onMouseUp']);   }

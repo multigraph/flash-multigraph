@@ -15,6 +15,19 @@ mugl = element mugl {
 }
 
 graphcontents = (
+   element background {
+      attribute color   { text }?&
+      element img {
+         attribute frame    { text }?&
+         attribute anchor   { text }?&
+         attribute base     { text }?&
+         attribute position { text }?&
+         attribute src      { text }?
+      }?
+   }?&
+   element ui {
+      attribute eventhandler { text }?
+   }?&
    element window {
       attribute width   { xsd:integer }?&
       attribute height  { xsd:integer }?&
