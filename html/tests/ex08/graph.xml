@@ -7,7 +7,7 @@
   <verticalaxis   min="0" max="10"/>
   <plot>
     <renderer type="line">
-      <option name="linecolor" value="blue"/>
+      <option name="linecolor" value="red"/>
       <option name="dotcolor"  value="black"/>
       <option name="dotsize"   value="2"/>
     </renderer>
