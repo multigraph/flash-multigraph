@@ -18,10 +18,12 @@ package multigraph
   	public var second:int;
   	public var millisecond:Number;
 
-    public static var millisecondsInOneDay:int    = 1000 * 60 * 60 * 24;
-    public static var millisecondsInOneHour:int   = 1000 * 60 * 60;
-    public static var millisecondsInOneMinute:int = 1000 * 60;
-    public static var millisecondsInOneSecond:int = 1000;
+    public static var millisecondsInOneDay:int         = 1000 * 60 * 60 * 24;
+    public static var millisecondsInOneHour:int        = 1000 * 60 * 60;
+    public static var millisecondsInOneMinute:int      = 1000 * 60;
+    public static var millisecondsInOneSecond:int      = 1000;
+    public static var millisecondsInOneDecisecond:int  = 100;
+    public static var millisecondsInOneCentisecond:int = 10;
 
     private static var month_days_nonleap:Array = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     private static var month_days_leap   :Array = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -146,6 +148,14 @@ package multigraph
         ++d;
       }
       return new TurboDate(startms + d * msSpacing)
+    }
+
+    public function firstCentisecondSpacingTickAtOrAfter(start:TurboDate, centisecondSpacing:Number):TurboDate {
+      return firstMillisecondSpacingTickAtOrAfter(start, centisecondSpacing * millisecondsInOneCentisecond);
+    }
+
+    public function firstDecisecondSpacingTickAtOrAfter(start:TurboDate, decisecondSpacing:Number):TurboDate {
+      return firstMillisecondSpacingTickAtOrAfter(start, decisecondSpacing * millisecondsInOneDecisecond);
     }
 
     public function firstSecondSpacingTickAtOrAfter(start:TurboDate, secondSpacing:Number):TurboDate {

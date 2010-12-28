@@ -12,6 +12,10 @@ package multigraph.format
 	{		
 
       private var intervalRegexp:RegExp = /^(\d+)([A-Za-z])$/;
+      private var nonNumberCharRegexp:RegExp = /[^0-9]/g;
+      private var decimal0Regexp:RegExp = /\.$/;
+      private var decimal1Regexp:RegExp = /\.\d$/;
+      private var decimal2Regexp:RegExp = /\.\d\d$/;
 
 		public function DateFormatter(string:String)
 		{
@@ -41,7 +45,8 @@ package multigraph.format
 		            var weekdaysAbr:Array = new Array("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat");
 		            return weekdaysAbr[date.getUTCDay()];
 		        case "N": // Month name
-		            var months:Array = new Array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
+		            var months:Array = new Array("January", "February", "March", "April", "May", "June",
+                                                 "July", "August", "September", "October", "November", "December");
 		            return months[date.getUTCMonth()];
 		        case "n": // Month name -- 3 letter abbreviation
 		            var monthsAbr:Array = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
@@ -70,6 +75,14 @@ package multigraph.format
 		            return (date.getUTCMinutes() < 10) ? "0" + date.getUTCMinutes() + '' : date.getUTCMinutes() + '';
 		        case "s": // Seconds
 		            return (date.getUTCSeconds() < 10) ? "0" + date.getUTCSeconds() + '' : date.getUTCSeconds() + '';
+
+                case "v": // deciseconds -- 10ths of second -- 1 char
+                    return int(date.getUTCMilliseconds()/100) + '';
+                case "V": // centiseconds -- 100ths of second -- 2 chars
+                    return int(date.getUTCMilliseconds()/10) + '';
+                case "q": // milliseconds -- 1000ths of second -- 3 chars
+                    return date.getUTCMilliseconds() + '';
+
 		        case "P": // AM or PM
 		            return (date.getUTCHours() < 12) ? "AM" : "PM";
 		        case "p": // am or pm
@@ -134,6 +147,17 @@ package multigraph.format
           var   HH:Number = 0;
           var   mm:Number = 0;
           var   ss:Number = 0;
+          var  qqq:Number = 0; // qqq = milliseconds
+
+          if (string.search(decimal0Regexp) != -1) {
+            string = string + "000";
+          } else if (string.search(decimal1Regexp) != -1) {
+            string = string + "00";
+          } else if (string.search(decimal2Regexp) != -1) {
+            string = string + "0";
+          }
+
+          string = string.replace(nonNumberCharRegexp, '');
 
           // First check to see if the string consists of a number followed by a single character,
           // by matching against intervalRegexp defined above.  If it does, treat it as an interval
@@ -144,20 +168,32 @@ package multigraph.format
             var len:Number  = Number(a[1]);
             var unit:String = a[2];
             switch(unit){
-            case "H":
-              len = len * 3600000;
-              break;
-            case "D":
-              len = len * 3600000 * 24;
+            case "Y":
+              len = len * 3600000 * 24 * 365;
               break;
             case "M":
               len = len * 3600000 * 24 * 30;
               break;
-            case "Y":
-              len = len * 3600000 * 24 * 365;
+            case "D":
+              len = len * 3600000 * 24;
               break;
-            case "m":
+            case "H":
+              len = len * 3600000;
+              break;
+			case "m":
               len = len * 60000;
+              break;
+			case "s":
+              len = len * 1000;
+              break;
+			case "v":
+              len = len * 100;
+              break;
+			case "V":
+              len = len * 10;
+              break;
+			case "q":
+              // this is milliseconds; don't need to modify len here
               break;
             default:
               break;
@@ -168,6 +204,8 @@ package multigraph.format
           // If we make it to here, assume the string represents an instantaneous date/time value,
           // and parse based on its length
           switch (string.length) {
+          case 17: // YYYYMMDDHHmmssqqq    // qqq = milliseconds
+            qqq = int(string.substring(14,17));
           case 14: // YYYYMMDDHHmmss
             ss = int(string.substring(12,14));
           case 12: // YYYYMMDDHHmm
@@ -184,7 +222,7 @@ package multigraph.format
           }
           
           if (YYYY != 0) {
-            return Date.UTC(YYYY, MM, DD, HH, mm, ss, 0);   // note that this returns ms, not a Date object!
+            return Date.UTC(YYYY, MM, DD, HH, mm, ss, qqq);   // note that this returns ms, not a Date object!
           }
           
           // YYYY = 0, then we can't make sense of the string as a date at all, so just parse it as a number directly.
@@ -266,6 +304,15 @@ package multigraph.format
 	            case "p": // am or PM
 	                length += 2;
 	                break;
+                case "v": // deciseonds
+                    length += 1;
+                    break;
+                case "V": // centiseconds
+                    length += 2;
+                    break;
+                case "q": // milliseconds
+                    length += 3;
+                    break;
 	            }
 	        }
 	        return length;

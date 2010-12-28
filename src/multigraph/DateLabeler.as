@@ -47,21 +47,31 @@ package multigraph
       _unit                  = unit;
       
       switch(unit){
-      case "H":
-        _msSpacing = _spacing * 3600000;
-        break;
-      case "D":
-        _msSpacing = _spacing * 3600000 * 24;
+      case "Y":
+        _msSpacing = _spacing * 3600000 * 24 * 365;
         break;
       case "M":
         _msSpacing = _spacing * 3600000 * 24 * 30;
         break;
-      case "Y":
-        _msSpacing = _spacing * 3600000 * 24 * 365;
+      case "D":
+        _msSpacing = _spacing * 3600000 * 24;
+        break;
+      case "H":
+        _msSpacing = _spacing * 3600000;
         break;
       case "m":
         _msSpacing = _spacing * 60000;
         break;
+      case "s": // seconds
+        _msSpacing = _spacing * 1000;
+        break;
+      case "v": // deciseconds
+        _msSpacing = _spacing * 100;
+        break;
+      case "V": // centiseconds
+        _msSpacing = _spacing * 10;
+        break;
+      case "q": // milliseconds
       default:
         _msSpacing = _spacing;
         break;
@@ -114,26 +124,40 @@ package multigraph
       var direction:int = (dataMax >= dataMin) ? 1 : -1;
       var dataStartTurboDate:TurboDate = (direction > 0) ? new TurboDate(dataMin) : new TurboDate(dataMax);
       switch (_unit) {
-      case "m":
-        _firstTickTurboDate = dataStartTurboDate.firstMinuteSpacingTickAtOrAfter(_startTurboDate, _spacing);
-        _msSpacing = _spacing * TurboDate.millisecondsInOneMinute;
-        break;
-      case "H":
-        _firstTickTurboDate = dataStartTurboDate.firstHourSpacingTickAtOrAfter(_startTurboDate, _spacing);
-        _msSpacing = _spacing * TurboDate.millisecondsInOneHour;
-        break;
-      case "D":
-        _firstTickTurboDate = dataStartTurboDate.firstDaySpacingTickAtOrAfter(_startTurboDate, _spacing);
-        _msSpacing = _spacing * TurboDate.millisecondsInOneDay;
+
+      case "Y":
+        _firstTickTurboDate = dataStartTurboDate.firstYearSpacingTickAtOrAfter(_startTurboDate, _spacing);
+        _msSpacing = _spacing * TurboDate.millisecondsInOneDay * 365;
         break;
       case "M":
         _firstTickTurboDate = dataStartTurboDate.firstMonthSpacingTickAtOrAfter(_startTurboDate, _spacing);
         _msSpacing = _spacing * TurboDate.millisecondsInOneDay * 30;
         break;
-      case "Y":
-        _firstTickTurboDate = dataStartTurboDate.firstYearSpacingTickAtOrAfter(_startTurboDate, _spacing);
-        _msSpacing = _spacing * TurboDate.millisecondsInOneDay * 365;
+      case "D":
+        _firstTickTurboDate = dataStartTurboDate.firstDaySpacingTickAtOrAfter(_startTurboDate, _spacing);
+        _msSpacing = _spacing * TurboDate.millisecondsInOneDay;
         break;
+      case "H":
+        _firstTickTurboDate = dataStartTurboDate.firstHourSpacingTickAtOrAfter(_startTurboDate, _spacing);
+        _msSpacing = _spacing * TurboDate.millisecondsInOneHour;
+        break;
+      case "m":
+        _firstTickTurboDate = dataStartTurboDate.firstMinuteSpacingTickAtOrAfter(_startTurboDate, _spacing);
+        _msSpacing = _spacing * TurboDate.millisecondsInOneMinute;
+        break;
+      case "s":
+        _firstTickTurboDate = dataStartTurboDate.firstSecondSpacingTickAtOrAfter(_startTurboDate, _spacing);
+        _msSpacing = _spacing * TurboDate.millisecondsInOneSecond;
+        break;
+      case "v":
+        _firstTickTurboDate = dataStartTurboDate.firstDecisecondSpacingTickAtOrAfter(_startTurboDate, _spacing);
+        _msSpacing = _spacing * TurboDate.millisecondsInOneDecisecond;
+        break;
+      case "V":
+        _firstTickTurboDate = dataStartTurboDate.firstCentisecondSpacingTickAtOrAfter(_startTurboDate, _spacing);
+        _msSpacing = _spacing * TurboDate.millisecondsInOneCentisecond;
+        break;
+      case "q":
       default:
         _firstTickTurboDate = dataStartTurboDate.firstMillisecondSpacingTickAtOrAfter(_startTurboDate, _spacing);
         _msSpacing = _spacing;
@@ -154,21 +178,31 @@ package multigraph
       ++_step;
       _currentTurboDate = _firstTickTurboDate.clone();
       switch (_unit) {
-      case "m":
-        _currentTurboDate.addMinutes(_step * _spacing);
-        break;
-      case "H":
-        _currentTurboDate.addHours(_step * _spacing);
-        break;
-      case "D":
-        _currentTurboDate.addDays(_step * _spacing);
+      case "Y":
+        _currentTurboDate.addYears(_step * _spacing);
         break;
       case "M":
         _currentTurboDate.addMonths(_step * _spacing);
         break;
-      case "Y":
-        _currentTurboDate.addYears(_step * _spacing);
+      case "D":
+        _currentTurboDate.addDays(_step * _spacing);
         break;
+      case "H":
+        _currentTurboDate.addHours(_step * _spacing);
+        break;
+      case "m":
+        _currentTurboDate.addMinutes(_step * _spacing);
+        break;
+      case "s":
+        _currentTurboDate.addMilliseconds(_step * _spacing*1000);
+        break;
+      case "v":
+        _currentTurboDate.addMilliseconds(_step * _spacing*100);
+        break;
+      case "V":
+        _currentTurboDate.addMilliseconds(_step * _spacing*10);
+        break;
+      case "q":
       default:
         _currentTurboDate.addMilliseconds(_step * _spacing);
         break;
