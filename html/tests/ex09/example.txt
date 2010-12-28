@@ -1,0 +1,18 @@
+[title]
+Time With Milliseconds
+
+[tag]
+milliseconds
+
+[width]
+500
+
+[height]
+300
+
+[weight]
+280
+
+[description]
+This example shows time values that are specified (and displayed) with millisecond
+granularity.

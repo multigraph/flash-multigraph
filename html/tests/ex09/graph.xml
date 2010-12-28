@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<mugl>
+  <horizontalaxis id="time" type="datetime" min="2010-12-01 12:00:00" max="2010-12-01 12:00:30">
+    <labels>
+      <label format="H:i:s"   start="0" spacing="1D 12H 6H 4H 2H 1H 5m 1m 30s 15s 5s 1s" />
+      <label format="H:i:s.v" start="0" spacing="1v" />
+      <label format="H:i:s.V" start="0" spacing="1V" />
+      <label format="H:i:s.q" start="0" spacing="1q" />
+    </labels>
+    <grid/>
+    <pan min="2010-12-01 11:59:00" max="2010-12-01 12:01"/>
+  </horizontalaxis>
+  <verticalaxis   id="y" min="0" max="10"/>
+  <plot>
+    <horizontalaxis ref="time">
+      <variable ref="x"/>
+    </horizontalaxis>
+    <verticalaxis ref="y">
+      <variable ref="y"/>
+    </verticalaxis>
+    <renderer type="line">
+      <option name="linecolor" value="blue"/>
+      <option name="dotcolor"  value="black"/>
+      <option name="dotsize"   value="2"/>
+    </renderer>
+  </plot>
+  <data>
+    <variables>
+      <variable type="datetime" column="0" id="x"/>
+      <variable column="1" id="y"/>
+    </variables>
+    <values>
+2010-12-01 12:00:00.1,2
+2010-12-01 12:00:05.2,8
+2010-12-01 12:00:10.3,2
+2010-12-01 12:00:15.4,8
+2010-12-01 12:00:20.5,2
+2010-12-01 12:00:25.6,8
+    </values>
+  </data>
+</mugl>
