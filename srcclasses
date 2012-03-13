@@ -1,0 +1,63 @@
+#! /usr/bin/perl
+
+##
+
+## This script generates a list of classes to be compiled into either
+## Multigraph.swc or Multigraph.swf by examining the contents of the
+## "src" directory and excluding certain files contained therein which
+## should not be included for various reasons.
+##
+## usage:
+##
+##    srcclasses { SWC | SWF }
+##
+
+$target = uc(shift);
+
+if (!$target) {
+    die "usage:  srcclasses { SWC | SWF }\n";
+}
+
+@asfiles = src_files("as");
+@mxmlfiles = src_files("mxml");
+
+@classes = ();
+foreach $file (@mxmlfiles, @asfiles) {
+    if (($target eq "SWC") && ($file eq "MultigraphApp.mxml")) { next; }
+    if ($file eq "MultigraphTest.mxml") { next; }
+    if ($file eq "StaticImports.as") { next; }
+    if ($file =~ /saui/) { next; }
+    if ($file =~ /holding/) { next; }
+    if ($file =~ m|Mock|) { next; }
+    if ($file =~ m|/Old|) { next; }
+    $file =~ s|.mxml$||;
+    $file =~ s|.as$||;
+    $file =~ s|/|\.|g;
+    push(@classes, $file);
+}
+
+foreach $f (@classes) {
+    printf("%s\n", $f);
+}
+
+exit;
+
+########################################################################
+
+sub src_files {
+    my $suffix = shift;
+    @files = ();
+    open(FIND, "find src -name '*.$suffix' -print |");
+    while (my $file = <FIND>) {
+        chomp($file);
+        if ($file =~ m|/generated/|) { next; }
+        if ($file =~ m|/edu/|) { next; }
+        if ($file =~ m|WeatherForecasts|) { next; }
+        if ($file =~ /\.$suffix$/) {
+            $file =~ s|^src/||;
+            push(@files, $file);
+        }
+    }
+    close(FIND);
+    return @files;
+}

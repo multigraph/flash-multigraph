@@ -14,9 +14,11 @@
       <path-element>./src</path-element>
     </source-path>
   </compiler>
-    <output>Multigraph.swc</output>
+    <output>Multigraph.swf</output>
     <use-network>false</use-network>
+<!--
     <include-classes>
+      <class>MultigraphApp</class>
       <class>multigraph.NewAnnotation</class>
       <class>multigraph.Multigraph</class>
       <class>multigraph.ImageAnnotation</class>
@@ -88,4 +90,5 @@
       <class>multigraph.DPoint</class>
       <class>multigraph.Title</class>
     </include-classes>
+-->
 </flex-config>

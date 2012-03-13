@@ -18,6 +18,7 @@ For example, on drought.nemac.unca.edu:
   <property environment="env"/>
   <property name="FLEX_HOME" value="${env.FLEX_HOME}"/>
   <property name="compc.exe" value="${FLEX_HOME}/bin/compc"/>
+  <property name="mxmlc.exe" value="${FLEX_HOME}/bin/mxmlc"/>
   <target name="checkenv">
     <fail unless="env.FLEX_HOME">FLEX_HOME not set
 
@@ -27,19 +28,33 @@ For example, on drought.nemac.unca.edu:
     </fail>
   </target>
 
-  <target name="build" depends="Multigraph.swc">  
+  <target name="build" depends="Multigraph.swc,Multigraph.swf">  
   </target>
 
   <target name="Multigraph.swc" depends="checkenv">  
-    <exec executable="./update-compc-config"/>
+    <exec executable="./update-config">
+      <arg line="compc-config.xml"/>
+    </exec>
     <exec executable="${compc.exe}" dir="${basedir}">
       <arg line="-load-config '${FLEX_HOME}/frameworks/flex-config.xml'" />
       <arg line="-load-config compc-config.xml" />
     </exec>
   </target> 
 
+  <target name="Multigraph.swf" depends="checkenv">  
+    <exec executable="./update-config">
+      <arg line="mxmlc-config.xml"/>
+    </exec>
+    <exec executable="${mxmlc.exe}" dir="${basedir}">
+      <arg line="-load-config '${FLEX_HOME}/frameworks/flex-config.xml'" />
+      <arg line="-load-config mxmlc-config.xml" />
+      <arg line="src/MultigraphApp.mxml" />
+    </exec>
+  </target> 
+
   <target name="clean">
     <delete file="Multigraph.swc"/>
+    <delete file="Multigraph.swf"/>
   </target>
 
 </project>
