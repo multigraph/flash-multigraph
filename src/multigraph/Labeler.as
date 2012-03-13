@@ -9,48 +9,134 @@
 package multigraph
 {
     import flash.text.TextFormat;
-  
+    
+    import mx.core.UIComponent;
+	
 	public class Labeler
 	{
+      protected var _axis:Axis;       // the axis that this labeler is for
       protected var _spacing:Number;  // Number of axis relative spaces to place labels
       protected var _unit:String;     // Unit for each label (i.e., Hours, Days, Number)                                              
       protected var _formatString:String;   // Format string used to format the label on ouput. (ANSI C String format syntax)                 
+      protected var _visible:Boolean; // whether or not to actually draw labels
       protected var _start:Number;    // Value used to begin labeling the axis                                                          
-      protected var _px:Number;       // Offset in negative|positive x direction for the label only                                       
-      protected var _py:Number ;      // Offset in negative|positive y direction for the label only                                         
+      protected var _position:DPoint; // Offset (position) for label
+      protected var _anchor:DPoint;   // Anchor for label
       protected var _angle:Number;    // The angle of the label relative to its anchor point in degrees           
-      protected var _ax:Number;       // x anchor point to a theoretical box around a label
-      protected var _ay:Number;       // y anchor point to a theoretical box around a label
 
       protected var _textFormat:TextFormat;
-      protected var _boldTextFormat:TextFormat;
+	  protected var _densityFactor:Number=1;
 
-      protected var _useBold:Boolean = false;
+      private var _positionWasNull : Boolean;
+      private var _anchorWasNull : Boolean;
       
-      public function Labeler(spacing:Number, unit:String, formatString:String, start:Number, px:Number, py:Number, angle:Number, ax:Number, ay:Number,
-                              textFormat:TextFormat, boldTextFormat:TextFormat) {
-        _spacing = spacing;
-        _unit    = unit;
+      public function Labeler(axis:Axis,
+                              spacing:Number,
+                              unit:String,
+                              formatString:String,
+                              visible:Boolean,
+                              start:Number,
+                              position:DPoint,
+                              anchor:DPoint,
+                              angle:Number,
+                              textFormat:TextFormat,
+	  						  densityFactor:Number) {
+        _axis         = axis;
+        _spacing      = spacing;
+        _unit         = unit;
         _formatString = (formatString == null) ? "number" : formatString;
-        _start  = start;
-        _px     = px;
-        _py     = py;
-        _angle  = angle;
-        _ax     = ax;
-        _ay     = ay;
+        _visible      = visible;
+        _start        = start;
+        _position     = position;
+        _angle        = angle;
+        _anchor       = anchor;
+        _textFormat   = textFormat;
+		_densityFactor = densityFactor;
 
-        _textFormat = textFormat;
-        _boldTextFormat = boldTextFormat;
+        _positionWasNull = (_position == null);
+        _anchorWasNull   = (_anchor   == null);
       }
       
-      public function labelDensity(axis:Axis):Number { return 0; }
-      public function renderLabel(sprite:MultigraphUIComponent, axis:Axis, value:Number):void {}
+      public function labelDensity():Number { return 0; }
+      public function renderLabel(sprite:UIComponent, value:Number):void {}
 	  public function prepare(dataMin:Number, dataMax:Number):void {}
 	  public function hasNext():Boolean { return true; }
 	  public function next():Number { return 0; }
-      public function set useBold(b:Boolean):void { _useBold = b; }
-      //public function set textFormat(newTextFormat:TextFormat) { _textFormat = newTextFormat; }
       public function get spacing():Number { return _spacing; }
+
+      public function initializeGeometry() : void {
+        if (_positionWasNull) {
+          if (_axis.orientation == AxisOrientation.HORIZONTAL) {
+            if (_axis.perpOffset > _axis.graph.plotBox.height/2) {
+              _position = Config.AXIS_LABEL_DEFAULT_POSITION_HORIZ_TOP;
+            } else {
+              _position = Config.AXIS_LABEL_DEFAULT_POSITION_HORIZ_BOT;
+            }
+          } else {
+            if (_axis.perpOffset > _axis.graph.plotBox.width/2) {
+              _position = Config.AXIS_LABEL_DEFAULT_POSITION_VERT_RIGHT;
+            } else {
+              _position = Config.AXIS_LABEL_DEFAULT_POSITION_VERT_LEFT;
+            }
+          }
+        }
+        if (_anchorWasNull) {
+          if (_axis.orientation == AxisOrientation.HORIZONTAL) {
+            if (_axis.perpOffset > _axis.graph.plotBox.height/2) {
+              _anchor = Config.AXIS_LABEL_DEFAULT_ANCHOR_HORIZ_TOP;
+            } else {
+              _anchor = Config.AXIS_LABEL_DEFAULT_ANCHOR_HORIZ_BOT;
+            }
+          } else {
+            if (_axis.perpOffset > _axis.graph.plotBox.width/2) {
+              _anchor = Config.AXIS_LABEL_DEFAULT_ANCHOR_VERT_RIGHT;
+            } else {
+              _anchor = Config.AXIS_LABEL_DEFAULT_ANCHOR_VERT_LEFT;
+            }
+          }
+        }
+      }
+
+      public static function create(type         : DataType,
+                                    axis         : Axis,
+                                    spacing      : Number,
+                                    unit         : String,
+                                    formatString : String,
+                                    visible      : Boolean,
+                                    start        : String, 
+                                    position     : DPoint,
+                                    anchor       : DPoint,
+                                    angle        : Number,
+                                    textFormat   : TextFormat,
+	  								densityFactor : Number) : Labeler {
+        if (type == DataType.DATETIME) {
+          return new DateLabeler(axis,
+                                 spacing,
+                                 unit,
+                                 formatString,
+                                 visible,
+                                 start,
+                                 position,
+                                 anchor,
+                                 angle,
+                                 textFormat,
+								 densityFactor);
+        } else {
+          return new NumberLabeler(axis,
+                                   spacing,
+                                   unit,
+                                   formatString,
+                                   visible,
+                                   parseFloat(start),
+                                   position,
+                                   anchor,
+                                   angle,
+                                   textFormat,
+								   densityFactor);
+        }
+      }
+          
+          
 
 	}
 }

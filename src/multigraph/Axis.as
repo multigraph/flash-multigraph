@@ -1,68 +1,103 @@
-/*
- * This file is part of Multigraph
- * by Mark Phillips and Devin Eldreth
- *
- * Copyright (c) 2009,2010  University of North Carolina at Asheville
- * Licensed under the RENCI Open Source Software License v. 1.0.
- * See http://www.multigraph.org/LICENSE.txt for details.
- */
-package multigraph {
-  import flash.events.KeyboardEvent;
-  import flash.events.MouseEvent;
-  import flash.display.Graphics;
+package multigraph
+{
+  import flash.events.EventDispatcher;
   import flash.text.TextField;
   import flash.text.TextFieldAutoSize;
   import flash.text.TextFormat;
   import flash.text.TextFormatAlign;
   
-  import multigraph.format.*;
+  import multigraph.format.DateFormatter;
+  import multigraph.format.Formatter;
   
-  public class Axis
-    /**
-     * The Axis object encapsulates stuff related to a graph's axis, including
-     *  - the axis's data type (number or datetime)
-     *  - the mapping between pixels ("axis" values) and data values
-     *  - information related to the visual display of the axis, such as position and length
-     */
+  import mx.core.UIComponent;
+
+/**
+ * Dispatched when the data range for this axis changes, either as a
+ * result of the user panning or zooming, or as a result of
+ * setDataRange() or setDataRangeFromStrings() being called.
+ *
+ *  @eventType multigraph.AxisEvent.CHANGE
+ */
+[Event(name="change", type="multigraph.AxisEvent")]
+
+  public class Axis extends EventDispatcher
   {
-	// id of the axis
-    private var _id:String;
-	public function get id():String { return _id; }
+    private var _graph          : Graph;
+    private var _orientation    : AxisOrientation;
+    private var _id             : String;
+    private var _type           : DataType;
+    private var _length         : Displacement;
+    private var _pixelLength    : Number;
+    private var _position       : DPoint;
+    private var _base           : DPoint;
+    private var _anchor         : Number;
+    private var _linewidth      : Number;
+    private var _color          : uint;
+    private var _parallelOffset : Number;
+    private var _perpOffset     : Number;
+    private var _minposition    : Displacement;
+    private var _maxposition    : Displacement;
+    private var _minOffset      : Number;
+    private var _maxOffset      : Number;
+	private var _drawGrid       : Boolean;
+	private var _gridColor      : uint;
+    private var _tickmin        : Number;
+    private var _tickmax        : Number;
+	private var _tickcolor      : uint;
+	private var _tickwidth      : Number;
 
-	// pixel length of the axis
-    private var _length:int;
-	public function get length():int { return _length; }
+    private var _parser         : Formatter = null;
+    private var _geometryInitialized : Boolean = false;
 
-	
-	// perpOffset and parallelOffset give the location of the axis in the graph,
-	// relative to the plot area.  perpOffset and parallelOffset are pixel
-	// values, and give the location of the lower left endpoint of the axis,
-	// as a coordinate offset from the lower left corner of the plot area.
-	// For a horizontal axis the lower left (i.e. left) endpoint of the
-	// axis is (parallelOffset, perpOffset), and for a vertical axis the lower
-	// left (i.e. lower) endpoint is (perpOffset, parallelOffset).
-	// Note that axes are specified in
-	// mugl files in terms of the "position", "positionbase",
-	// "pregap", and "postgap" attributes; these are converted to
-	// _length, _perpOffset, and _parallelOffset before the Axis() constructor
-	// is called.
-    private var _perpOffset:int;
-	public function get perpOffset():int { return _perpOffset; }
-    private var _parallelOffset:int;   
-	public function get parallelOffset():int { return _parallelOffset; }
-	
-	
-	// pixel offset, relative to the left or bottom end of the axis, of the point
-	// on the axis corresponding to the min data point.  Positive offsets are
-	// towards the center of the axis.
-    private var _minOffset:int;
-	//public function get minOffset():int { return _minOffset; }
+    private var _title             : String;
+    private var _titlePositionAttr : String;
+    private var _titlePosition     : DPoint;
+    private var _titleAnchorAttr   : String;
+    private var _titleAnchor       : DPoint;
+    private var _titleAngle        : Number;
+    private var _titleTextFormat   : TextFormat;
 
-	// pixel offset, relative to the right or top end of the axis, of the point
-	// on the axis corresponding to the max data point.   Positive offsets are
-	// towards the center of the axis.
-    private var _maxOffset:int;
-	//public function get maxOffset():int { return _maxOffset; }
+    private var _labeler           : Labeler;
+    private var _labelers          : Array;
+
+    private var _zoomConfig:ZoomConfig;
+    private var _panConfig:PanConfig;
+
+    private var _binding:AxisBinding = null;
+
+    // this gets set to true in initializeGeometry() if the data direction
+    // of this axis is reversed from what you'd usually expect,
+    // i.e. the location of the "min" data value is to the right, or
+    // above, the location of the "max" data value.
+    private var _reversed:Boolean = false;
+
+    public function get id() : String {
+      return _id;
+    }
+    public function get type() : DataType {
+      return _type;
+    }
+    public function get orientation() : AxisOrientation {
+      return _orientation;
+    }
+    public function get perpOffset() : Number {
+      return _perpOffset;
+    }
+    public function get parallelOffset() : Number {
+      return _parallelOffset;
+    }
+    public function get graph() : Graph {
+      return _graph;
+    }
+    public function get pixelLength() : Number {
+      return _pixelLength;
+    }
+    public function get zoomConfig() : ZoomConfig {
+      return _zoomConfig;
+    }
+    public function get panConfig() : PanConfig {
+      return _panConfig;
+    }
 
 	//
 	// _dataMin is the min data value; access through dataMin getter/setter property in order to keep
@@ -70,13 +105,24 @@ package multigraph {
 	//
     private var _dataMin:Number;
     private var _haveDataMin:Boolean = false;
+    /**
+     * @private
+     */
 	public function get haveDataMin():Boolean { return _haveDataMin; }
+    /**
+     * The data value corresponding to the minimum endpoint of the axis.  If the axis is of
+     * type datetime, this value is the internal microsecond value corresponding to the
+     * date/time.
+     */
 	public function get dataMin():Number { return _dataMin; }
+    /**
+     * @private
+     */
     public function set dataMin(min:Number):void {
       _dataMin = min;
 	  _haveDataMin = true;
-      if (_haveDataMin && _haveDataMax) {
-        _axisToDataRatio = (_length - _maxOffset - _minOffset) / (_dataMax - _dataMin);
+      if (_haveDataMin && _haveDataMax && _geometryInitialized) {
+        computeAxisToDataRatio();
       }
     }
 
@@ -86,520 +132,629 @@ package multigraph {
 	//
     private var _dataMax:Number;
     private var _haveDataMax:Boolean = false;
+    /**
+     * @private
+     */
 	public function get haveDataMax():Boolean { return _haveDataMax; }
+    /**
+     * The data value corresponding to the maximum endpoint of the axis.  If the axis is of
+     * type datetime, this value is the internal microsecond value corresponding to the
+     * date/time.
+     */
 	public function get dataMax():Number { return _dataMax; }
+    /**
+     * @private
+     */
     public function set dataMax(max:Number):void {
       _dataMax = max;
 	  _haveDataMax = true;
-      if (_haveDataMin && _haveDataMax) {
-       _axisToDataRatio = (_length - _maxOffset - _minOffset) / (_dataMax - _dataMin);
+      if (_haveDataMin && _haveDataMax && _geometryInitialized) {
+        computeAxisToDataRatio();
       }
     }
 
     private var _axisToDataRatio:Number;
+    /**
+     * @private
+     */
     public function get axisToDataRatio():Number { return _axisToDataRatio; }
 
-    public static var TYPE_UNKNOWN:int = 0;
-    public static var TYPE_NUMBER:int = 1;
-    public static var TYPE_DATETIME:int = 2;
 
-    private var _type:int;
-    public function get type():int { return _type; }
-    
-    private var _title:String;
-    public function get title():String { return _title; }
-    private var _titlePx:Number;
-    public function get titlePx():Number { return _titlePx; }
-    private var _titlePy:Number;
-    public function get titlePy():Number { return _titlePy; }
-    private var _titleAx:Number;
-    public function get titleAx():Number { return _titleAx; }
-    private var _titleAy:Number;
-    public function get titleAy():Number { return _titleAy; }
-    private var _titleAngle:Number;
-    public function get titleAngle():Number { return _titleAngle; }
+    public function Axis(graph : Graph, orientation : AxisOrientation, config : Config, axisNumber : int = 0) {
+      _graph = graph;
+      _orientation = orientation;
 
-    private var _controller : AxisController = null;
-    public function set controller(newcontroller:AxisController) { this._controller = newcontroller; }
-    public function get controller():AxisController { return _controller; }
-    //private function controllerUseBold():Boolean { return _controller!=null && _controller.useBold(); }
-
-    private var _clientData : Object = null;
-    public function get clientData():Object { return _clientData; }
-
-    public static function parseType(string:String):int {
-      switch (string) {
-      case "number": return TYPE_NUMBER;
-      case "datetime": return TYPE_DATETIME;
+      //
+      // type
+      //
+      var typeAttr : String = config.value('@type');
+      _type = DataType.parse( typeAttr );
+      if (_type == DataType.UNKNOWN) {
+        throwInvalidAttributeError("type", typeAttr);
       }
-      return TYPE_UNKNOWN;
-    }
-    
-    public static var ORIENTATION_NONE:int = 0;
-    public static var ORIENTATION_HORIZONTAL:int = 1;
-    public static var ORIENTATION_VERTICAL:int = 2;
-
-    private var _orientation:int = Axis.ORIENTATION_NONE;
-	public function get orientation():int { return _orientation; }
-	public function set orientation(o:int):void { _orientation = o; }
-	
-    private var _labelers:Array = [];
-    public function get labelers():Array { return _labelers; }
-
-    private var _parser:Formatter = null;
-    //public function get parser():Formatter { return _parser; }
-
-    private var _graph:Graph;
-    public function get graph():Graph { return _graph; }
-
-//c    private var _selected:Boolean = false;
-//c    public function get selected():Boolean { return _selected; }
-//c    public function set selected(v:Boolean):void { _selected = v; }
-    
-//c    private var _mouseDragBase:PixelPoint = null;
-//c    private var _mouseLast:PixelPoint = null;
-//c    private var _pixelSelectionDistance:int = 30;
-
-    private var _panConfig:PanConfig;
-    public function get panConfig():PanConfig { return _panConfig; }
-    
-    private var _zoomConfig:ZoomConfig;
-    public function get zoomConfig():ZoomConfig { return _zoomConfig; }
-      
-    private var _binding:AxisBinding = null;
-    public function get binding():AxisBinding { return _binding; }
-
-	private var _grid:Boolean = false;
-	public function get grid():Boolean { return _grid; }
-
-	private var _gridColor:uint = 0x000000;
-	public function get gridColor():uint { return _gridColor; }
-
-	private var _color:uint = 0x000000;
-	public function get color():uint { return _color; }
-
-    private var _lineWidth:int;
-    public function get lineWidth():int { return _lineWidth; }
-	
-    private var _tickMin:int;
-    public function get tickMin():int { return _tickMin; }
-	
-    private var _tickMax:int;
-    public function get tickMax():int { return _tickMax; }
-	
-//c    public static var HIGHLIGHT_AXIS:int = 1;
-//c    public static var HIGHLIGHT_LABELS:int = 2;
-//c    public static var HIGHLIGHT_ALL:int = 3;
-
-//c    private var _highlightStyle:int;
-//c    public function get highlightStyle():int { return _highlightStyle; }
-	
-	private var _axisControl:AxisControls = null;
-	public function get axisControl():AxisControls { return _axisControl; }
-	public function set axisControl(controls:AxisControls):void { _axisControl = controls; }
-	
-	private var _hasAxisControls:Boolean = false;
-	public function get hasAxisControls():Boolean { return _hasAxisControls; }
-	public function set hasAxisControls(condition:Boolean):void { _hasAxisControls = condition; } 
-
-    private var _titleTextFormat:TextFormat;
-    private var _titleBoldTextFormat:TextFormat;
-
-
-    // this gets set to true in the constructor if the data direction
-    // of this axis is reversed from what you'd usually expect,
-    // i.e. the location of the "min" data value is to the right, or
-    // above, the location of the "max" data value.
-    private var _reversed:Boolean = false;
-
-    public function Axis(id:String,
-						 graph:Graph,
-						 length:int,
-						 parallelOffset:int,
-						 perpOffset:int,
-						 type:int,
-		   				 color:uint,
-						 min:String,
-						 minoffset:int,
-						 max:String,
-						 maxoffset:int,
-                         title:String,
-                         titlePx:Number,
-						 titlePy:Number,
-                         titleAx:Number,
-						 titleAy:Number,
-                         titleAngle:Number,
-						 grid:Boolean,
-						 gridColor:uint,
-                         lineWidth:int,
-                         tickMin:int,
-                         tickMax:int,
-                         /*highlightStyle:int,*/
-                         titleTextFormat:TextFormat,
-                         titleBoldTextFormat:TextFormat,
-                         clientData
-						 )   {
-      _id              = id;
-      _s_instances[id] = this;
-      _length          = length;
-      _parallelOffset  = parallelOffset;
-      _perpOffset      = perpOffset;
-      _type            = type;
-      _minOffset       = minoffset;
-      _maxOffset       = maxoffset;
-      _graph           = graph;
-      _title           = title;
-      _titlePx         = titlePx;
-      _titlePy         = titlePy;
-      _titleAx         = titleAx;
-      _titleAy         = titleAy;
-      _titleAngle      = titleAngle;
-	  _grid            = grid;
-	  _gridColor       = gridColor;
-	  _color           = color;
-      _lineWidth       = lineWidth;
-      _tickMin		   = tickMin;
-      _tickMax		   = tickMax;
-      _clientData      = clientData;
-      /*_highlightStyle  = highlightStyle;*/
-
-      _reversed = (_minOffset > _length - _maxOffset);
-
-	  if (title == null) { _title = _id; }
-      if (_title == '') { _title = null; }
 
       // Establish a parser for converting this axis's data between strings and numeric values,  For a
       // number type axis there is no parser -- we simply cast back and forth.  For a "datetime" type
       // axis, the "parser" field is set to a DateParser object that has two methods: parse(), for
       // converting a string to a numeric value, and format(), for converting a numeric value to a string.
-      switch (type) {
-      case TYPE_DATETIME:
+      _parser = null;
+      if (_type == DataType.DATETIME) {
         _parser = new DateFormatter("YMDHs");
-        break;
-      case TYPE_NUMBER:
-        _parser = null;
-        break;
-      case TYPE_UNKNOWN:
-      	_parser = null;
-      	break;
-      }
-      
-      // Set the _dataMin and _dataMax fields, if possible.
-	  if (min != "auto") {
-	  	dataMin = parse(min);
       }
 
-	  if (max != "auto") {
-	  	dataMax = parse(max);
+      //
+      // id
+      //
+      _id = config.value('@id');
+      if (_id == null || _id == "") {
+        _id = ((_orientation == AxisOrientation.HORIZONTAL) ? "x" : "y");
+        if (axisNumber > 0) {
+          _id = _id + axisNumber;
+        }
       }
+      _s_instances[id] = this;
+
+      //
+      // length
+      //
+      var lengthAttr : String = config.value('@length')
+      try {
+        _length = Displacement.parse( lengthAttr );
+      } catch (e : ParseError) {
+        throwInvalidAttributeError("length");
+      }
+
+      //
+      // position
+      //
+      var positionAttr : String = config.value('@position');
+      try {
+        _position = DPoint.parseWithDefaultCoordinate(positionAttr, _orientation == AxisOrientation.HORIZONTAL ? 1 : 0);
+      } catch (e : ParseError) {
+        throwInvalidAttributeError("position");
+      }
+
+      //
+      // base
+      //
+      var baseAttr : String = config.value('@base');
+      /////////////////////////////////////////////////////////////
+      // code to handle deprecated "@positionbase" attribute; only
+      // has effect if "@base" is not specifed in xml
+      var xmlbase:String = config.xmlvalue('@base');
+      if (xmlbase==null || xmlbase=="") {
+        var positionbase:String = config.xmlvalue('@positionbase');
+        if (positionbase == 'right') {
+          baseAttr = "1 -1";
+        }
+        if (positionbase == 'top') {
+          baseAttr = "-1 1";
+        }
+      }
+      // end of code to handle deprecated "@positionbase" attribute
+      /////////////////////////////////////////////////////////////
+      try {
+        _base = DPoint.parse( baseAttr );
+      } catch (e : ParseError) {
+        throwInvalidAttributeError("base");
+      }
+
+
+      //
+      // anchor
+      //
+      _anchor = parseFloat(config.value('@anchor'));
+      if (isNaN(_anchor)) {
+        throwInvalidAttributeError("anchor");
+      }
+
+      //
+      // linewidth
+      //
+      _linewidth = parseFloat(config.value('@linewidth'));
+      if (isNaN(_linewidth)) {
+        throwInvalidAttributeError("linewidth");
+      }
+
+      //
+      // color
+      //
+	  try {
+        _color = parsecolor(config.value('@color'));
+	  } catch (e : ParseError) {
+	    throwInvalidAttributeError("color");
+	  }
+
+
+      //
+      // minposition, maxposition
+      //
+      try {
+        _minposition = Displacement.parse( config.value('@minposition') );
+      } catch (e : ParseError) {
+        throwInvalidAttributeError("minposition");
+      }
+      try {
+        _maxposition = Displacement.parse( config.value('@maxposition') );
+      } catch (e : ParseError) {
+        throwInvalidAttributeError("maxposition");
+      }
+
+      //
+      // min, max
+      //
+      var minAttr : String = config.value('@min');
+      var maxAttr : String = config.value('@max');
+      if (minAttr != "auto") {
+		// NOTE: important to assign to "dataMin" here, not "_dataMin", so that we call the setter method!!
+        dataMin = parse(minAttr);
+        if (isNaN(_dataMin)) {
+          throwInvalidAttributeError('min', minAttr);
+        }
+      }
+      if (maxAttr != "auto") {
+	    // NOTE: important to assign to "dataMax" here, not "_dataMax", so that we call the setter method!!
+        dataMax = parse(maxAttr);
+        if (isNaN(_dataMax)) {
+          throwInvalidAttributeError('max', maxAttr);
+        }
+      }
+
+
+      //
+      // title
+      //
+      _title = config.xmlvalue('title');
+	  if (_title == null) {
+        // If _title is null here, it means that there was no <title> element in the mugl file,
+        // so default the title to the axis id:
+        _title = _id;
+      } else if (_title == '') {
+        // If _title is the empty string, it means that there was an empty <title/>
+        // element in the mugl file, which means to show no title for this axis.  We
+        // set the _title attribute to null to indicate this.
+        _title = null;
+      }
+      // Note that the above logic uses a null value for _title to
+      // mean two different things in different contexts.  In the
+      // first one, a null value returned by config.xmlvalue('title')
+      // means that there was no <title> element in the mugl file, in
+      // which case we choose a default value (the axis id).  In the
+      // second case, we assign a null value to _title as a way of
+      // indicating the fact that no title should be drawn.  The first
+      // meaning is only used temporarily; the second meaning is the
+      // only one that persists after the code above has finished
+      // executing.
+
+      //
+      // title position
+      //
+      _titlePositionAttr = config.xmlvalue('title','@position');
+      if (_titlePositionAttr==null || _titlePositionAttr=="") {
+        _titlePositionAttr = null;
+      }
+	  if (_titlePositionAttr != null) {
+	      try {
+        	_titlePosition = DPoint.parse( _titlePositionAttr );
+      	} catch (e : ParseError) {
+	        throwInvalidAttributeError("title position", _titlePositionAttr);
+      	}
+	  }
+
+
+      //
+      // title anchor
+      //
+      _titleAnchorAttr = config.xmlvalue('title','@anchor');
+      if (_titleAnchorAttr==null || _titleAnchorAttr=="") {
+        _titleAnchorAttr = null;
+      }
+	  if (_titleAnchorAttr != null) {
+      	try {
+	        _titleAnchor = DPoint.parse( _titleAnchorAttr );
+      	} catch (e : ParseError) {
+	        throwInvalidAttributeError("title anchor", _titleAnchorAttr);
+      	}
+	  }
+
+      //
+      // title angle
+      //
+      _titleAngle = parseFloat(config.value('title', '@angle'));
+      if (isNaN(_titleAngle)) {
+        throwInvalidAttributeError("title angle");
+      }
+
+      //
+      // title fontname
+      //
+      var titleFontname : String = config.value('title','@fontname');
+      // !!!!!  need to validate here !!!!!
       
+
+      //
+      // title fontsize
+      //
+      var titleFontsize : Number = parseFloat(config.value('title','@fontsize'));
+      if (isNaN(titleFontsize)) {
+        throwInvalidAttributeError("title fontsize");
+      }
+
+      //
+      // title fontcolor
+      //
+      var titleFontcolor : uint;
+	  try {
+        titleFontcolor = parsecolor(config.value('title','@fontcolor'));
+	  } catch (e : ParseError) {
+	    throwInvalidAttributeError("title fontcolor");
+	  }
+
+	  _titleTextFormat       = new TextFormat();
+	  _titleTextFormat.font  = titleFontname;
+	  _titleTextFormat.size  = titleFontsize;
+	  _titleTextFormat.color = titleFontcolor;
+	  _titleTextFormat.align = TextFormatAlign.LEFT;
+
+
+      //
+      // grid stuff
+      //
+	  if (config.xmlvalue('grid') != null) {
+		  // if the <grid> element is present, draw the grid unless its 'visible' attribute is 'false'
+		  _drawGrid = config.xmlvalue('grid','@visible') != "false";
+	  } else {
+		  // if the <grid> element is not present at all, don't draw the grid
+		  _drawGrid = false;
+	  }
+	  try {
+		  _gridColor = parsecolor( config.value('grid','@color') );
+	  } catch (e : ParseError) {
+		  throwInvalidAttributeError("grid color");
+	  }
+
+      //
+      // tickmin, tickmax, tickcolor, tickwidth:
+      //
+      _tickmin = parseFloat(config.value('@tickmin'));
+      if (isNaN(_tickmin)) {
+	    throwInvalidAttributeError("tickmin");
+	  }
+	  _tickmax = parseFloat(config.value('@tickmax'));
+	  if (isNaN(_tickmax)) {
+		  throwInvalidAttributeError("tickmax");
+	  }
+	  try {
+		  _tickcolor = parsecolor( config.value('@tickcolor') );
+	  } catch (e : ParseError) {
+		  throwInvalidAttributeError("tick color");
+	  }
+	  _tickwidth = parseFloat(config.value('@tickwidth'));
+	  if (isNaN(_tickwidth)) {
+		  throwInvalidAttributeError("tickwidth");
+	  }
+
+
+      //
+      // zoomconfig, panconfig:
+      //
       _panConfig = new PanConfig('allowed', null, null, this);
+      _panConfig.setConfig(config.value('pan', '@allowed'),
+                           config.value('pan', '@min'),
+                           config.value('pan', '@max'));
       _zoomConfig = new ZoomConfig('allowed', null, null, null, this);
+      _zoomConfig.setConfig(config.value('zoom', '@allowed'),
+                            config.value('zoom', '@anchor'),
+                            config.value('zoom', '@min'),
+                            config.value('zoom', '@max'));
 
-      this._titleTextFormat = titleTextFormat;
-      this._titleBoldTextFormat = titleBoldTextFormat;
+
+
+      //
+      // labels position attribute
+      //
+      var labelPosition : DPoint;
+      var labelPositionAttr : String = config.xmlvalue('labels', '@position');
+      if (labelPositionAttr!=null && labelPositionAttr!="") {
+        try {
+          labelPosition = DPoint.parse( labelPositionAttr );
+        } catch ( e : ParseError ) {
+          throwInvalidAttributeError("labels position");
+        }
+      } else {
+        labelPosition = null; // pass null for labelPosition to indicate default
+      }
+
+      //
+      // labels anchor attribute
+      //
+      var labelAnchor : DPoint;
+      var labelAnchorAttr : String = config.xmlvalue('labels', '@anchor');
+      if (labelAnchorAttr!=null && labelAnchorAttr!="") {
+        try {
+          labelAnchor = DPoint.parse( labelAnchorAttr );
+        } catch ( e : ParseError ) {
+          throwInvalidAttributeError("labels anchor");
+        }
+      } else {
+        labelAnchor = null; // pass null for labelAnchor to indicate default
+      }
+
+      //
+      // labelers
+      //
+      _labelers = new Array();
+      var spacingAndUnit:NumberAndUnit;
+      if(config.xmlvalue('labels', 'label') != null) {
+        var nlabeltags:int = config.xmlvalue('labels','label').length();
+        for(var k:int = 0; k < nlabeltags; ++k) {
+          var hlabelSpacings:Array = config.value('labels', 'label', k, '@spacing').split(" ");
+          var labelTextFormat:TextFormat = new TextFormat();
+          labelTextFormat.font  = config.value('labels','label',k,'@fontname');
+          labelTextFormat.size  = config.value('labels','label',k,'@fontsize');
+          labelTextFormat.color = config.value('labels','label',k,'@fontcolor');
+		  var densityFactor:Number = config.value('labels','label',k,'@densityfactor');
+          labelTextFormat.align = TextFormatAlign.LEFT;
+          for (var j:int=0; j<hlabelSpacings.length; ++j) {
+            var spacing = hlabelSpacings[j];
+            spacingAndUnit = NumberAndUnit.parse(spacing);
+            
+            var labeler : Labeler = Labeler.create(_type,
+                                                   this,
+                                                   spacingAndUnit.number,
+                                                   spacingAndUnit.unit,
+                                                   config.value('labels', 'label', k, '@format'),
+                                                   config.value('labels', 'label', k, '@visible')=='true',
+                                                   config.value('labels', '@start'),
+                                                   labelPosition,
+                                                   labelAnchor,
+                                                   parseFloat(config.value('labels', '@angle')),
+                                                   labelTextFormat,
+												   densityFactor);
+            _labelers.push(labeler);
+          }
+        } 
+      } else {
+        var hlabelSpacings:Array = config.value('labels', '@spacing').split(" ");
+        var labelTextFormat:TextFormat = new TextFormat();
+        labelTextFormat.font  = config.value('labels','@fontname');
+        labelTextFormat.size  = config.value('labels','@fontsize');
+        labelTextFormat.color = config.value('labels','@fontcolor');
+		var densityFactor:Number = config.value('labels','@densityfactor');
+        labelTextFormat.align = TextFormatAlign.LEFT;
+        for (var k:int=0; k<hlabelSpacings.length; ++k) {
+          var spacing = hlabelSpacings[k];
+          spacingAndUnit = NumberAndUnit.parse(spacing);
+          var labeler : Labeler = Labeler.create(_type,
+                                                 this,
+                                                 spacingAndUnit.number,
+                                                 spacingAndUnit.unit,
+                                                 config.value('labels', '@format'),
+                                                 config.value('labels', '@visible')=='true',
+                                                 config.value('labels', '@start'),
+                                                 labelPosition,
+                                                 labelAnchor,
+                                                 parseFloat(config.value('labels','@angle')),
+                                                 labelTextFormat,
+		  										 densityFactor);
+          _labelers.push(labeler);
+        }   
+      }
+      
+    }
+
+    private function throwInvalidAttributeError(attr : String, value : String = null) : void {
+      if (value != null) {
+        throw new MuglError("Invalid " + attr + " attribute value ('" + value + "') for " + _orientation.toString() + " axis");
+      } else {
+        throw new MuglError("Invalid " + attr + " attribute for " + _orientation.toString() + " axis");
+      }
     }
     
-    public function parse(string:String):Number {
+    private function computeAxisToDataRatio() : void {
+      _axisToDataRatio = (_pixelLength - _maxOffset - _minOffset) / (_dataMax - _dataMin);
+    }
+
+    public function initializeGeometry() : void {
+      _geometryInitialized = true;
+      if (_orientation == AxisOrientation.HORIZONTAL) {
+        _pixelLength = _length.calculateLength( _graph.plotBox.width );
+        _parallelOffset = _position.x + (_base.x + 1) * _graph.plotBox.width/2 - (_anchor + 1) * _pixelLength / 2;
+        _perpOffset = _position.y + (_base.y + 1) * _graph.plotBox.height/2;
+      } else {
+        _pixelLength = _length.calculateLength( _graph.plotBox.height );
+        _parallelOffset = _position.y + (_base.y + 1) * _graph.plotBox.height/2 - (_anchor + 1) * _pixelLength / 2;
+        _perpOffset = _position.x + (_base.x + 1) * _graph.plotBox.width/2;
+      }
+      if (_titlePositionAttr == null) {
+        if (_orientation == AxisOrientation.HORIZONTAL) {
+          if (_perpOffset > _graph.plotBox.height/2) {
+            _titlePosition = Config.AXIS_TITLE_DEFAULT_POSITION_HORIZ_TOP;
+          } else {
+            _titlePosition = Config.AXIS_TITLE_DEFAULT_POSITION_HORIZ_BOT;
+          }
+        } else {
+          if (_perpOffset > _graph.plotBox.width/2) {
+            _titlePosition = Config.AXIS_TITLE_DEFAULT_POSITION_VERT_RIGHT;
+          } else {
+            _titlePosition = Config.AXIS_TITLE_DEFAULT_POSITION_VERT_LEFT;
+          }
+        }
+      }
+      if (_titleAnchorAttr == null) {
+        if (_orientation == AxisOrientation.HORIZONTAL) {
+          if (_perpOffset > _graph.plotBox.height/2) {
+            _titleAnchor = Config.AXIS_TITLE_DEFAULT_ANCHOR_HORIZ_TOP;
+          } else {
+            _titleAnchor = Config.AXIS_TITLE_DEFAULT_ANCHOR_HORIZ_BOT;
+          }
+        } else {
+          if (_perpOffset > _graph.plotBox.width/2) {
+            _titleAnchor = Config.AXIS_TITLE_DEFAULT_ANCHOR_VERT_RIGHT;
+          } else {
+            _titleAnchor = Config.AXIS_TITLE_DEFAULT_ANCHOR_VERT_LEFT;
+          }
+        }
+      }
+      _minOffset = _minposition.calculateCoordinate(_pixelLength);
+      _maxOffset = _pixelLength - _maxposition.calculateCoordinate(_pixelLength);
+      _reversed = (_minOffset > _pixelLength - _maxOffset);
+      if (_haveDataMin && _haveDataMax) {
+        computeAxisToDataRatio();
+      }
+      for each ( var labeler : Labeler in _labelers ) {
+          labeler.initializeGeometry();
+      }
+    }
+	
+    /**
+     * @private
+     */
+    public function renderGrid(sprite:UIComponent):void {
+      if (!_geometryInitialized) { return; }
+		
+      // Render the grid lines for this axis, if any
+
+      //skip if we don't yet have data values
+      if (!_haveDataMin || !_haveDataMax) { return; }
+
+      prepareRender();
+
+	  // skip if grid lines aren't turned on
+	  if (!_drawGrid) { return ; }
+	  
+      if (_labelers.length > 0 && _currentLabelDensity <= 1.5) {
+        _currentLabeler.prepare(dataMin, dataMax);
+        while (_currentLabeler.hasNext()) {
+          var v:Number = _currentLabeler.next();
+          var a:Number = dataValueToAxisValue(v);
+          sprite.graphics.lineStyle(1, _gridColor, 1);
+          if (_orientation == AxisOrientation.HORIZONTAL) {
+            sprite.graphics.moveTo(a, _perpOffset);
+            sprite.graphics.lineTo(a, _graph.plotBox.height - _perpOffset);
+          } else {
+            sprite.graphics.moveTo(_perpOffset, a);
+            sprite.graphics.lineTo(_graph.plotBox.width - _perpOffset, a);
+          }
+        }
+      }
+    }
+
+	public function render(sprite : UIComponent) : void {
+	  if (!_geometryInitialized) { return; }
+      // render the axis line itself:
+      if (_linewidth > 0) {
+        sprite.graphics.lineStyle(_linewidth,_color,1);
+        if (_orientation == AxisOrientation.HORIZONTAL) {
+          sprite.graphics.moveTo(_parallelOffset, _perpOffset);
+          sprite.graphics.lineTo(_parallelOffset + _pixelLength, _perpOffset);
+        } else {
+          sprite.graphics.moveTo(_perpOffset, _parallelOffset);
+          sprite.graphics.lineTo(_perpOffset, _parallelOffset + _pixelLength);
+        }
+      }
+
+      // render the axis title
+      if (_title != null) {
+        var titlePositionX : Number;
+        var titlePositionY : Number;
+        if (_orientation == AxisOrientation.HORIZONTAL) {
+          titlePositionX = _parallelOffset + _pixelLength / 2 + _titlePosition.x
+          titlePositionY = _perpOffset + _titlePosition.y;
+        } else {
+          titlePositionX = _perpOffset + _titlePosition.x
+          titlePositionY = _parallelOffset + _pixelLength / 2 + _titlePosition.y
+        }
+        sprite.addChild(new TextLabel(_title,
+                                      _titleTextFormat,
+                                      titlePositionX, titlePositionY,
+                                      _titleAnchor.x, _titleAnchor.y,
+                                      _titleAngle));
+      }
+
+      // render the tick marks and labels
+      if (_haveDataMin && _haveDataMax) { // but skip if we don't yet have data values
+        if (_labelers.length > 0 && _currentLabelDensity <= 1.5) {
+          _currentLabeler.prepare(dataMin, dataMax);
+          while (_currentLabeler.hasNext()) {
+            var v:Number = _currentLabeler.next();
+            var a:Number = dataValueToAxisValue(v);
+			if (_tickwidth > 0) {
+			sprite.graphics.lineStyle(_tickwidth,_tickcolor,1);
+            if (_orientation == AxisOrientation.HORIZONTAL) {
+              sprite.graphics.moveTo(a, _perpOffset+_tickmax);
+              sprite.graphics.lineTo(a, _perpOffset+_tickmin);
+            } else {
+              sprite.graphics.moveTo(_perpOffset+_tickmin, a);
+              sprite.graphics.lineTo(_perpOffset+_tickmax, a);
+            }
+			}
+            _currentLabeler.renderLabel(sprite, v);
+          }
+        }
+      }
+
+	  
+
+	}
+
+
+    /**
+     * @private
+     */
+    public function parse(string : String) : Number {
 	  if (_parser != null) {
 		return _parser.parse(string);
   	  }
-      return Number(string);
-    }
-    
-    public function setDataRangeNoBind(min:Number,max:Number):void {
-      dataMin = min;
-      dataMax = max;
-      if (_graph != null) {
-		// Check to make sure _graph is nonnull so that this method will work when
-		// used in a testing environment, where we have axes that aren't actually
-		// associated with a Graph object.  In real use, however, _graph will always
-		// be nonnull.
-		_graph.paintNeeded = true;
-	  }
-    }
-      
-    public function setDataRange(min:Number,max:Number):void {
-      if (_binding != null) {
-        _binding.setDataRange(this, min, max);
-      } else {
-        setDataRangeNoBind(min, max);
-      }
-    }
-    
-    public function setDataRangeFromStrings(min:String, max:String):void {
-      var minValue:Number = parse(min);
-      var maxValue:Number = parse(max);
-	  setDataRange(minValue, maxValue);
-    }
-    
-    public function setBinding(binding:AxisBinding, min:String, max:String):void {
-      _binding = binding;
-      var minValue:Number = parse(min);
-      var maxValue:Number = parse(max);
-      binding.addAxis(this, minValue, maxValue);
-      setDataRangeNoBind(minValue, maxValue);
+      return parseFloat(string);
     }
 
+    /**
+     * @private
+     */
     public function dataValueToAxisValue(v:Number):Number {
       return _axisToDataRatio * ( v - _dataMin ) + _minOffset + _parallelOffset;
     }
 
+    /**
+     * @private
+     */
     public function axisValueToDataValue(V:Number):Number {
       return (V - _minOffset - _parallelOffset) / _axisToDataRatio + _dataMin;
     }
 
-    public function render(sprite:MultigraphUIComponent, step:int):void {
-      // Render this axis in the given sprite.  Step is an integer
-      // that says which step of the rendering should be done. There
-      // are currently two steps: step 0, which consists of rendering
-      // the axis's grid lines, and step 1, which renders everything
-      // else.  These are separated into two steps so that all of a
-      // graph's axis' grid lines can be rendered before any of the
-      // axes themselves, in order to insure that no grid lines lie on
-      // top of any axes.
-      var g:Graphics = sprite.graphics;
 
-      var titleTextFormat:TextFormat = _titleTextFormat;
-
-      //var useBold:Boolean =  (this.selected && (_highlightStyle==Axis.HIGHLIGHT_LABELS || _highlightStyle==Axis.HIGHLIGHT_ALL));
-      var useBold:Boolean = _controller!=null && _controller.useBoldLabels();
-
-      if (useBold) {
-        titleTextFormat = _titleBoldTextFormat;
+    /**
+     * @private
+     */
+    public var _currentLabeler:Labeler;
+    /**
+     * @private
+     */
+    public var _currentLabelDensity:Number;
+    /**
+     * @private
+     */
+    public function prepareRender() {
+      // Decide which labeler to use: take the one with the largest density <= 0.8.
+      // Unless all have density > 0.8, in which case we take the first one.  This assumes
+      // that the labelers list is ordered in increasing order of label density.
+      // This function sets the _currentLabeler and _currentLabelDensity private properties.
+      _currentLabeler = _labelers[0];
+      _currentLabelDensity = _currentLabeler.labelDensity();
+      if (_currentLabelDensity < 0.8) {
+        for (var i:uint = 1; i < _labelers.length; i++) {
+          var density:Number = _labelers[i].labelDensity();
+          if (density > 0.8) { break; }
+          _currentLabeler = _labelers[i];
+          _currentLabelDensity = density;
+        }
       }
-
-      switch (step) {
-      case 0:  // in step 0, render the grid lines associated with this axis, if any
-        prepareRender();
-        if (grid) {
-          if (labelers.length > 0 && _density <= 1.5) {
-            _labeler.prepare(dataMin, dataMax);
-            _labeler.useBold = useBold;
-            while (_labeler.hasNext()) {
-              var v:Number = _labeler.next();
-              var a:Number = dataValueToAxisValue(v);
-              g.lineStyle(1, gridColor, 1);
-              if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-                g.moveTo(a, perpOffset);
-                g.lineTo(a, graph.plotBox.height - perpOffset);
-              } else {
-                g.moveTo(perpOffset, a);
-                g.lineTo(graph.plotBox.width - perpOffset, a);
-              }
-            }
-          }
-        }
-        break;
-
-      default:
-      case 1:  // in step 1, render everything else
-        // render the axis itself:
-        if (_lineWidth > 0) {
-          if (_controller!=null && _controller.useBoldAxis()) {
-            g.lineStyle(_lineWidth+3,0,1);
-          } else {
-            g.lineStyle(_lineWidth,0,1);
-          }
-          if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-            g.moveTo(_parallelOffset, _perpOffset);
-            g.lineTo(_parallelOffset + _length, _perpOffset);
-          } else {
-            g.moveTo(_perpOffset, _parallelOffset);
-            g.lineTo(_perpOffset, _parallelOffset + _length);
-          }
-        }
-
-        // render the axis title
-        if (title != null) {
-          if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-            sprite.addChild(new TextLabel(title,
-                                          titleTextFormat,
-                                          _parallelOffset + _length / 2 + titlePx,  _perpOffset + titlePy,
-                                          titleAx, titleAy,
-                                          titleAngle));
-          } else {
-            sprite.addChild(new TextLabel(title,
-                                          titleTextFormat,
-                                          _perpOffset + titlePx,  _parallelOffset + _length / 2 + titlePy,
-                                          titleAx, titleAy,
-                                          titleAngle));
-          }
-        }
-
-        // render the tick marks and labels
-        if (labelers.length > 0 && _density <= 1.5) {
-          var tickThickness:int = 1;
-          if (_controller!=null && _controller.useBoldLabels()) {
-            tickThickness = 3;
-          }
-          _labeler.prepare(dataMin, dataMax);
-          _labeler.useBold = useBold;
-          while (_labeler.hasNext()) {
-            var v:Number = _labeler.next();
-            var a:Number = dataValueToAxisValue(v);
-            g.lineStyle(tickThickness,0,1);
-            if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-              g.moveTo(a, perpOffset+_tickMax);
-              g.lineTo(a, perpOffset+_tickMin);
-            } else {
-              g.moveTo(perpOffset+_tickMin, a);
-              g.lineTo(perpOffset+_tickMax, a);
-            }
-            _labeler.renderLabel(sprite, this, v);
-          }
-        }
-        break;
-      }
-
     }
 
-
-    public function addLabeler(labeler:Labeler):void {
-      _labelers.push(labeler);
-    }
-    
-//c    public function handleMouseDown(p:PixelPoint, event:MouseEvent):Boolean {
-//c      if(axisControl != null) axisControl.destroyAllControls();
-//c      _mouseDragBase = p;
-//c      _mouseLast     = _mouseDragBase;
-//c      return true;
-//c    }
-//c
-//c    public function handleMouseUp(p:PixelPoint, event:MouseEvent):Boolean {
-//c      _mouseDragBase = null;
-//c      _graph.prepareData();
-//c      return true;
-//c    }
-//c
-//c    public function handleMouseOut(p:PixelPoint, event:MouseEvent):Boolean {
-//c      return handleMouseUp(p, event);
-//c    }
-//c
-//c    public function handleMouseMove(p:PixelPoint, event:MouseEvent):Boolean {
-//c      if(_mouseDragBase == null) {
-//c        // this is a real 'move' event --- not a 'drag'
-//c        var d:Number;
-//c        var e:Number;
-//c        if (_orientation == Axis.ORIENTATION_VERTICAL) {
-//c          d = p.x - _perpOffset;
-//c          e = p.y - _parallelOffset;
-//c        } else {
-//c          d = p.y - _perpOffset;
-//c          e = p.x - _parallelOffset;
-//c        }
-//c        if (
-//c            ((e >= 0) && (e <= _length))
-//c            &&
-//c            (((d >= 0) && (d < _pixelSelectionDistance)) || ((d < 0) && (d > -_pixelSelectionDistance)))
-//c            ) {
-//c		  if (_graph != null) { selectAxis(this); }   //(SelectedAxisUIEventHandler)(_graph.uiEventHandler).selectAxis(this); } 
-//c			  
-//c	/*
-//c          // change the mouse cursor
-//c          if (_orientation == Axis.VERTICAL) {
-//c            graph.div.style.cursor="n-resize";
-//c          } else {
-//c            graph.div.style.cursor="e-resize";
-//c          }
-//c    */
-//c          return true;
-//c        }
-//c      } else {
-//c        var dx:Number = p.x- _mouseLast.x;
-//c        var dy:Number = p.y- _mouseLast.y;
-//c        _mouseLast = p;
-//c        handleMouseDrag(dx, dy, event);
-//c        return true;
-//c      }
-//c      return false;
-//c    }
-//c
-//c    public function handleMouseDrag(dx:Number, dy:Number, event:MouseEvent):void {
-//c      if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-//c        if (event.shiftKey || _graph.toolbarState == "zoom") {
-//c          if (_zoomConfig.allowed) { zoom(_mouseDragBase.x, dx); }
-//c        } else {
-//c          if (_panConfig.allowed) {
-//c            pan(-dx);
-//c          } else {
-//c            //zoom(_mouseDragBase.x, dx);
-//c          }
-//c        }
-//c      } else {
-//c        if (event.shiftKey || _graph.toolbarState == "zoom") {
-//c          if (_zoomConfig.allowed) { zoom(_mouseDragBase.y, dy); }
-//c        } else {
-//c          if (_panConfig.allowed) {
-//c            pan(-dy);
-//c          } else {
-//c            //zoom(_mouseDragBase.y, dy);
-//c          }
-//c        }
-//c      }
-//c      /*
-//c      if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
-//c      	if(axisControl != null) axisControl.destroyAllControls();
-//c      }
-//c      */
-//c    }
-//c  
-//c	private var _aCharCode:uint = 'a'.charCodeAt();
-//c	private var _zCharCode:uint = 'z'.charCodeAt();
-//c	private var _ACharCode:uint = 'A'.charCodeAt();
-//c	private var _ZCharCode:uint = 'Z'.charCodeAt();
-//c	
-//c	private var _qCharCode:uint = 'q'.charCodeAt();
-//c	private var _QCharCode:uint = 'Q'.charCodeAt();
-//c	
-//c	private var _plusCharCode:uint = '+'.charCodeAt();
-//c	private var _minusCharCode:uint = '-'.charCodeAt();
-//c
-//c    private var _lessCharCode:uint = '<'.charCodeAt();
-//c    private var _greaterCharCode:uint = '>'.charCodeAt();
-//c
-//c    public function handleKeyDown(p:PixelPoint, event:KeyboardEvent):void {
-//c      var pixAmount = 3;
-//c      switch (event.charCode) {
-//c      case _aCharCode:
-//c      case _ACharCode:
-//c      case _minusCharCode:
-//c        if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-//c          zoom(p.x, -pixAmount);
-//c        } else {
-//c          zoom(p.y, -pixAmount);
-//c        }
-//c        break;
-//c      case _zCharCode:
-//c      case _ZCharCode:
-//c      case _plusCharCode:
-//c        if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-//c          zoom(p.x, pixAmount);
-//c        } else {
-//c          zoom(p.y, pixAmount);
-//c        }
-//c        break;
-//c
-//c      case _lessCharCode:
-//c          pan(5*pixAmount);
-//c          break;
-//c
-//c      case _greaterCharCode:
-//c          pan(-5*pixAmount);
-//c          break;
-//c        
-//c      // TODO: Should there be a way to pan by holding a key?
-//c      case _qCharCode:
-//c      case _QCharCode:
-//c      	if (_orientation == Axis.ORIENTATION_HORIZONTAL) {
-//c      		pan(10);
-//c      	} else {
-//c      		pan(10);
-//c      	}
-//c      	break;
-//c      }
-//c    }
-
+    /**
+     * @private
+     */
     public function pan(pixelDisplacement:int):void {
         if (!_panConfig.allowed) { return; }
         var offset:Number = pixelDisplacement / _axisToDataRatio;
@@ -616,13 +771,16 @@ package multigraph {
         setDataRange( newMin, newMax );
     }
 
+    /**
+     * @private
+     */
     public function zoom(base:Number, pixelDisplacement:Number):void {
         if (!_zoomConfig.allowed) { return; }
         var dataBase:Number = axisValueToDataValue(base);
         if (_zoomConfig.haveAnchor) {
             dataBase = _zoomConfig.anchor;
         }
-        var factor:Number = 10 * Math.abs(pixelDisplacement / (_length - _maxOffset - _minOffset));
+        var factor:Number = 10 * Math.abs(pixelDisplacement / (_pixelLength - _maxOffset - _minOffset));
         if (_reversed) { factor = -factor; }
         var newMin:Number, newMax:Number;
         if (pixelDisplacement <= 0) {
@@ -657,32 +815,66 @@ package multigraph {
         }
     }
 
-    static private var _s_instances:Array = [];
-    public static function getInstanceById(id:String):Axis {
-      return _s_instances[id];
+
+    /**
+     * @private
+     */
+    public function setDataRangeNoBind(min:Number,max:Number,dispatch:Boolean=true):void {
+      dataMin = min;
+      dataMax = max;
+      if (_graph != null) {
+		// Check to make sure _graph is nonnull so that this method will work when
+		// used in a testing environment, where we have axes that aren't actually
+		// associated with a Graph object.  In real use, however, _graph will always
+		// be nonnull.
+		//_graph.paintNeeded = true;
+		_graph.invalidateDisplayList();
+	  }
+	  if (dispatch) {
+		  dispatchEvent(new AxisEvent(AxisEvent.CHANGE,min,max));  
+	  }
     }
 
-
-
-    public var _labeler:Labeler;
-    public var _density:Number;
-    public function prepareRender() {
-      // Decide which labeler to use: take the one with the largest density <= 0.8.
-      // Unless all have density > 0.8, in which case we take the first one.  This assumes
-      // that the labelers list is ordered in increasing order of label density.
-      // This function sets the _labeler and _density private properties.
-      _labeler = labelers[0];
-      _density = _labeler.labelDensity(this);
-      if (_density < 0.8) {
-        for (var i:uint = 1; i < _labelers.length; i++) {
-          var density:Number = labelers[i].labelDensity(this);
-          if (density > 0.8) { break; }
-          _labeler = labelers[i];
-          _density = density;
-        }
+    /**
+     * Set the minimum and maximum data values for the axis.
+     */
+    public function setDataRange(min:Number,max:Number,dispatch:Boolean=true):void {
+      if (_binding != null) {
+        _binding.setDataRange(this, min, max, dispatch);
+      } else {
+        setDataRangeNoBind(min, max, dispatch);
       }
     }
 
+    /**
+     * Set the minimum and maximum data values for the axis, using string values
+     * that can be of the form "YYYYMMDDHHmmss" (or any meaningful prefix thereof)
+     * for axes of type datetime.
+     */
+    public function setDataRangeFromStrings(min:String, max:String):void {
+      var minValue:Number = parse(min);
+      var maxValue:Number = parse(max);
+	  setDataRange(minValue, maxValue);
+    }
+
+    /**
+     * @private
+     */
+    public function setBinding(binding:AxisBinding, min:String, max:String):void {
+      _binding = binding;
+      var minValue:Number = parse(min);
+      var maxValue:Number = parse(max);
+      binding.addAxis(this, minValue, maxValue);
+      setDataRangeNoBind(minValue, maxValue);
+    }
+
+    static private var _s_instances:Array = [];
+    /**
+     * @private
+     */
+    public static function getInstanceById(id:String):Axis {
+      return _s_instances[id];
+    }
 
 
   }

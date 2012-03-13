@@ -39,7 +39,7 @@ package multigraph
       }
     }
 
-    public function setDataRange(initiatingAxis:Axis, min:Number, max:Number):void {
+    public function setDataRange(initiatingAxis:Axis, min:Number, max:Number, dispatch:Boolean=true):void {
       var initiatingAxisIndex:int;
       for (var i:int=0; i<_axes.length; ++i) {
         if (_axes[i].axis == initiatingAxis) {
@@ -49,7 +49,7 @@ package multigraph
       }
       for (var j:int=0; j<_axes.length; ++j) {
         if (j==initiatingAxisIndex) {
-          _axes[j].axis.setDataRangeNoBind(min, max);
+          _axes[j].axis.setDataRangeNoBind(min, max, dispatch);
         } else {
           _axes[j].axis.setDataRangeNoBind(
                                            (min * _axes[initiatingAxisIndex].factor + _axes[initiatingAxisIndex].offset
@@ -57,7 +57,8 @@ package multigraph
                                            / _axes[j].factor,
                                            (max * _axes[initiatingAxisIndex].factor + _axes[initiatingAxisIndex].offset
                                             - _axes[j].offset)
-                                           / _axes[j].factor
+                                           / _axes[j].factor,
+										   dispatch
                                            );
         }
       }

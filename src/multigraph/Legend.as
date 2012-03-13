@@ -11,6 +11,8 @@ package multigraph
 
   import flash.display.Graphics;
   import flash.text.TextFormat;
+  
+  import mx.core.UIComponent;
 
     
   public class Legend extends Annotation
@@ -31,8 +33,7 @@ package multigraph
                               bx:Number, by:Number,
                               ax:Number, ay:Number,
                               px:Number, py:Number,
-                              plotBox:Box,
-                              paddingBox:Box,
+                              graph:Graph,
                               frameIsPlot:Boolean,
                               numberOfRows:int, numberOfColumns:int, color:uint, border:Number,
                            borderColor:uint, opacity:Number, icon:Object, radius:Number=0):void 
@@ -63,8 +64,7 @@ package multigraph
       super(bx, by,
             ax, ay,
             px, py,
-            plotBox,
-            paddingBox,
+            graph,
             frameIsPlot,
             color,
             border,
@@ -73,11 +73,11 @@ package multigraph
             radius);
     }
 
-    override protected function createSprite():MultigraphUIComponent {
-      var legendSprite = new MultigraphUIComponent();
+    override protected function createSprite():UIComponent {
+      var legendSprite = new UIComponent();
         
       var textFormat:TextFormat = new TextFormat();
-      textFormat.font = "DefaultFont";
+      textFormat.font = "default";
       textFormat.color = 0x000000;
       textFormat.size = 12;
         
@@ -139,7 +139,7 @@ package multigraph
           }
                 
           if (_plots[numberOfPlots].legendLabel != null) {
-            var iconSprite:MultigraphUIComponent = new MultigraphUIComponent();
+            var iconSprite:UIComponent = new UIComponent();
             iconSprite.x = iconx;
             iconSprite.y = icony;
             iconSprite.width = _icon.width;

@@ -10,7 +10,7 @@ package multigraph.renderer {
 	import flash.display.Graphics;
 	import flash.text.TextFormat;
 	
-	import multigraph.MultigraphUIComponent;
+	import mx.core.UIComponent;
 	import multigraph.Axis;
 	import multigraph.TextLabel;
 	import multigraph.format.DateFormatter;
@@ -48,17 +48,17 @@ package multigraph.renderer {
       super(haxis, vaxis, data, varids);
       _dateFormatter = new DateFormatter(_dateFormat);
       _textFormat = new TextFormat();
-      _textFormat.font = "DefaultFont";
+      _textFormat.font = "default";
       _textFormat.color = 0x000000;
       _textFormat.size = 12;
       _lineheight = _haxis.graph.plotBox.height - 15;
     }
 
-    override public function begin(sprite:MultigraphUIComponent):void {
+    override public function begin(sprite:UIComponent):void {
     }
 
 	private var p:Array = [];
-    override public function dataPoint(sprite:MultigraphUIComponent, datap:Array):void {
+    override public function dataPoint(sprite:UIComponent, datap:Array):void {
       transformPoint(p, datap);
       var g:Graphics = sprite.graphics;
 	  if (datap[1] == 1) {
@@ -74,7 +74,7 @@ package multigraph.renderer {
 	  g.lineTo(p[0], _lineheight); // graph.plotBox.height - position
     }
 
-    override public function end(sprite:MultigraphUIComponent):void {
+    override public function end(sprite:UIComponent):void {
       var minDateString:String = _dateFormatter.format(_haxis.dataMin);
       var px = _haxis.dataValueToAxisValue(_haxis.dataMin);
       var py = _haxis.graph.plotBox.height + 5;
@@ -95,7 +95,7 @@ package multigraph.renderer {
       sprite.addChild(maxTextLabel);
     }
     
-    override public function renderLegendIcon(sprite:MultigraphUIComponent, legendLabel:String, opacity:Number):void {
+    override public function renderLegendIcon(sprite:UIComponent, legendLabel:String, opacity:Number):void {
     	
     }
   }

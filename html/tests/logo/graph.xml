@@ -1,0 +1,37 @@
+<mugl>
+  <background color="0x000066"/>
+  <window margin="20" padding="5" bordercolor="0xffffff"/>
+  <plotarea marginbottom="5" margintop="5" marginleft="5" marginright="5"/>
+  <horizontalaxis id="x" min="0" max="3.2" color="0xffffff">
+  </horizontalaxis>
+  <verticalaxis id="y" min="0" max="3.8" color="0xffffff">
+    <grid color="0x888888"/>
+  </verticalaxis>
+  <plot>
+    <horizontalaxis ref="x">
+      <variable ref="x"/>
+    </horizontalaxis>
+    <verticalaxis ref="y">
+      <variable ref="y"/>
+    </verticalaxis>
+    <renderer type="bar">
+      <option name="fillcolor" value="0xffffff"/>
+      <option name="linecolor" value="0xffffff"/>
+      <option name="barwidth" value="0.4"/>
+      <option name="baroffset" value="0.25"/>
+    </renderer>
+  </plot>
+  <data>
+    <variables>
+      <variable id="x" column="0"/>
+      <variable id="y" column="1"/>
+    </variables>
+    <values>                                                                                        
+      0.25,0.5                                                                                           
+      0.75,1.0
+      1.25,1.75
+      1.75,2.5
+      2.25,3.3
+    </values>
+  </data>
+</mugl>

@@ -9,6 +9,8 @@
 package multigraph
 {
   import multigraph.renderer.Renderer;
+  
+  import mx.core.UIComponent;
 
   public class Plot
   {
@@ -41,8 +43,10 @@ package multigraph
      */
 	public function prepareData():void {}
 
+	public function showTip(mouseLocation:DPoint, component:UIComponent, plotBox:Box):void {}
+	public function hideTip():void {}
 
-    public function render(sprite:MultigraphUIComponent):void {}
+    public function render(sprite:UIComponent):void {}
 
   }
 

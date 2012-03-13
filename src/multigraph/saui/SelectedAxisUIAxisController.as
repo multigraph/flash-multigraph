@@ -4,7 +4,6 @@ package multigraph.saui
   import flash.events.MouseEvent;
   import multigraph.Axis;
   import multigraph.AxisController;
-  import multigraph.AxisControls;
   import multigraph.Graph;
   import multigraph.PixelPoint;
 
@@ -36,17 +35,17 @@ package multigraph.saui
 	  this._selectedAxisUIEventHandler = selectedAxisUIEventHandler;
       this._highlightStyle = (int)(axis.clientData);
     }
-    
+/*    
 	private var _axisControl:AxisControls = null;
 	public function get axisControl():AxisControls { return _axisControl; }
 	public function set axisControl(controls:AxisControls):void { _axisControl = controls; }
-	
 	private var _hasAxisControls:Boolean = false;
 	public function get hasAxisControls():Boolean { return _hasAxisControls; }
 	public function set hasAxisControls(condition:Boolean):void { _hasAxisControls = condition; } 
-
+*/
+	
     public function handleMouseDown(p:PixelPoint, event:MouseEvent):Boolean {
-      if(axisControl != null) axisControl.destroyAllControls();
+      //if(axisControl != null) axisControl.destroyAllControls();
       _mouseDragBase = p;
       _mouseLast     = _mouseDragBase;
       return true;

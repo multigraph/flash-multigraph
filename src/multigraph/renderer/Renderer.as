@@ -7,9 +7,10 @@
  * See http://www.multigraph.org/LICENSE.txt for details.
  */
 package multigraph.renderer {
+	import mx.core.UIComponent;
 	import multigraph.Axis;
 	import multigraph.data.Data;
-	import multigraph.MultigraphUIComponent;
+	import mx.core.UIComponent;
 	import multigraph.parsecolor;
     import multigraph.data.Data;
     import multigraph.DataFilter;
@@ -94,15 +95,15 @@ package multigraph.renderer {
 	// with option values can override this
     public function initialize():void {}
     
-    public function begin(sprite:MultigraphUIComponent):void {}
-    public function dataPoint(sprite:MultigraphUIComponent, p:Array):void {}
-    public function end(sprite:MultigraphUIComponent):void {}
+    public function begin(sprite:UIComponent):void {}
+    public function dataPoint(sprite:UIComponent, p:Array):void {}
+    public function end(sprite:UIComponent):void {}
     
     /** 
     * This function is responisble for drawing the legend icon for the specific renderer
     * as well as the text.
     * */
-    public function renderLegendIcon(sprite:MultigraphUIComponent, legendLabel:String, opacity:Number):void {}
+    public function renderLegendIcon(sprite:UIComponent, legendLabel:String, opacity:Number):void {}
 
 	// The list of renderers is given as a static function here rather than a static
 	// var, because using a static var in this way gives a bizarre error that I suspect

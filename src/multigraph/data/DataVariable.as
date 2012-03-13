@@ -9,6 +9,7 @@
 package multigraph.data
 {
   import multigraph.Axis;
+  import multigraph.DataType;
   import multigraph.format.*;
 	
   public class DataVariable
@@ -19,8 +20,8 @@ package multigraph.data
 	private var _column:int;
 	public function get column():int { return _column; }
 		
-	private var _type:int;
-	public function get type():int { return _type; }
+	private var _type:DataType;
+	public function get type():DataType { return _type; }
 		
 	private var _parser:Formatter;
 	public function get parser():Formatter { return _parser; }
@@ -34,7 +35,7 @@ package multigraph.data
     private var _missingOp:int       =  _missingOpNONE;	
 	private var _missingValue:Number;
 
-	public function DataVariable(id:String, column:int, type:int, missingValue:Number=0, missingOpString:String=null)
+	public function DataVariable(id:String, column:int, type:DataType, missingValue:Number=0, missingOpString:String=null)
 	{
 	  this._id           = id;
 	  this._column       = column;
@@ -43,7 +44,7 @@ package multigraph.data
 	  this._missingOp    = missingOpStringToInt(missingOpString);
 			
 	  switch (this.type) {
-	  case Axis.TYPE_DATETIME:
+	  case DataType.DATETIME:
 		this._parser = new DateFormatter("YMDHis");
 		break;
 	  default:

@@ -10,7 +10,7 @@ package multigraph.renderer {
 	import flash.display.Graphics;
 	
 	import multigraph.Axis;
-	import multigraph.MultigraphUIComponent;
+	import mx.core.UIComponent;
     import multigraph.parsecolor;
     import multigraph.data.Data;
 	

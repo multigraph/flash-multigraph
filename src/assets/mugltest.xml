@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<mugl>
+    <window x="0" y="20" width="100%" height="100%" margin="0" border="2"/>
+    <horizontalaxis id="xaxis" min="0" max="10">
+      <labels densityfactor="0.25"/>
+      <title>Year</title>
+      <grid/>
+    </horizontalaxis>
+    <verticalaxis   id="yaxis" min="0" max="10">
+      <title>y</title>
+      <grid/>
+    </verticalaxis>
+    <plot>
+      <datatips/>
+      <renderer type="pointline">
+        <option name="linecolor" value="0xff0000"/>
+        <option name="pointcolor"  value="0x00ffff"/>
+        <option name="pointsize"   value="2"/>
+      </renderer>
+    </plot>
+    <data>
+      <values>
+        3, 5
+        4, 3
+      </values>
+    </data>
+</mugl>

@@ -11,6 +11,8 @@ package multigraph
 
   import flash.display.Graphics;
   import flash.filters.DropShadowFilter;
+  
+  import mx.core.UIComponent;
 
   /*
    * An Annotation is a rectangular region that holds some kind of
@@ -19,6 +21,26 @@ package multigraph
    * instances of Annotation itself --- only of its subclasses.  The
    * current subclasses are Legend and Title; I may add an Image subclass
    * later.
+   *
+   * The usage for all Annoation subclasses is the same: this superclass
+   * contains attributes that specify location of the annotation rectangle
+   * using the standard base/anchor/position/frame (no angle) mechanism
+   * used elsewhere in Multigraph, as well as attributes specifying the
+   * annotation's background color, opacity, border color, border
+   * thickness, and corner radius.
+   * 
+   * To use an Annotation, simply create an instance of one of its
+   * subclasses, and then just call its render(...) method, which will add
+   * the annotation to the graph's paddingBoxSprite.
+   * 
+   * To create a new subclass, just extend annotation, provide a
+   * constructor that takes whatever argments are appropriate for the
+   * subclass, and override the "createSprite" method, which should simply
+   * create whatever UIComponent (the method really should be called
+   * createUIComponent instead!) is desired.  The superclass "render"
+   * method takes care of positioning the sprite, drawing its background
+   * and border, and adding it to the graph's paddingBoxSprite.
+   * 
    */
   public class Annotation
   {
@@ -56,10 +78,9 @@ package multigraph
     protected var _color_str:uint;    
     protected var _opacity:Number;
     
-    private var _annotationSprite:MultigraphUIComponent;
+    private var _annotationSprite:UIComponent;
 
-    private var _plotBox:Box;
-    private var _paddingBox:Box;
+	private var _graph:Graph;
     
     private var _frameIsPlot:Boolean;
     
@@ -71,8 +92,7 @@ package multigraph
     public function Annotation(bx:Number, by:Number,
                                ax:Number, ay:Number,
                                px:Number, py:Number,
-                               plotBox:Box,
-                               paddingBox:Box,
+							   graph:Graph,
                                frameIsPlot:Boolean,
                                color:uint,
                                border:Number,
@@ -88,8 +108,7 @@ package multigraph
       _py          = py;
       _radius      = radius;
 
-      _plotBox = plotBox;
-      _paddingBox = paddingBox;
+      _graph       = graph;
       
       _frameIsPlot = frameIsPlot;
 
@@ -97,12 +116,13 @@ package multigraph
       _border      = border;
       _borderColor = borderColor;
       _opacity     = opacity;
-      createAndDecorateSprite();
+	  
+	  _annotationSprite = null;
     }
 
     // subclasses should override this method with one that creates the sprite they want:
-    protected function createSprite():MultigraphUIComponent {
-      return new MultigraphUIComponent();
+    protected function createSprite():UIComponent {
+      return new UIComponent();
     }
 
     private function createAndDecorateSprite() {
@@ -110,8 +130,8 @@ package multigraph
         
       var ax:Number = (_ax+1)*_annotationSprite.width/2;
       var ay:Number = (_ay+1)*_annotationSprite.height/2;
-      var bx:Number = _frameIsPlot ? (_bx+1)*_plotBox.width/2 : (_bx+1)*_paddingBox.width/2; 
-      var by:Number = _frameIsPlot ? (_by+1)*_plotBox.height/2 : (_by+1)*_paddingBox.height/2;
+      var bx:Number = _frameIsPlot ? (_bx+1)*_graph.plotBox.width/2 : (_bx+1)*_graph.paddingBox.width/2; 
+      var by:Number = _frameIsPlot ? (_by+1)*_graph.plotBox.height/2 : (_by+1)*_graph.paddingBox.height/2;
       _spritePosX =  bx + _px - ax;
       _spritePosY =  by + _py - ay;
 
@@ -138,10 +158,13 @@ package multigraph
 
     }
 
-    public function render(paddingBoxSprite:MultigraphUIComponent, plotBoxSprite:MultigraphUIComponent):void {
+    public function render(paddingBoxSprite:UIComponent, plotBoxSprite:UIComponent):void {
       //var shadow:DropShadowFilter = new DropShadowFilter();
       //shadow.alpha = 0.5;
       //shadow.distance = 1;
+	  if (_annotationSprite == null) {		
+		createAndDecorateSprite();
+	  }
       
       _annotationSprite.x = _spritePosX + (_frameIsPlot ? plotBoxSprite.x : 0);
       _annotationSprite.y = _spritePosY + (_frameIsPlot ? plotBoxSprite.y : 0);

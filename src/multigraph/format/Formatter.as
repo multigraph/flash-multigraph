@@ -8,6 +8,8 @@
  */
 package multigraph.format
 {
+	import multigraph.DataType;
+	
 	/*
 		This class defines a formatter that can now be used to parse and format numberical values 
 		into string values of arbitrary representation specified by the _formatString. As of 01/01/2009
@@ -28,5 +30,14 @@ package multigraph.format
    	public function parse(string:String):Number { return 0; } 
     
     public function getLength():int { return 5; }
+
+    public static function create(type:DataType, string:String):Formatter {
+      switch (type) {
+        case DataType.NUMBER: return new NumberFormatter(string);
+        case DataType.DATETIME: return new DateFormatter(string);
+      }
+      return null;
+    }
+
   }
 }

@@ -48,11 +48,32 @@ package multigraph
      *     "-A"   ==>  a=-A b=0
      **/
     public static function parse(string:String):Displacement {
-      var a:Array = _displacementRegExp.exec(string);
-      if (a != null) {
-        return new Displacement( Number(a[1]), (a[2]=="+" ? 1 : -1) * Number(a[3]) );
+      var ar:Array = _displacementRegExp.exec(string);
+      if (ar != null) {
+        var a : Number = parseFloat(ar[1]);
+        var b : Number = parseFloat(ar[3]);
+        var sign : int;
+        switch (ar[2]) {
+        case "+":
+          sign = 1;
+          break;
+        case "-":
+          sign = -1;
+          break;
+        default:
+          sign = 0;
+          break;
+        }
+        if (isNaN(a) || sign == 0 || isNaN(b)) {
+          throw new ParseError('parse error');
+        }
+        return new Displacement( a, sign * b );
       }
-      return new Displacement( Number(string), 0 );
+      var a : Number = parseFloat(string);
+      if (isNaN(a)) {
+          throw new ParseError('parse error');
+      }
+      return new Displacement( a, 0 );
     }
 
 

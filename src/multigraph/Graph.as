@@ -1,414 +1,291 @@
-/*
- * This file is part of Multigraph
- * by Mark Phillips and Devin Eldreth
- *
- * Copyright (c) 2009,2010  University of North Carolina at Asheville
- * Licensed under the RENCI Open Source Software License v. 1.0.
- * See http://www.multigraph.org/LICENSE.txt for details.
- */
-package multigraph {
+package multigraph
+{
   import flash.display.Bitmap;
   import flash.display.BitmapData;
-  import flash.display.Graphics;
   import flash.display.Loader;
   import flash.display.Shape;
   import flash.display.Sprite;
-  import flash.events.*;
+  import flash.events.Event;
+  import flash.events.IOErrorEvent;
+  import flash.events.KeyboardEvent;
+  import flash.events.MouseEvent;
   import flash.geom.Matrix;
-  import flash.net.*;
+  import flash.net.URLRequest;
+  import flash.text.TextField;
+  import flash.text.TextFieldAutoSize;
   import flash.text.TextFormat;
   import flash.text.TextFormatAlign;
-  import flash.utils.*;
   
+  import multigraph.controls.Spinner;
   import multigraph.data.*;
-  import multigraph.debug.DebugWindow;
-  import multigraph.debug.Debugger;
-  import multigraph.debug.NetworkMonitor;
   import multigraph.format.*;
-  import multigraph.renderer.*;
-  import multigraph.saui.SelectedAxisUIAxisController;
-  import multigraph.saui.SelectedAxisUIEventHandler;
-  //import multigraph.naui.NearestAxisUIAxisController;
   import multigraph.naui.NearestAxisUIEventHandler;
+  import multigraph.renderer.*;
   
-  import mx.controls.*;
   import mx.core.UIComponent;
-  import mx.managers.CursorManager;
-  import mx.managers.PopUpManager;
-    
-  /*
-    import mx.containers.Panel;
-    import mx.core.Application;
-  */
-
+  
   public class Graph extends UIComponent
   {
-    private var _windowMargin : Insets;
-    private var _border       : Insets;
-    private var _padding      : Insets;
-    private var _plotMargin   : Insets;
-    private var _plotareaBorder : Number;
+	private var _multigraph : Multigraph;
+	public function get multigraph() : Multigraph { return _multigraph; }
+
+    private var _isValidMugl : Boolean = false;
+	
+    private var _mugl : XML;
+    public function get mugl() : XML {
+      return _mugl;
+    }
+    public function set mugl( mugl : XML ) : void {
+      _mugl = mugl;
+      try {
+        parseMugl();
+        _isValidMugl = (_mugl != null);
+      } catch (e : *) {
+        if (e is MuglError) {
+          _multigraph.alert(e.message, "MUGL Error");
+        } else {
+          _multigraph.alert(e.message, "Error");
+        }
+        _isValidMugl = false;
+      }
+      invalidateDisplayList();
+    }
+
+	private var _currentWidth  : int;
+	private var _currentHeight : int;
+
+    //private var _fillerBackgroundURL : String = "assets/MultigraphFiller.png";
+	private var _fillerBackgroundURL : String = null;
+    private var _fillerBackgroundImage : Bitmap = null;
+
+    private var _windowMargin        : Insets;
+	private var _backgroundColor     : uint;
+	private var _backgroundOpacity   : Number;
+	private var _border              : Number;
+	private var _borderColor         : uint;
+	private var _borderOpacity       : Number;
+    private var _padding             : Insets;
+    private var _plotMargin          : Insets;
+    public function get plotMargin() : Insets { return _plotMargin; }
+    private var _plotareaBorder      : Number;
     private var _plotareaBorderColor : uint;
-    private var _window       : Box;
-    private var _paddingBox   : Box;
-    private var _plotBox      : Box;
-    public function get plotBox():Box { return _plotBox; }
-    //private var haxis        : HorizontalAxis;
+    private var _window              : Box;
+    private var _paddingBox          : Box;
+	public function get paddingBox() : Box { return _paddingBox; }
+    private var _plotBox             : Box;
+	public function get plotBox() : Box { return _plotBox; }
+		
+    private var _divSprite           : UIComponent ;
+    private var _bgSprite            : UIComponent ;
+    private var _eventSprite         : UIComponent ;
+    private var _axisControlSprite   : UIComponent ;
+    private var _paddingBoxSprite    : UIComponent ;
+    private var _axisSprite1         : UIComponent ;
+    private var _plotBoxSprite       : UIComponent ;
+	private var _axisSprite2         : UIComponent ;
+    private var _paddingBoxMask      : Shape ;
+    private var _plotBoxMask         : Shape ;
+
+    private var _backgroundImage            : Bitmap = null;
+    private var _backgroundImageAnchor      : Array  = null;
+    private var _backgroundImageBase        : Array  = null;
+    private var _backgroundImagePosition    : Array  = null;
+    private var _backgroundImageFrameIsPlot : Boolean = false;
+
+    private var _imageAnnotations    : Array = [];
+
+	private var _spinnerSprite       : UIComponent ;
+    private var _spinners            : Array;
+    private var _spinnerMaxIndex     : int;
+    private var _spinnerSize         : int = 28;
+    private var _spinnerSeparation   : int =  5;
+	
+	private var _config              : Config;
+
     private var _haxes        : Array = [];
+	public  function get haxes():Array { return _haxes; } 
     private var _vaxes        : Array = [];
+	public  function get vaxes():Array { return _vaxes; } 
     private var _axes         : Array = [];
 	public  function get axes():Array { return _axes; } 
-    private var _legend      : Legend;
-    private var _title       : Title;
-    private var _toolbar	 : ToolBar;
-    private var _toolbarState : String;
-    public function set toolbarState(state:String):void {
-    	_toolbarState = state;
-    }
-    public function get toolbarState():String { return _toolbarState; }
-        
-    private var _plots       : Array = [];
-    private var _data        : Array = [];
-    private var _paintNeeded : Boolean = false;
-    public function set paintNeeded(needed:Boolean):void { _paintNeeded = needed; }
 
-/*    // Timer used to arrange for a call to prepareData() after user stops
-    // zooming with keyboard shortcuts:
-    private var _keyTimer    : Timer = null;
-    // Delay, in milliseconds, before prepareData() should be called after
-    // user stops zooming with keyboard shortcuts:
-    private var _keyTimerDelay:int = 500;
-	*/
+    private var _data         : Array = [];
+    private var _plots        : Array = [];
 
-    private var _bgSprite:MultigraphUIComponent;
-    private var _divSprite:MultigraphUIComponent;
-    private var _eventSprite:MultigraphUIComponent;
-    private var _axisControlSprite:MultigraphUIComponent;
-    private var _paddingBoxSprite:MultigraphUIComponent;
-    private var _plotBoxSprite:MultigraphUIComponent;
-    // There are 2 axis sprites: one below the plotBoxSprite, and one
-    // above.  The one below (_axisSprite1) is where the axis grid
-    // lines are drawn, so they appear below the data.  The one above
-    // (_axisSprite2) is where the axes themselves, and their labels &
-    // tic marks, appear, so that these things are drawn on top of the
-    // data.
-    private var _axisSprite1:MultigraphUIComponent;
-    private var _axisSprite2:MultigraphUIComponent;
-	
+    private var _legend       : NewLegend;
+    private var _title        : Title;
+
+
 	private var _uiEventHandler:UIEventHandler;
-	public function get uiEventHandler():UIEventHandler { return _uiEventHandler; }
 
-    private var _graphWidth:Number;
-    private var _graphHeight:Number;
-    private var _xml:XML;
-    private var _config:Config;
-
-    private var _constructorSize:Box;
-    private var _swfname:String;
-    public function get swfname():String { return _swfname; }
-    private var _hostname:String;
-    public function get hostname():String { return _hostname; }
-    private var _pathname:String;
-    public function get pathname():String { return _pathname; }
-    private var _port:String;
-    private var _proxy:String;
-    public function get port():String { return _port; }
-    private var _numCsvOutstanding = 0;
-
-    // icon asset
-    [Embed(source="assets/plus.PNG")]
-      [Bindable]
-      private var plusIcon:Class;
-    
-    [Embed(source="assets/minus.PNG")]
-      [Bindable]
-      private var minusIcon:Class;
-      
-    public function displayMessage(msg:String):void {
-      //_app.displayMessage(msg);
-    }
-
-    public function Graph(xml:XML, swfname:String, hostname:String, pathname:String, port:String, proxy:String, width:int=-1, height:int=-1) {
-      this._xml = xml;
-      this._swfname  = swfname;
-      this._hostname = hostname; 
-      this._pathname = pathname; 
-      this._port= port; 
-      this._proxy = proxy;
-      init(width, height);
-    }       
-
-    private function init(width:int, height:int):void {
-      _graphWidth  = width;
-      _graphHeight = height;
-      init_phase1();
-    }
-
-
-//    private function doFirstFrame(event:Event):void {
-//      removeEventListener(Event.ENTER_FRAME, doFirstFrame);
-//      if (_constructorSize != null) {
-//        _graphWidth  = _constructorSize.width;
-//        _graphHeight = _constructorSize.height;
-//      } else {
-//        _graphWidth  = stage.stageWidth;
-//        _graphHeight = stage.stageHeight;
-//      }
-//      init();
-//      
-//      addChild(_divSprite);
-//      addChild(_eventSprite);  
-//      //addChild(mouseControlSprite);    
-//      addChild(_axisControlSprite);
-//      addEventListener(Event.ENTER_FRAME, doEveryFrame);
-//      prepareData();
-//      _paintNeeded = true;
-//    }
-    
-    private var _diagnosticWindow:DebugWindow = null;
-    
-    private var _networkMonitor:NetworkMonitor = null;
-    private var _networkDots:Boolean = false;
-    private var _debugger:Debugger = null;
-
-    public function addDebuggerItem(debugable:Object):void {
-      if (_debugger != null) {
-        _debugger.addItem(debugable);
+    /**
+     * The parseMugl function populates the property values of this
+     * graph object by reading them out of its _mugl object.  This
+     * isn't really parsing, in the sense of XML parsing --- that has
+     * already happened by this point, when the _mugl XML object was
+     * constructed.  But this is where the XML tree is interpreted and
+     * values set for the graph.
+     *
+     * This is a purely internal function, intended only to be called
+     * from the mugl= setter method.  This function, and the functions
+     * it calls, throw various errors if a problem is encountered
+     * while interpreting the MUGL.  It is up to whoever called this
+     * function (the mugl= setter method) to deal with those errors.
+     * It is also up to the caller to call invalidateDisplayList() to
+     * cause the graph to be redrawn after this.
+     *
+     * The main point of all this is: don't call this function.  It is
+     * intended specifically to work in the context of the mugl=
+     * setter method.
+     */
+    private function parseMugl() : void {
+      if (_mugl == null) {
+        return;
       }
-    }
-    
-    public function diagnosticOutput(s:String):void {
-      if (_diagnosticWindow != null) {
-        _diagnosticWindow.append(s+'\n');
+	  _config = new Config(_mugl);
+
+	  this.x      = _config.value('window','@x');
+	  this.y      = _config.value('window','@y');
+
+      var percentRegexp : RegExp = /^([\+-]?[0-9\.]+)(%?)$/;
+      var a:Array = percentRegexp.exec(_config.value('window','@width'));
+      if (a != null) {
+        if (a[2] == '%') {
+		  this.percentWidth = a[1];
+          if (isNaN(this.percentWidth)) { throw new MuglError('invalid window width attribute'); }
+        } else {
+          this.width = a[1];
+          if (isNaN(this.width)) { throw new MuglError('invalid window width attribute'); }
+        }
       }
-    }    
-
-    private function showDiagnostics():void {
-      _diagnosticWindow = DebugWindow(PopUpManager.createPopUp(this, DebugWindow, false));
-      _diagnosticWindow.width = 750;
-      _diagnosticWindow.height = 300;
-      _diagnosticWindow.title = "Diagnostics";
-    }
-    
-    private function showNetworkMonitor():void {
-      _networkMonitor = new NetworkMonitor();
-      _networkMonitor.width = 750;
-        
-      var monitorPosition:String = _config.xmlvalue('networkmonitor', '@fixed');
-      if (monitorPosition == 'true') {
-        _networkMonitor.y = _graphHeight + 10;
-        _networkMonitor.width = _graphWidth;
-        _networkMonitor.height = _graphHeight;
-        this.addChild(_networkMonitor);
+      a = percentRegexp.exec(_config.value('window','@height'));
+      if (a != null) {
+        if (a[2] == '%') {
+		  this.percentHeight = a[1];
+          if (isNaN(this.percentHeight)) { throw new MuglError('invalid window height attribute'); }
+        } else {
+          this.height = a[1];
+          if (isNaN(this.height)) { throw new MuglError('invalid window height attribute'); }
+        }
       }
-      else {
-        PopUpManager.addPopUp(_networkMonitor, this, false);    
+
+      //
+      // window @margin attribute
+      // 
+      var windowMargin : Number = parseFloat(_config.value('window','@margin'));
+      if (isNaN(windowMargin)) {
+        throwInvalidError('window margin attribute');
       }
-    }
-	
-    private function showDebugger():void {
-      _debugger = new Debugger();
-      _debugger.width = _graphHeight;
-        
-      var debuggerPosition:String = _config.xmlvalue('debugger', '@fixed');
-      if (debuggerPosition == 'true') {
-        _debugger.x = _graphWidth + 10;
-        _debugger.width = _graphHeight;
-        _debugger.height = _graphHeight * 2 + 10;
-        this.addChild(_debugger);
-      } else {
-        PopUpManager.addPopUp(_debugger, this, false);
-      } 
-    }
+      _windowMargin = new Insets(windowMargin);
 
-    public function networkMonitorStartRequest(networkable:Object):void {
-      if (_networkMonitor != null) {
-        _networkMonitor.startRequest(networkable);
+      //
+      // window @border attribute
+      //
+	  _border = parseFloat(_config.value('window','@border'));
+      if (isNaN(_border)) {
+        throwInvalidError('window border attribute');
       }
-    }
-    public function networkMonitorEndRequest(networkable:Object):void {
-      if (_networkMonitor != null) {
-        _networkMonitor.endRequest(networkable);
+
+      //
+      // window @bordercolor attribute
+      //
+      try {
+		  _borderColor = parsecolor( _config.value('window','@bordercolor') );
+      } catch (e : ParseError) {
+        throwInvalidError('window bordercolor attribute');
       }
-    }
-	
-    private function init_phase1():void {
-      _config = new Config(_xml);
-	  
-      
-      var diagnosticsVisible:String = _config.xmlvalue('diagnostics', '@visible');
-      if (diagnosticsVisible=='true') {
-        showDiagnostics();
+	  _borderOpacity = _config.value('window','@borderopacity');
+
+      //
+      // window @padding attribute
+      //
+      var windowPadding : Number = parseFloat(_config.value('window','@padding'));
+      if (isNaN(windowPadding)) {
+        throwInvalidError('window padding attribute');
       }
-      
-      var networkVisible:String = _config.xmlvalue('networkmonitor', '@visible');
-      if (networkVisible == 'true') {
-        showNetworkMonitor();
+      _padding = new Insets(windowPadding);
+
+
+      //
+      // plotarea @margintop, @marginleft, @marginbottom, @marginright attributes
+      //
+      var plotareaMargintop     : Number = parseFloat( _config.value('plotarea', '@margintop')    );
+      if (isNaN(plotareaMargintop)) {
+        throwInvalidError('plotarea margintop attribute');
       }
-      
-      var networkDotsString:String = _config.xmlvalue('networkdots', '@visible');
-      _networkDots = (networkDotsString == 'true');
-      
-      var debuggerVisible:String = _config.xmlvalue('debugger', '@visible');
-      if (debuggerVisible == 'true') {
-        showDebugger();
+      var plotareaMarginleft    : Number = parseFloat( _config.value('plotarea', '@marginleft')   );
+      if (isNaN(plotareaMarginleft)) {
+        throwInvalidError('plotarea marginleft attribute');
       }
-      
-      // Initiate the cursor manager
-      //_cursorManager = new CursorManager();
-      
-      _window = new Box(_graphWidth, _graphHeight);
-      
-      // Just a test
-      var debugable:Object = {type:_window, data:"BALH"};
-      addDebuggerItem(debugable);
+      var plotareaMarginbottom  : Number = parseFloat( _config.value('plotarea', '@marginbottom') );
+      if (isNaN(plotareaMarginbottom)) {
+        throwInvalidError('plotarea marginbottom attribute');
+      }
+      var plotareaMarginright   : Number = parseFloat( _config.value('plotarea', '@marginright')  );
+      if (isNaN(plotareaMarginright)) {
+        throwInvalidError('plotarea marginright attribute');
+      }
+      _plotMargin = new Insets(plotareaMargintop,
+                               plotareaMarginleft,
+                               plotareaMarginbottom,
+                               plotareaMarginright);
 
-      _windowMargin = new Insets(_config.value('window','@margin'));
-      _border       = new Insets(_config.value('window','@border'));
-      _padding      = new Insets(_config.value('window','@padding'));
-      _paddingBox = new Box(_window.width
-                           - ( _windowMargin.left + _border.left + _padding.left )
-                           - ( _windowMargin.right + _border.right + _padding.right ),
-                           _window.height
-                           - ( _windowMargin.top + _border.top + _padding.top )
-                           - ( _windowMargin.bottom + _border.bottom + _padding.bottom )
-                           );
+      //
+      // plotarea border attribute
+      //
+      _plotareaBorder = parseFloat(_config.value('plotarea', '@border'));
+      if (isNaN(_plotareaBorder)) {
+        throwInvalidError('plotarea border attribute');
+      }
 
-
-      _plotMargin = new Insets(_config.value('plotarea', '@margintop'),
-                              _config.value('plotarea', '@marginleft'),
-                              _config.value('plotarea', '@marginbottom'),
-                              _config.value('plotarea', '@marginright'));
-
-      _plotareaBorder = _config.value('plotarea', '@border');
-      _plotareaBorderColor = parsecolor( _config.value('plotarea', '@bordercolor') );
-
-      _plotBox = new Box(_paddingBox.width - ( _plotMargin.left + _plotMargin.right),
-                         _paddingBox.height - ( _plotMargin.top + _plotMargin.bottom ));
-
-      _divSprite = new MultigraphUIComponent();
-	  _divSprite.transform.matrix = new Matrix(1, 0, 0, -1, 0, _graphHeight);
-      
-      /* Dropshadow filter over div sprite
-      var shadow:DropShadowFilter = new DropShadowFilter();
-      shadow.alpha = 0.4;
-      shadow.distance = 0.5;
-      
-      _divSprite.filters = [shadow];
-      */
-	  
-	  _bgSprite = new MultigraphUIComponent();
-	  //_bgSprite.transform.matrix = new Matrix(1, 0, 0, -1, 0, _graphHeight);
-	  //this.addChild(_bgSprite);
-
-
-
-      
-      _eventSprite = new MultigraphUIComponent();
-      _eventSprite.transform.matrix = new Matrix(1, 0, 0, -1, 0, _graphHeight);
-      
-      _eventSprite.graphics.beginFill(0xffffff, 0);
-      _eventSprite.graphics.drawRect(0,0,_graphWidth,_graphHeight);
-      _eventSprite.graphics.endFill();
-/*
-	  if (_uiEventHandler['onMouseDown']) { _eventSprite.addEventListener(MouseEvent.MOUSE_DOWN, _uiEventHandler['onMouseDown']); }
-	  if (_uiEventHandler['onMouseUp'])   { _eventSprite.addEventListener(MouseEvent.MOUSE_UP,   _uiEventHandler['onMouseUp']);   }
-	  if (_uiEventHandler['onMouseMove']) { _eventSprite.addEventListener(MouseEvent.MOUSE_MOVE, _uiEventHandler['onMouseMove']); }
-	  if (_uiEventHandler['onMouseOut'])  { _eventSprite.addEventListener(MouseEvent.MOUSE_OUT,  _uiEventHandler['onMouseOut']);  }
-	  if (_uiEventHandler['onKeyDown'])   { addEventListener(KeyboardEvent.KEY_DOWN, _uiEventHandler['onKeyDown']); }
-	  if (_uiEventHandler['onKeyUp'])     { addEventListener(KeyboardEvent.KEY_UP,   _uiEventHandler['onKeyUp']);   }
-*/
-	  // Remove the cursor if it moves outside of the graph window
-	  _divSprite.addEventListener(MouseEvent.MOUSE_OUT, function (event:MouseEvent):void {
-	  	CursorManager.removeAllCursors();
-	  });
-	  
-
-      _axisControlSprite = new MultigraphUIComponent();
-      _axisControlSprite.transform.matrix = new Matrix(1, 0, 0, -1, 0, _graphHeight);
-      
-      var paddingBoxMask:Shape = new Shape();
-      paddingBoxMask.graphics.beginFill(0x000000);
-      paddingBoxMask.graphics.drawRect(_windowMargin.left + _border.left + _padding.left,
-                                       _windowMargin.bottom + _border.bottom + _padding.bottom,
-                                       _graphWidth - (_windowMargin.left + _border.left + _padding.left
-                                                     + _windowMargin.right + _border.right + _padding.right),
-                                       _graphHeight - (_windowMargin.bottom + _border.bottom + _padding.bottom
-                                                      + _windowMargin.top + _border.top + _padding.top));
-      paddingBoxMask.graphics.endFill();
-
-      _paddingBoxSprite = new MultigraphUIComponent();
-      _divSprite.addChild(paddingBoxMask);
-      _divSprite.addChild(_paddingBoxSprite);
-      _paddingBoxSprite.mask = paddingBoxMask;
-      _paddingBoxSprite.x = _windowMargin.left + _border.left + _padding.left;
-      _paddingBoxSprite.y = _windowMargin.bottom + _border.bottom + _padding.bottom;
-
-      _axisSprite1 = new MultigraphUIComponent();
-      _axisSprite1.x = _plotMargin.left;
-      _axisSprite1.y = _plotMargin.bottom;
-      
-      _paddingBoxSprite.addChild(_axisSprite1);
-
-      var plotBoxMask:Shape = new Shape();
-      plotBoxMask.graphics.beginFill(0x000000);
-      plotBoxMask.graphics.drawRect(_plotMargin.left, _plotMargin.bottom,
-                                    _plotBox.width, _plotBox.height);
-      plotBoxMask.graphics.endFill();
-
-      _plotBoxSprite = new MultigraphUIComponent();
-      _paddingBoxSprite.addChild(plotBoxMask);
-      _paddingBoxSprite.addChild(_plotBoxSprite);
-      _plotBoxSprite.mask = plotBoxMask;
-      _plotBoxSprite.x = _plotMargin.left;
-      _plotBoxSprite.y = _plotMargin.bottom;
-
-      _axisSprite2 = new MultigraphUIComponent();
-      _axisSprite2.x = _plotMargin.left;
-      _axisSprite2.y = _plotMargin.bottom;
-      _paddingBoxSprite.addChild(_axisSprite2);
-
-	  var bgColorString:String = _config.xmlvalue('background', '@color');	 
-	  if (bgColorString!=null && bgColorString!='') {
-		  var bgColor:uint = parsecolor( bgColorString );
-		  _bgSprite.graphics.beginFill(bgColor, 1);
-		  _bgSprite.graphics.drawRect(_windowMargin.left, _windowMargin.bottom,
-			  						  _graphWidth - _windowMargin.left - _windowMargin.right,
-			  						  _graphHeight - _windowMargin.bottom - _windowMargin.top);		  
-		  _bgSprite.graphics.endFill();
+      //
+      // plotarea bordercolor
+      //
+	  try {
+		  _plotareaBorderColor = parsecolor( _config.value('plotarea', '@bordercolor') );
+	  } catch (e : ParseError) {
+		  throwInvalidError('plotarea bordercolor attribute');
 	  }
-	  
+
+      initializeBackground();
+      initializeAxes();
+      initializeDataSections();
+      initializePlots();
+      initializeLegend();
+      initializeTitle();
+      //initializeImageAnnotations();  // call in commitProperties instead!!!
+      bindAxes(_vaxes, _config, 'verticalaxis');
+      bindAxes(_haxes, _config, 'horizontalaxis');
+      prepareData();
+
+    }
+
+    private function initializeBackground():void {
+      //
+      // background @color attribute
+      //
+      try {
+		  _backgroundColor = parsecolor(_config.value('background','@color'));
+      } catch (e : ParseError) {
+        throwInvalidError('background color attribute');
+      }
+	  _backgroundOpacity = _config.value('background','@opacity');
+
 	  var bgImageURL:String = _config.xmlvalue('background','img','@src');
 	  
 	  if (bgImageURL!=null && bgImageURL!='') {
-		  var bgAnchor:Array    = _config.value('background', 'img', '@anchor').split(" ");
-		  var bgBase:Array      = _config.value('background', 'img', '@base').split(" ");
-		  var bgPosition:Array  = _config.value('background', 'img', '@position').split(" ");
-		  var bgFrame:String    = _config.value('background', 'img', '@frame');
+        _backgroundImageAnchor      = _config.value('background', 'img', '@anchor').split(" ");
+        _backgroundImageBase        = _config.value('background', 'img', '@base').split(" ");
+        _backgroundImagePosition    = _config.value('background', 'img', '@position').split(" ");
+        _backgroundImageFrameIsPlot = (_config.value('background', 'img', '@frame') == "plot");
 		  
 		  var loader:Loader = new Loader();
 		  loader.contentLoaderInfo.addEventListener(Event.COMPLETE, 
-			  function(sprite:Sprite, anchor:Array, base:Array, position:Array, frameIsPlot:Boolean, windowMargin:Insets, border:Insets, plotMargin:Insets, plotBox:Box, paddingBox:Box):Function {
-				  return function (event:Event):void {
-					  var loader:Loader = Loader(event.target.loader);
-					  var image:Bitmap = Bitmap(loader.content);
-					  
-					  var ax:Number = (Number(anchor[0])+1)*image.width/2;
-					  var ay:Number = image.height - ((Number(anchor[1])+1)*image.height/2);
-					  var bx:Number=0, by:Number=0;
-					  if (frameIsPlot) {
-						  bx = plotMargin.left + (Number(base[0])+1)*plotBox.width/2;
-						  by = plotMargin.top + plotBox.height - ((Number(base[1])+1)*plotBox.height/2);
-					  } else {
-						  bx = windowMargin.left + border.left + (Number(base[0])+1)*paddingBox.width/2; 
-						  by = windowMargin.top  + border.top + paddingBox.height - ((Number(base[1])+1)*paddingBox.height/2);
-					  }
-					  image.x = bx + Number(position[0]) - ax;
-					  image.y = by + Number(position[1]) - ay;		  
-					  sprite.addChild(image);
-				  }
-			  }(_bgSprite, bgAnchor, bgBase, bgPosition, bgFrame=="plot", _windowMargin, _border, _plotMargin, _plotBox, _paddingBox)
-		  );
+              function (event:Event):void {
+                var loader:Loader = Loader(event.target.loader);
+                _backgroundImage = Bitmap(loader.content);
+              }
+          );
 		  loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,
 			  function(errmsg:String):Function {
 				  return function(event:IOErrorEvent):void {
@@ -418,10 +295,403 @@ package multigraph {
 		  );
 		  loader.load(new URLRequest(bgImageURL));
 	  }	  
+
+    }
+
+		
+    public function Graph(multigraph : Multigraph) {
+	  _multigraph      = multigraph;
+	  _spinners        = new Array();
+      _spinnerMaxIndex = -1;
+      super();
+    }
+		
+    override protected function commitProperties() : void {
+      super.commitProperties();
+      // call initializeEventHandler() here rather than in parseMugl, because commitProperties() is
+      // called after createChildren(), and _eventSprite needs to exist before we can call
+      // initializeEventHandler()
+      initializeEventHandler();
+	  initializeImageAnnotations();
+    }
+
+    public function findAvailableSpinnerIndex() : int {
+      for (var i : int = 0; i < _spinnerMaxIndex; ++i) {
+        if (_spinners[i] == null) {
+          return i;
+        }
+      }
+      ++_spinnerMaxIndex;
+      return _spinnerMaxIndex;
+    }
+
+    public function startAvailableSpinner() : int {
+      var spinnerIndex : int = findAvailableSpinnerIndex();
+      startSpinner( spinnerIndex );
+      return spinnerIndex;
+    }
+	
+	public function startSpinner( i : int ) : void {
+      _spinners[i] = new multigraph.controls.Spinner();
+      _spinners[i].setStyle("tickColor", 0x000000);
+      _spinners[i].size = _spinnerSize;
+      _spinners[i].x = i * (_spinnerSeparation + _spinnerSize);
+      _spinners[i].y = 0;  // unscaledHeight - 5 - _spinner.size;
+	  if (_spinnerSprite != null) {
+		  // only display the spinner if the _spinnerSprite has been created at this point
+      	_spinnerSprite.addChild(_spinners[i]);
+      	invalidateDisplayList();
+	  }
+	}
+	
+    public function stopSpinner( i : int ) : void {
+      if (_spinners[i] != null) {
+        _spinners[i].stop();
+		if ((_spinnerSprite != null) && (_spinnerSprite.contains(_spinners[i]))) { 
+        	_spinnerSprite.removeChild(_spinners[i]);
+		}
+        _spinners[i] = null;
+      }
+	}
+	
+	public function isSpinning( i : int ) : Boolean {
+		return _spinners[i] != null;
+	}
+	
+    override protected function createChildren() : void {
+      super.createChildren();
+	  _bgSprite                                     = new UIComponent();
+      _divSprite                                    = new UIComponent();
+      _eventSprite                                  = new UIComponent();
+      _paddingBoxMask                               = new Shape();
+      _paddingBoxSprite                             = new UIComponent();
+      _axisSprite1                                  = new UIComponent();
+      _plotBoxMask                                  = new Shape();
+      _plotBoxSprite                                = new UIComponent();
+      _axisSprite2                                  = new UIComponent();
+	  _spinnerSprite                                = new UIComponent();
+
+	  // display any spinners that may have already been created
+	  for ( var i:int = 0; i<_spinnerMaxIndex; ++i) {
+		  if (_spinners[i] != null) {
+			  _spinnerSprite.addChild(_spinners[i]);
+		  }
+	  }
 	  
+      //_axisControlSprite                            = new UIComponent();
+
+	  addChild(_bgSprite);
+      addChild(_divSprite);
+      _divSprite.addChild(_paddingBoxMask);
+      _divSprite.addChild(_paddingBoxSprite);
+      _paddingBoxSprite.mask = _paddingBoxMask;
+      _paddingBoxSprite.addChild(_axisSprite1);
+
+
+      _paddingBoxSprite.addChild(_plotBoxMask);
+      _paddingBoxSprite.addChild(_plotBoxSprite);
+      _plotBoxSprite.mask = _plotBoxMask;
+      _paddingBoxSprite.addChild(_axisSprite2);
+	  
+	  addChild(_spinnerSprite);
+
+      addChild(_eventSprite);
+    }
+	
+	private var _forceInitializeGeometry : Boolean = false;
+	
+	public function reInitializeGeometry():void {
+		_forceInitializeGeometry = true;
+		invalidateDisplayList();
+	}	
+
+    override protected function updateDisplayList( unscaledWidth : Number, unscaledHeight : Number) : void  {
+		
+		var i : int;
+
+		if (!_isValidMugl) {
+			return;
+		}
+		
+      if ((unscaledWidth != _currentWidth) || (unscaledHeight != _currentHeight) || (_forceInitializeGeometry)) {
+        initializeGeometry(unscaledWidth, unscaledHeight);
+        _currentWidth  = unscaledWidth;
+        _currentHeight = unscaledHeight;
+		_forceInitializeGeometry = false;
+      }
+      super.updateDisplayList(unscaledWidth, unscaledHeight);
+
+      _divSprite.graphics.clear();
+      _bgSprite.graphics.clear();
+
+      /*
+      // Fill the whole _divSprite with its background color
+      _divSprite.graphics.beginFill(_backgroundColor, 1);
+      _divSprite.graphics.drawRect(0, 0, _currentWidth, _currentHeight);
+      _divSprite.graphics.endFill();
+      */
+
+
+      if (_border > 0) {
+        // If there is a border, fill the part of the _divSprite that is inside the window margin with the border color
+        _bgSprite.graphics.lineStyle(0,0x000000,_borderOpacity);
+        _bgSprite.graphics.beginFill(_borderColor, _borderOpacity);
+        _bgSprite.graphics.drawRect(_windowMargin.left, _windowMargin.right,
+                                     _currentWidth - _windowMargin.left - _windowMargin.right,
+                                     _currentHeight - _windowMargin.bottom - _windowMargin.top);
+        _bgSprite.graphics.endFill();
+      }
+      // Fill part of the  _bgSprite that is inside the border with the background color
+      _bgSprite.graphics.beginFill(_backgroundColor, _backgroundOpacity);
+      _bgSprite.graphics.drawRect(_windowMargin.left + _border, _windowMargin.bottom + _border,
+                                   _currentWidth  - _windowMargin.left   - _windowMargin.right - 2 * _border,
+                                   _currentHeight - _windowMargin.bottom - _windowMargin.top - 2 * _border);
+
+
+      ////////////////////////////////////////////////////////////////////////////////////////
+
+      // clear out the axis sprites
+      _axisSprite1.graphics.clear();
+      while (_axisSprite1.numChildren) { _axisSprite1.removeChildAt(0); }
+
+      _axisSprite2.graphics.clear();
+      while (_axisSprite2.numChildren) { _axisSprite2.removeChildAt(0); }
+
+      // clear out the plotBox sprite
+      _plotBoxSprite.graphics.clear();
+      while (_plotBoxSprite.numChildren) { _plotBoxSprite.removeChildAt(0); }
+
+      //
+      // Draw the filler background image; this is just for testing and should eventually be removed
+      //
+      if (_fillerBackgroundImage != null) {
+        var box : Box               = _plotBox;
+        var boxSprite : UIComponent = _plotBoxSprite;
+        _fillerBackgroundImage.transform.matrix = new Matrix(1, 0, 0, -1, 0, box.height);
+        _fillerBackgroundImage.x = 0;
+        _fillerBackgroundImage.y = box.height;
+        boxSprite.addChild(_fillerBackgroundImage);
+      }
+
+      // draw the plotbox border, if any, in the padding box, so that its full linewidth shows up (if we draw
+      // it in the plotbox, it gets clipped to the plotbox)
+      if (_plotareaBorder > 0) {
+        _axisSprite2.graphics.lineStyle(_plotareaBorder, _plotareaBorderColor, 1);
+        _axisSprite2.graphics.drawRect(0, 0, _plotBox.width, _plotBox.height);
+      }
+
+      // render the axes' grid lines, if any
+      for each ( var axis : Axis in _axes ) {
+        axis.renderGrid(_axisSprite1);
+      }
+
+      // render the plots
+	  for each ( var plot : Plot in _plots ) {
+		  plot.render(_plotBoxSprite);
+	  }
+      
+      // render the axes themselves
+      for each ( var axis : Axis in _axes ) {
+        axis.render(_axisSprite1);
+      }
+	  
+
+      // render the legend
+      /*NewLegend doesn't need this:
+      if (_legend!=null) {
+        _legend.render(_paddingBoxSprite, _plotBoxSprite);
+      }
+      */
+
+	  /*
+      // render the title
+      if (_title!=null) {
+        _title.render(_paddingBoxSprite, _plotBoxSprite);
+      }
+      
+      // render the toolbar
+      if (_toolbar != null) {
+      	_toolbar.render(_axisControlSprite, _plotBoxSprite);
+      }
+      */
+      ////////////////////////////////////////////////////////////////////////////////////////
+
+    }		
+
+    private function initializeGeometry( width : int, height : int ):void {
+      //
+      // Construct internal geometry
+      //
+      _window = new Box(width, height);
+      _paddingBox = new Box(_window.width
+                            - ( _windowMargin.left + _border + _padding.left )
+                            - ( _windowMargin.right + _border + _padding.right ),
+                            _window.height
+                            - ( _windowMargin.top + _border + _padding.top )
+                            - ( _windowMargin.bottom + _border + _padding.bottom )
+                            );
+      _plotBox = new Box(_paddingBox.width - ( _plotMargin.left + _plotMargin.right),
+                         _paddingBox.height - ( _plotMargin.top + _plotMargin.bottom ));
+
+
+      //
+      // set geometric properties of flex/flash child components from internal geometry objects
+      //
+	  _divSprite.transform.matrix = new Matrix(1, 0, 0, -1, 0, height);
+      _paddingBoxMask.graphics.clear();
+      _paddingBoxMask.graphics.beginFill(0x000000);
+      _paddingBoxMask.graphics.drawRect(_windowMargin.left + _border + _padding.left,
+                                        _windowMargin.bottom + _border + _padding.bottom,
+                                        width - (_windowMargin.left + _border + _padding.left
+                                                 + _windowMargin.right + _border + _padding.right),
+                                        height - (_windowMargin.bottom + _border + _padding.bottom
+                                                  + _windowMargin.top + _border + _padding.top));
+      _paddingBoxMask.graphics.endFill();
+      _paddingBoxSprite.x = _windowMargin.left + _border + _padding.left;
+      _paddingBoxSprite.y = _windowMargin.bottom + _border + _padding.bottom;
+	  
+      _axisSprite1.x = _plotMargin.left;
+      _axisSprite1.y = _plotMargin.bottom;
+      _axisSprite1.graphics.clear();
+	  
+      _plotBoxMask.graphics.clear();
+      _plotBoxMask.graphics.beginFill(0x000000);
+      _plotBoxMask.graphics.drawRect(_plotMargin.left, _plotMargin.bottom,
+                                     _plotBox.width, _plotBox.height);
+      _plotBoxMask.graphics.endFill();
+      _plotBoxSprite.x = _plotMargin.left;
+      _plotBoxSprite.y = _plotMargin.bottom;
+      _axisSprite2.x = _plotMargin.left;
+      _axisSprite2.y = _plotMargin.bottom;
+
+      _eventSprite.transform.matrix = new Matrix(1, 0, 0, -1, 0, height);
+      _eventSprite.graphics.beginFill(0xffffff, 0);
+      _eventSprite.graphics.drawRect(0,0,width,height);
+      _eventSprite.graphics.endFill();
+
+      _spinnerSprite.x = _spinnerSeparation;
+      _spinnerSprite.y = _spinnerSeparation;
+
+      for each (var axis : Axis in _axes) {
+          axis.initializeGeometry();
+      }
+
+      if (_backgroundImage != null) {
+        var ax:Number = (Number(_backgroundImageAnchor[0])+1)*_backgroundImage.width/2;
+        var ay:Number = _backgroundImage.height - ((Number(_backgroundImageAnchor[1])+1)*_backgroundImage.height/2);
+        var bx:Number=0, by:Number=0;
+        if (_backgroundImageFrameIsPlot) {
+          bx = _plotMargin.left + (Number(_backgroundImageBase[0])+1)*_plotBox.width/2;
+          by = _plotMargin.top + _plotBox.height - ((Number(_backgroundImageBase[1])+1)*_plotBox.height/2);
+        } else {
+          bx = _windowMargin.left + _border + (Number(_backgroundImageBase[0])+1)*_paddingBox.width/2; 
+          by = _windowMargin.top  + _border + _paddingBox.height - ((Number(_backgroundImageBase[1])+1)*_paddingBox.height/2);
+        }
+        _backgroundImage.x = bx + Number(_backgroundImagePosition[0]) - ax;
+        _backgroundImage.y = by + Number(_backgroundImagePosition[1]) - ay;		  
+        if (!_bgSprite.contains(_backgroundImage)) {
+          // Hack to work around chicken-and-egg problem: at the time
+          // that the _backgroundImage is loaded, the _bgSprite might
+          // not have been created, because createChildren() might not
+          // have been called.  But at the time that createChildren()
+          // is called, the _backgroundImage might not have been
+          // loaded yet.  So we can't add the _backgroundImage to the
+          // _bgSprite in either of those locations.  This hack works
+          // around this because this code here won't get executed
+          // until both the _bgSprite has been created, and the
+          // _backgroundImage has been loaded.  We use a Boolean to
+          // make sure we only add the _backgroundImage once.
+          _bgSprite.addChild(_backgroundImage);
+        }
+      }
+
+	  if ( (_fillerBackgroundURL != null) && (_fillerBackgroundURL != "") && (_fillerBackgroundImage == null) ) {
+        loadFillerBackground();
+      }
+
+      if (_legend != null) {
+        _legend.initializeGeometry();
+		if (!_paddingBoxSprite.contains(_legend)) {
+          _paddingBoxSprite.addChild(_legend);
+		}
+      }
+
+      for each ( var imageAnnotation : ImageAnnotation in _imageAnnotations ) {
+		  //trace('imageAnnotation.initializeGeometry()');
+        imageAnnotation.initializeGeometry();
+		/*
+        if (!_paddingBoxSprite.contains(imageAnnotation)) {
+			//trace('_paddingBoxSprite.addChild(imageAnnotation)');
+			_paddingBoxSprite.addChild(imageAnnotation);
+        }
+		*/
+      }
+
+      /*
+        _axisControlSprite.transform.matrix = new Matrix(1, 0, 0, -1, 0, height);
+      */
+	  //trace('graph ' + this.width + ' X ' + this.height + ' @  (' + this.x + ',' + this.y + ')');
+    }
+
+
+
+    private function loadFillerBackground() : void {
+      var loader:Loader = new Loader();
+	  var box : Box               = _plotBox;
+	  var boxSprite : UIComponent = _plotBoxSprite;
+      loader.contentLoaderInfo.addEventListener(Event.COMPLETE, 
+                                                function():Function {
+                                                  return function (event:Event):void {
+                                                    var loader:Loader = Loader(event.target.loader);
+                                                    _fillerBackgroundImage = Bitmap(loader.content);
+													invalidateDisplayList();
+                                                  }
+                                                }()
+                                                );
+      loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,
+                                                function(errmsg:String):Function {
+                                                  return function(event:IOErrorEvent):void {
+                                                    trace(errmsg);
+                                                  }
+                                                }("Unable to load background image: " + _fillerBackgroundURL)
+                                                );
+      loader.load(new URLRequest(_fillerBackgroundURL));
+    }
+
+
+    private function initializeAxes():void {
+      /// create horizontal axes
+      _haxes = createAxes(AxisOrientation.HORIZONTAL);
+      for (var i:int = 0; i<_haxes.length; ++i) {
+        _axes.push(_haxes[i]);
+      }
+
+      /// create vertical axes
+      _vaxes = createAxes(AxisOrientation.VERTICAL);
+      for (i = 0; i<_vaxes.length; ++i) {
+        _axes.push(_vaxes[i]);
+      }
+    }
+
+    private function createAxes(orientation : AxisOrientation):Array {
+      //var formatter:Formatter;
+	  var axistag : String = orientation == AxisOrientation.HORIZONTAL ? "horizontalaxis" : "verticalaxis";
+      var numAxes:int = 1; // force at least one axis, in case none is specifed in the xml file
+      if (_config.xmlvalue(axistag) != null) {
+        numAxes = _config.xmlvalue(axistag).length();
+      }
+      var axes:Array = [];
+      for(var i:int = 0; i < numAxes; ++i){
+		var axisconf : Config = _config.subconfig(axistag, i);
+		axes[i] = new Axis(this, orientation, axisconf, i);
+      }
+      return axes;
+    }
+
+
+    private function initializeDataSections():void {
       var numDataSections:int = _config.xmlvalue('data').length();
       var vars:Array;
-      var haveCsv:Boolean = false;
       for (var j:int=0; j<numDataSections; ++j) {
         // Determine where to get the data for this data section...
         if (_config.value('data', j, 'values') != null) {
@@ -437,65 +707,57 @@ package multigraph {
           vars = buildDataVariableArrayFromConfig(j);
           var url:String = _config.value('data', j, 'csv','@location');
           var randomize:Boolean = (_config.xmlvalue('data', j, 'csv','@randomize') == "true");
-          ++_numCsvOutstanding;
-          _data[j] = new CSVFileArrayData( vars, Multigraph.proxiedUrl(_proxy, url), this, randomize, this.finishCsv );
-		  haveCsv = true;
+          _data[j] = new CSVFileArrayData( vars, url, this, randomize );
         } else if (_config.value('data', j, 'service') != null) {
           // The <data> section contains a <service> element, so the data is to be fetched
           // from a web service.  Use a Multigraph.WebServiceData object.
           vars = buildDataVariableArrayFromConfig(j);
           var url:String = _config.value('data', j, 'service','@location');
-          diagnosticOutput('creating a web service data object with service location "'+url+'"');
-          _data[j] = new WebServiceData( Multigraph.proxiedUrl(_proxy, url), vars, this );
+          _data[j] = new WebServiceData( url, vars, this );
         } else {
-          trace("unknown data section type!");
+			throw new MuglError('<data> section has no <values>, <csv>, or <service> section');
         }
       }
-      
-      // temporarily disable delayed phase2 initialization because it does not seem to work when compiled with Flex 4 SDK.
-      //    When fixing this, be sure to remove the early 'return' from finishCsv() below!
-      //if (!haveCsv) {
-        init_phase2();
-      //}
+    }
 
-      var uieh:String = _config.value('ui', '@eventhandler');
-      if (uieh == "naui") {
-        this._uiEventHandler = new NearestAxisUIEventHandler(this);
+    private function buildDataVariableArrayFromConfig(dataSection:int):Array {
+      var vars:Array = [];
+      var xmlvarlist = _config.xmlvalue('data', dataSection, 'variables', 'variable');
+      if (xmlvarlist != null) {
+        var nvars:int = xmlvarlist.length();
+        for (var i:int=0; i<nvars; ++i) {
+          var col:String = _config.value('data', dataSection, 'variables','variable',i,'@column');
+          if (col == null) { col = i+''; }
+          var id:String = _config.value('data', dataSection, 'variables', 'variable', i, '@id');
+          if (id == null) { id = 'var' + col; }
+          var missingOp:String = _config.value('data', dataSection, 'variables', 'variable', i, '@missingop');
+          var missingValueString:String = _config.value('data', dataSection, 'variables', 'variable', i, '@missingvalue');
+          // if no missingValue was specified for this variable (or inherited from <variables>), set its missingOp to null
+          var missingValue:Number = 0;
+          if (missingValueString==null || missingValueString=="") {
+            missingOp=null;
+          } else {
+            missingValue = Number(missingValueString);
+          }
+          vars.push(new DataVariable(id,
+                                     int(col),
+                                     DataType.parse(_config.value('data', dataSection, 'variables', 'variable', i, '@type')),
+                                     missingValue,
+                                     missingOp)
+                    );
+        }
       } else {
-        this._uiEventHandler = new SelectedAxisUIEventHandler(this);
+		// don't throw an error here after all --- need to support the case where entire <variables> section is missing
+		// maybe it will just work  :-)
+        //throw new MuglError('missing <variables><variable> metadata in <data> section');
       }
-
-	  if ('onMouseDown' in _uiEventHandler) { _eventSprite.addEventListener(MouseEvent.MOUSE_DOWN, _uiEventHandler['onMouseDown']); }
-	  if ('onMouseUp'   in _uiEventHandler) { _eventSprite.addEventListener(MouseEvent.MOUSE_UP,   _uiEventHandler['onMouseUp']);   }
-	  if ('onMouseMove' in _uiEventHandler) { _eventSprite.addEventListener(MouseEvent.MOUSE_MOVE, _uiEventHandler['onMouseMove']); }
-	  if ('onMouseOut'  in _uiEventHandler) { _eventSprite.addEventListener(MouseEvent.MOUSE_OUT,  _uiEventHandler['onMouseOut']);  }
-	  if ('onKeyDown'   in _uiEventHandler) { addEventListener(KeyboardEvent.KEY_DOWN,             _uiEventHandler['onKeyDown']);   }
-	  if ('onKeyUp'     in _uiEventHandler) { addEventListener(KeyboardEvent.KEY_UP,               _uiEventHandler['onKeyUp']);     }
+      return vars;
     }
-    
-    private function finishCsv(data:CSVFileArrayData):void {
-    	// temporarily disable delayed phase2 initialization because it does not seem to work when compiled with Flex 4 SDK
-    	return;
-    	--_numCsvOutstanding;
-    	if (_numCsvOutstanding == 0) {
-          init_phase2();
-    	}
-    }
-    
-    private function init_phase2():void {
-      
-      /// create horizontal axes
-      _haxes = createAxes('horizontalaxis', HorizontalAxis);
-      for (var i:int = 0; i<_haxes.length; ++i) {
-        _axes.push(_haxes[i]);
-      }
 
-      /// create vertical axes
-      _vaxes = createAxes('verticalaxis', VerticalAxis);
-      for (i = 0; i<_vaxes.length; ++i) {
-        _axes.push(_vaxes[i]);
-      }
-      
+    private function initializePlots():void {
+
+      _plots = new Array();
+
       ///
       /// create the plot objects
       ///
@@ -505,7 +767,7 @@ package multigraph {
         nplots = _config.xmlvalue('plot').length();
       }
 
-      for (i=0; i<nplots; ++i) {
+      for (var i:int=0; i<nplots; ++i) {
         // 
         // get the plot's horizontal axis
         //
@@ -516,6 +778,7 @@ package multigraph {
         //
         // ... to the one specified in the xml file (<plot><verticalaxis ref="...">),
         // if any, or default to the first vertical axis if none is specified
+        //var vaxis:Axis = Axis.getInstanceById( _config.xmlvalue('plot', i, 'verticalaxis', '@ref') );
         var vaxis:Axis = Axis.getInstanceById( _config.xmlvalue('plot', i, 'verticalaxis', '@ref') );
         if (vaxis == null) {
           vaxis = _vaxes[0];
@@ -528,6 +791,7 @@ package multigraph {
         var constantValue:Number;
         var data:Data = null;
         var varids:Array = [];
+        var vartypes:Array = [];
         if (_config.xmlvalue('plot', i, 'verticalaxis', 'constant') != null) {
           plotIsConstant = true;
           constantValue = _config.xmlvalue('plot', i, 'verticalaxis', 'constant', '@value');
@@ -548,6 +812,7 @@ package multigraph {
             data = _data[0];
           }
           varids.push( hvarid );
+          vartypes.push( haxis.type );
           setAxisBoundsIfNeeded(haxis, data, hvarid);
 
           //   ... next comes a list of vertical variables (one or more), specified either
@@ -567,9 +832,8 @@ package multigraph {
             vvarid = _data[0].getVariableId(1);
             varids.push( vvarid );
           }
+          vartypes.push( vaxis.type );
           setAxisBoundsIfNeeded(vaxis, data, vvarid);
-
-
         }
 
         //
@@ -613,9 +877,9 @@ package multigraph {
           renderer.dataFilter = new GridDataFilter(rows, columns, _plotBox.width, _plotBox.height, visible);
         } else if (filterType == "consecutivedistance") {
           var distance:int    = 5;
-          var noptions:int = _config.value('plot', i, 'filter', 'option').length();
-          for (var j:int=0; j<noptions; ++j) {
-            var name:String  = _config.value('plot', i, 'filter', 'option', j, '@name');
+		  var noptions:int = _config.value('plot', i, 'filter', 'option').length();
+		  for (var j:int=0; j<noptions; ++j) {
+			  var name:String  = _config.value('plot', i, 'filter', 'option', j, '@name');
             var value:String = _config.value('plot', i, 'filter', 'option', j, '@value');
             if (name=="distance") { distance = int(value); }
           }
@@ -633,6 +897,49 @@ package multigraph {
         }
         if (_config.value('plot', i, 'legend', '@visible')=="false") {
           legendLabel = null;
+        }
+		
+		//
+		// determine whether this plot wants to show data tips:
+		//
+		var showDataTips:Boolean = ((_config.xmlvalue('plot', i, 'datatips') != null)
+									&&
+									(_config.xmlvalue('plot', i, 'datatips', '@visible')!='false'));
+		// Note: we check !=false above, rather than ==true, so that data tips will be shown
+		// in the case where there is a <datatip> tag without a 'visible' attribute.
+        if (showDataTips) {
+			var masterFormat:String = _config.xmlvalue('plot', i, 'datatips', '@format');
+          if (masterFormat == null) {
+			throw new MuglError('<datatips> section for plot #'+i+' missing required "format" attribute');
+          }
+          var dataTipFormatter:DataTipFormatter = new DataTipFormatter(masterFormat);
+		  
+		  try {
+			  dataTipFormatter.bgcolor = parsecolor( _config.value('plot', i, 'datatips', '@bgcolor') );
+		  } catch (e : ParseError) {
+			  throwInvalidError('plot #'+i+' <datatip> "bgcolor" attribute');
+		  }
+		  dataTipFormatter.bgalpha   = _config.value('plot', i, 'datatips', '@bgalpha');
+		  dataTipFormatter.border    = _config.value('plot', i, 'datatips', '@border');
+		  dataTipFormatter.pad       = _config.value('plot', i, 'datatips', '@pad');
+		  dataTipFormatter.fontcolor = _config.value('plot', i, 'datatips', '@fontcolor');
+		  dataTipFormatter.fontsize  = _config.value('plot', i, 'datatips', '@fontsize');
+		  dataTipFormatter.bold      = (_config.value('plot', i, 'datatips', '@bold') == "true") ? true : null;
+		  try {
+			  dataTipFormatter.bordercolor = parsecolor( _config.value('plot', i, 'datatips', '@bordercolor') );
+		  } catch (e : ParseError) {
+			  throwInvalidError('plot #'+i+' <datatip> "bordercolor" attribute');
+		  }
+		  
+          var nvars:int = _config.value('plot', i, 'datatips', 'variable').length();
+          for (var j:int=0; j<nvars; ++j) {
+			var format:String  = _config.value('plot', i, 'datatips', 'variable', j, '@format');
+            if (format == null) {
+              throw new MuglError('<variable> #'+j+' in <datatips> section for plot #'+i+' missing required "format" attribute');
+            }
+            var formatter:Formatter = Formatter.create(vartypes[j], format);
+			dataTipFormatter.addFormatter(formatter, j);
+          }
         }
 
         //
@@ -654,7 +961,9 @@ package multigraph {
                               haxis,
                               vaxis,
                               renderer,
-                              legendLabel
+                              legendLabel,
+							  showDataTips,
+							  dataTipFormatter
                               );
         }
         
@@ -664,126 +973,17 @@ package multigraph {
         _plots.push( plot );
 
       }
-      
-      /**
-       * This section is responsible for configuring the legends based upon the 
-       * <legend .../> section of the mugl file.
-       **/
-      // Positioning
-      
-      var legendPosition:Array   = _config.value('legend', 0, '@position').split(" ");
-	  var legendAnchor:Array     = _config.value('legend', 0, '@anchor').split(" ");
-      var legendBase:Array       = _config.value('legend', 0, '@base').split(" ");
-      var legendFrame:String     = _config.value('legend', 0, '@frame');
-      var legendBorder:Number    = _config.value('legend', 0, '@border');    
-      var legendRows:Number      = _config.value('legend', 0, '@rows');     
-      var legendColumns:Number   = _config.value('legend', 0, '@columns');
-	  var legendBgColor:uint     = parsecolor( _config.value('legend', 0, '@color') );
-      var legendBorderColor:uint = parsecolor( _config.value('legend', 0, '@bordercolor') );
-      var legendOpacity:Number   = _config.value('legend', 0, '@opacity');
-      var legendRadius:Number    = _config.value('legend', 0, '@cornerradius');
-      var icon:Object = {
-        width  : _config.value('legend', 'icon', 0, '@width'),
-        height : _config.value('legend', 'icon', 0, '@height'),
-        border : _config.value('legend', 'icon', 0, '@border')
-      };
+    }
 
-      var legendVisible:String = _config.value('legend', 0, '@visible');
-      var isLegendVisible:Boolean;
-      if (legendVisible == null || legendVisible == "") {
-        // if legend visibility is not explicitly specified, default to true if
-        // there are 2 or more plots, otherwise false
-        isLegendVisible = (_plots.length >= 2);
-      } else {
-        isLegendVisible = (legendVisible=="true");
+    private function findDataObjectContainingVariable(id:String):Data {
+      for (var i:int=0; i<_data.length; ++i) {
+        for (var j:int=0; j<_data[i].variables.length; ++j) {
+          if (id == _data[i].variables[j].id) {
+            return _data[i];
+          }
+        }
       }
-
-      if (isLegendVisible) {
-        _legend = new Legend(_plots,
-                             legendBase[0], 
-                             legendBase[1], 
-                             legendAnchor[0], 
-                             legendAnchor[1], 
-                             legendPosition[0], 
-                             legendPosition[1], 
-                             _plotBox,
-                             _paddingBox,
-                             legendFrame=="plot",
-                             legendRows, 
-                             legendColumns, 
-                             legendBgColor, 
-                             legendBorder, 
-                             legendBorderColor, 
-                             legendOpacity,
-                             icon,
-                             legendRadius);
-      } else {
-        _legend = null;
-      }
-
-      var titlePosition:Array   = _config.value('title', 0, '@position').split(" ");
-      var titleAnchor:Array     = _config.value('title', 0, '@anchor').split(" ");
-      var titleBase:Array       = _config.value('title', 0, '@base').split(" ");
-      var titleFrame:String     = _config.value('title', 0, '@frame');
-      var titleBorder:Number    = _config.value('title', 0, '@border');    
-      var titleBgColor:uint     = parsecolor( _config.value('title', 0, '@color') );
-      var titleBorderColor:uint = parsecolor( _config.value('title', 0, '@bordercolor') );
-      var titleOpacity:Number   = _config.value('title', 0, '@opacity');
-      var titleFontSize:uint    = _config.value('title', 0, '@fontsize');
-      var titlePadding:Number   = _config.value('title', 0, '@padding');
-      var titleRadius:Number    = _config.value('title', 0, '@cornerradius');
-
-      var titleString:String = _config.xmlvalue('title');
-      if (titleString != null && titleString != "") {
-        _title = new Title(titleString,
-                           titleBase[0], 
-                           titleBase[1], 
-                           titleAnchor[0], 
-                           titleAnchor[1], 
-                           titlePosition[0], 
-                           titlePosition[1], 
-                           _plotBox,
-                           _paddingBox,
-                           titleFrame=="plot",
-                           titleBgColor, 
-                           titleBorder, 
-                           titleBorderColor, 
-                           titleOpacity,
-                           titleFontSize,
-                           titlePadding,
-                           titleRadius);
-      } else {
-        _title = null;
-      }
-      
-      var toolbarString:String = _config.xmlvalue("toolbar", 0, "@visible");
-      var isToolbarVisible:Boolean = (toolbarString == "true");
-      // Create the toolbar
-      if(isToolbarVisible) {
-      	_toolbar = new ToolBar(this,
-      						 1, 1,
-       					     1, 1,
-       					     -7, -5,
-       					     _plotBox,
-       					     _window,
-       					     false,
-       					     0xFFFFFF,
-       					     1,
-       					     0x000000,
-       					     1,
-       					     0);
-      }
-
-      
-      bindAxes(_vaxes, _config, 'verticalaxis', _swfname);
-      bindAxes(_haxes, _config, 'horizontalaxis', _swfname);
-
-/*      _keyTimer = new Timer(_keyTimerDelay, 1);
-      _keyTimer.addEventListener("timer", keyTimerHandler);
-	  */
-
-      // phase3
-      init_phase3();
+      return null;
     }
 
     private function setAxisBoundsIfNeeded(axis:Axis, data:Data, varid:String):void {
@@ -798,336 +998,67 @@ package multigraph {
       }
     }
 
-    private function init_phase3():void {
-	  addChild(_bgSprite);
-	  addChild(_divSprite);
-      addChild(_eventSprite);  
-      addChild(_axisControlSprite);
-      
-      addEventListener(Event.ENTER_FRAME, doEveryFrame);
-      prepareData();
-      _paintNeeded = true;
+    /**
+     * Do whatever prep work is needed to make sure that each plot is
+     * ready for plotting all data along its current horizontal axis
+     * extent.
+	 * 
+	 * @private
+     */
+    public function prepareData(propagate:Boolean=true):void {
+      for each ( var data : Data in _data ) {
+        data.prepareDataReset();
+      }
+      for each (var plot : Plot in _plots ) {
+        plot.prepareData();
+      }
+      invalidateDisplayList();
+    }
+	
+	/**
+	 * @private
+	 */
+	public function plotXY(x:Number, y:Number):DPoint {
+		return new DPoint(x - ( _windowMargin.left   + _border   + _padding.left   + _plotMargin.left   ),
+			              y - ( _windowMargin.bottom + _border   + _padding.bottom + _plotMargin.bottom ));
+	}	
+	
+	
+	/**
+	 * @private
+	 */
+	public function inPlotBox(x:Number, y:Number):Boolean {
+		return ( (x > _axisSprite1.x                       ) &&
+			(x < _plotBox.width + _plotMargin.left    ) &&
+			(y > _axisSprite1.y                       ) &&
+			(y < _plotBox.height + _plotMargin.bottom ) );
+	}
+
+
+    private function throwInvalidError(attr : String) : void {
+      throw new MuglError('Invalid ' + attr);
     }
 
-/*    private function keyTimerHandler(event:TimerEvent):void {
-      prepareData();
-    }*/
-
-    private function createAxes(axistag:String, axisType:Object):Array {
-      var formatter:Formatter;
-      var numAxes:int = 1; // force at least one axis, in case none is specifed in the xml file
-      if (_config.xmlvalue(axistag) != null) {
-        numAxes = _config.xmlvalue(axistag).length();
+    private function initializeEventHandler():void {
+      _uiEventHandler = new NearestAxisUIEventHandler(this);
+      /*
+      var uieh:String = _config.value('ui', '@eventhandler');
+      if (uieh == "naui") {
+        this._uiEventHandler = new NearestAxisUIEventHandler(this);
+      } else {
+        this._uiEventHandler = new SelectedAxisUIEventHandler(this);
       }
+      */
 
-      var axes:Array = [];
-
-      for(var i:int = 0; i < numAxes; ++i){
-        /*
-        var position:Number = _config.value(axistag, i, '@position');
-        var positionbase:String = _config.value(axistag, i, '@positionbase');
-        if (positionbase == 'right') {
-          position = _plotBox.width + position;
-        } else if (positionbase == 'top') {
-          position = _plotBox.height + position;
-        }
-        */
-
-        var titletext:String;
-        if (_config.xmlvalue(axistag, i, '@title') == null) {
-          titletext = null;
-        } else {
-          titletext = _config.value(axistag, i, '@title');
-          if (titletext == undefined) {
-            titletext = "";
-          }
-        }
-        var type:int = -1;
-        var axisTypeString:String = _config.value(axistag, i, '@type'); 
-        switch (axisTypeString) {
-        case "number":
-          type = Axis.TYPE_NUMBER;
-          break;
-        case "datetime":
-          type = Axis.TYPE_DATETIME;
-          break;
-        }
-        
-        var id:String        = _config.value(axistag, i, '@id');
-        var min:String       = _config.value(axistag, i, '@min');
-        var max:String       = _config.value(axistag, i, '@max');
-        //var minoffset:String = _config.value(axistag, i, '@minoffset');
-        //var maxoffset:String = _config.value(axistag, i, '@maxoffset');
-        //var pregap:Number = _config.value(axistag,i,'@pregap');
-        //var postgap:Number = _config.value(axistag,i,'@postgap');
-
-        var minPosition:Displacement = Displacement.parse( _config.value(axistag, i, '@minposition') );
-        var maxPosition:Displacement = Displacement.parse( _config.value(axistag, i, '@maxposition') );
-
-        var position:String   = _config.value(axistag, i, '@position');
-        var axisPosition:PixelPoint = PixelPoint.parse(position, (axisType==HorizontalAxis) ? 1 : 0);
-
-        var base:String       = _config.value(axistag, i, '@base');
-
-        //
-        // code to handle deprecated "@positionbase" attribute; only has effect if "@base" is not specifed in xml
-        //
-        var xmlbase:String = _config.xmlvalue(axistag, i, '@base');
-        if (xmlbase==null || xmlbase=="") {
-          var positionbase:String = _config.xmlvalue(axistag, i, '@positionbase');
-          if (positionbase == 'right') {
-            base = "1 -1";
-          }
-          if (positionbase == 'top') {
-            base = "-1 1";
-          }
-        }
-        //
-        // end of code to handle deprecated "@positionbase" attribute
-        //
-
-        var axisBase:PixelPoint = PixelPoint.parse(base);
-
-        var anchor:Number     = Number(_config.value(axistag, i, '@anchor'));
-
-        var lengthDisplacement:Displacement = Displacement.parse( _config.value(axistag,i,'@length') );
-        var length:Number = lengthDisplacement.calculateLength((axisType == HorizontalAxis) ? _plotBox.width : _plotBox.height );
-        
-        var parallelOffset:Number = 0;
-		var perpOffset:Number = 0;
-
-        if (axisType == HorizontalAxis) {
-          parallelOffset = axisPosition.x + (axisBase.x + 1) * _plotBox.width/2 - (anchor + 1) * length / 2;
-          perpOffset = axisPosition.y + (axisBase.y + 1) * _plotBox.height/2;
-        } else {
-          parallelOffset = axisPosition.y + (axisBase.y + 1) * _plotBox.height/2 - (anchor + 1) * length / 2;
-          perpOffset = axisPosition.x + (axisBase.x + 1) * _plotBox.width/2;
-        }
-
-        var title:String  = _config.xmlvalue(axistag,i,'title');
-
-        var titlePositionString:String = _config.xmlvalue(axistag,i,'title','@position');
-        if (titlePositionString==null || titlePositionString=="") {
-          if (axisType == HorizontalAxis) {
-            if (perpOffset > _plotBox.height/2) {
-              titlePositionString = _config.value(axistag,i,'title','@position_horiz_top');
-            } else {
-              titlePositionString = _config.value(axistag,i,'title','@position_horiz_bot');
-            }
-          } else {
-            if (perpOffset > _plotBox.width/2) {
-              titlePositionString = _config.value(axistag,i,'title','@position_vert_right');
-            } else {
-              titlePositionString = _config.value(axistag,i,'title','@position_vert_left');
-            }
-          }
-        }
-        var titlePosition:PixelPoint = PixelPoint.parse( titlePositionString );
-
-        var titleAnchorString:String = _config.xmlvalue(axistag,i,'title','@anchor');
-        if (titleAnchorString==null || titleAnchorString=="") {
-          if (axisType == HorizontalAxis) {
-            if (perpOffset > _plotBox.height/2) {
-              titleAnchorString = _config.value(axistag,i,'title','@anchor_horiz_top');
-            } else {
-              titleAnchorString = _config.value(axistag,i,'title','@anchor_horiz_bot');
-            }
-          } else {
-            if (perpOffset > _plotBox.width/2) {
-              titleAnchorString = _config.value(axistag,i,'title','@anchor_vert_right');
-            } else {
-              titleAnchorString = _config.value(axistag,i,'title','@anchor_vert_left');
-            }
-          }
-        }
-        var titleAnchor:PixelPoint = PixelPoint.parse( titleAnchorString );
-
-        var titleAngle:Number = parseFloat(_config.value(axistag,i,'title','@angle'));
-
-
-        var grid:Boolean = (_config.xmlvalue(axistag,i,'grid') != null);
-        var gridColor:uint = parsecolor( _config.value(axistag,i,'grid','@color') );
-
-        var lineWidth:int = _config.value(axistag,i,'@linewidth');
-
-        var tickMin:int = _config.value(axistag,i,'@tickmin');
-        var tickMax:int = _config.value(axistag,i,'@tickmax');
-
-        var highlightStyleString:String = _config.value(axistag,i,'@highlightstyle');
-        var highlightStyle:int = SelectedAxisUIAxisController.HIGHLIGHT_AXIS;
-        if (highlightStyleString == "labels") {
-          highlightStyle = SelectedAxisUIAxisController.HIGHLIGHT_LABELS;
-        } else if (highlightStyleString == "all") {
-          highlightStyle = SelectedAxisUIAxisController.HIGHLIGHT_ALL;
-        }
-		
-        var titleTextFormat:TextFormat = new TextFormat();
-        titleTextFormat.font  = _config.value(axistag,i,'title','@fontname');
-        titleTextFormat.size  = _config.value(axistag,i,'title','@fontsize');
-        titleTextFormat.color = _config.value(axistag,i,'title','@fontcolor');
-        titleTextFormat.align = TextFormatAlign.LEFT;
-
-        var titleBoldTextFormat:TextFormat = new TextFormat();
-        titleBoldTextFormat.font  = titleTextFormat.font + "Bold";
-        titleBoldTextFormat.size  = titleTextFormat.size;
-        titleBoldTextFormat.color = titleTextFormat.color;
-        titleBoldTextFormat.align = titleTextFormat.align;
-
-        axes[i] = new axisType(id,
-                               this,
-                               length,
-                               parallelOffset,
-                               perpOffset,
-                               type,
-                               0x000000,
-                               min,
-                               minPosition.calculateCoordinate(length), //minoffset,
-                               max,
-                               length - maxPosition.calculateCoordinate(length), //maxoffset,
-                               title,
-                               titlePosition.x,
-                               titlePosition.y,
-                               titleAnchor.x,
-                               titleAnchor.y,
-                               titleAngle,
-                               grid,
-                               gridColor,
-                               lineWidth,
-                               tickMin,
-                               tickMax,
-                               /*highlightStyle,*/
-                               titleTextFormat,
-                               titleBoldTextFormat,
-                               highlightStyle
-                               );
-
-        axes[i].panConfig.setConfig(_config.value(axistag, i, 'pan', '@allowed'),
-                                    _config.value(axistag, i, 'pan', '@min'),
-                                    _config.value(axistag, i, 'pan', '@max'));
-                                       
-        axes[i].zoomConfig.setConfig(_config.value(axistag, i, 'zoom', '@allowed'),
-                                     _config.value(axistag, i, 'zoom', '@anchor'),
-                                     _config.value(axistag, i, 'zoom', '@min'),
-                                     _config.value(axistag, i, 'zoom', '@max'));
-                                       
-        // Setup the axis controls
-        var axisControlsVisible:String = _config.value(axistag, i, 'axiscontrols', '@visible');
-        if(axisControlsVisible == "true") {
-          axes[i].hasAxisControls = true;
-          axes[i].axisControl = new AxisControls(_axisControlSprite, axes[i], _config);
-        }
-
-        var labelPositionString:String = _config.xmlvalue(axistag, i, 'labels', '@position');
-        if (labelPositionString==null || labelPositionString=="") {
-          if (axisType == HorizontalAxis) {
-            if (perpOffset > _plotBox.height/2) {
-              labelPositionString = _config.value(axistag,i,'labels','@position_horiz_top');
-            } else {
-              labelPositionString = _config.value(axistag,i,'labels','@position_horiz_bot');
-            }
-          } else {
-            if (perpOffset > _plotBox.width/2) {
-              labelPositionString = _config.value(axistag,i,'labels','@position_vert_right');
-            } else {
-              labelPositionString = _config.value(axistag,i,'labels','@position_vert_left');
-            }
-          }
-        }
-        var labelPosition:PixelPoint = PixelPoint.parse( labelPositionString );
-
-        var labelAnchorString:String = _config.xmlvalue(axistag, i, 'labels', '@anchor');
-        if (labelAnchorString==null || labelAnchorString=="") {
-          if (axisType == HorizontalAxis) {
-            if (perpOffset > _plotBox.height/2) {
-              labelAnchorString = _config.value(axistag,i,'labels','@anchor_horiz_top');
-            } else {
-              labelAnchorString = _config.value(axistag,i,'labels','@anchor_horiz_bot');
-            }
-          } else {
-            if (perpOffset > _plotBox.width/2) {
-              labelAnchorString = _config.value(axistag,i,'labels','@anchor_vert_right');
-            } else {
-              labelAnchorString = _config.value(axistag,i,'labels','@anchor_vert_left');
-            }
-          }
-        }
-        var labelAnchor:PixelPoint = PixelPoint.parse( labelAnchorString );
-
-        var labeler:Labeler;
-        
-        var labelerType:Object = (type == Axis.TYPE_DATETIME) ? DateLabeler : NumberLabeler;
-        
-        var spacingAndUnit:NumberAndUnit;
-        if(_config.xmlvalue(axistag, i, 'labels', 'label') != null) {
-          var nlabeltags:int = _config.xmlvalue(axistag, i, 'labels','label').length();
-          for(var k:int = 0; k < nlabeltags; ++k) {
-            var hlabelSpacings:Array = _config.value(axistag, i, 'labels', 'label', k, '@spacing').split(" ");
-            var labelTextFormat:TextFormat = new TextFormat();
-            labelTextFormat.font  = _config.value(axistag,i,'labels','label',k,'@fontname');
-            labelTextFormat.size  = _config.value(axistag,i,'labels','label',k,'@fontsize');
-            labelTextFormat.color = _config.value(axistag,i,'labels','label',k,'@fontcolor');
-            labelTextFormat.align = TextFormatAlign.LEFT;
-            
-            var labelBoldTextFormat:TextFormat = new TextFormat();
-            labelBoldTextFormat.font  = labelTextFormat.font + "Bold";
-            labelBoldTextFormat.size  = labelTextFormat.size;
-            labelBoldTextFormat.color = labelTextFormat.color;
-            labelBoldTextFormat.align = labelTextFormat.align;
-            for (var j:int=0; j<hlabelSpacings.length; ++j) {
-              var spacing = hlabelSpacings[j];
-              spacingAndUnit = NumberAndUnit.parse(spacing);
-
-              labeler = new labelerType(spacingAndUnit.number,
-                                        spacingAndUnit.unit,
-                                        _config.value(axistag, i, 'labels', 'label', k, '@format'),
-                                        _config.value(axistag, i, 'labels', '@start'),
-                                        labelPosition.x,
-                                        labelPosition.y,
-                                        _config.value(axistag, i, 'labels', '@angle'),
-                                        labelAnchor.x, 
-                                        labelAnchor.y,
-                                        labelTextFormat,
-                                        labelBoldTextFormat);
-              axes[i].addLabeler(labeler);
-            }
-          } 
-        } else {
-          var hlabelSpacings:Array = _config.value(axistag, i, 'labels', '@spacing').split(" ");
-          var labelTextFormat:TextFormat = new TextFormat();
-          labelTextFormat.font  = _config.value(axistag,i,'labels','@fontname');
-          labelTextFormat.size  = _config.value(axistag,i,'labels','@fontsize');
-          labelTextFormat.color = _config.value(axistag,i,'labels','@fontcolor');
-          labelTextFormat.align = TextFormatAlign.LEFT;
-          
-          var labelBoldTextFormat:TextFormat = new TextFormat();
-          labelBoldTextFormat.font  = labelTextFormat.font + "Bold";
-          labelBoldTextFormat.size  = labelTextFormat.size;
-          labelBoldTextFormat.color = labelTextFormat.color;
-          labelBoldTextFormat.align = labelTextFormat.align;
-          for (var k:int=0; k<hlabelSpacings.length; ++k) {
-            var spacing = hlabelSpacings[k];
-            spacingAndUnit = NumberAndUnit.parse(spacing);
-            labeler = new labelerType(spacingAndUnit.number,
-                                      spacingAndUnit.unit,
-                                      _config.value(axistag, i, 'labels', '@format'),
-                                      _config.value(axistag, i, 'labels', '@start'),  //parseFloat(_config.value(axistag, i, 'labels', '@start')),
-                                      labelPosition.x,
-                                      labelPosition.y,
-                                      parseFloat(_config.value(axistag, i, 'labels','@angle')),
-                                      labelAnchor.x,
-                                      labelAnchor.y,
-                                      labelTextFormat,
-                                      labelBoldTextFormat);
-            axes[i].addLabeler(labeler);
-          }   
-        }
-
-      }
-      return axes;
+	  if ('onMouseDown' in _uiEventHandler) { _eventSprite.addEventListener(MouseEvent.MOUSE_DOWN, _uiEventHandler['onMouseDown']); }
+	  if ('onMouseUp'   in _uiEventHandler) { _eventSprite.addEventListener(MouseEvent.MOUSE_UP,   _uiEventHandler['onMouseUp']);   }
+	  if ('onMouseMove' in _uiEventHandler) { _eventSprite.addEventListener(MouseEvent.MOUSE_MOVE, _uiEventHandler['onMouseMove']); }
+	  if ('onMouseOut'  in _uiEventHandler) { _eventSprite.addEventListener(MouseEvent.MOUSE_OUT,  _uiEventHandler['onMouseOut']);  }
+	  if ('onKeyDown'   in _uiEventHandler) { addEventListener(KeyboardEvent.KEY_DOWN,             _uiEventHandler['onKeyDown']);   }
+	  if ('onKeyUp'     in _uiEventHandler) { addEventListener(KeyboardEvent.KEY_UP,               _uiEventHandler['onKeyUp']);     }
     }
 
-
-    /*
+    /**
      * For an axis with a binding, there are (potentially) 2 pairs of min/max values:
      *    1. the axis's own min/max attributes
      *    2. the min/max attributes for the binding
@@ -1149,8 +1080,10 @@ package multigraph {
      * which means that their values are determined from the data.  After the
      * axis min/max values have been set, axis binding happens exactly as
      * above.
+     *
+     * @private
      */
-    public static function bindAxes(axes:Array, config:Config, axistag:String, swfname:String):void {
+    public static function bindAxes(axes:Array, config:Config, axistag:String):void {
       var i:int;
       var bindingId:String;
       var binding:AxisBinding;
@@ -1185,270 +1118,158 @@ package multigraph {
       
     }
 
-    var _frameCount:int;
-    var _frameCountStartUp = 4;
-    
-    private function doEveryFrame(event:Event):void {
-      if (_paintNeeded) {
-        _paintNeeded = false;
-        paint();
-      }
-      if (_frameCount < _frameCountStartUp) {
-        ++_frameCount;
-        _paintNeeded = true;
-      }
-    }
+    private function initializeLegend():void {
+      /*
+       * This section is responsible for configuring the legends based upon the 
+       * <legend .../> section of the mugl file.
+       */
+      // Positioning
+      
+      var legendPosition:Array   = _config.value('legend', 0, '@position').split(" ");
+	  var legendAnchor:Array     = _config.value('legend', 0, '@anchor').split(" ");
+      var legendBase:Array       = _config.value('legend', 0, '@base').split(" ");
+      var legendFrame:String     = _config.value('legend', 0, '@frame');
+      var legendBorder:Number    = _config.value('legend', 0, '@border');    
+      var legendRows:Number      = _config.value('legend', 0, '@rows');     
+      var legendColumns:Number   = _config.value('legend', 0, '@columns');
+	  var legendBgColor:uint     = parsecolor( _config.value('legend', 0, '@color') );
+      var legendBorderColor:uint = parsecolor( _config.value('legend', 0, '@bordercolor') );
+      var legendOpacity:Number   = _config.value('legend', 0, '@opacity');
+      var legendRadius:Number    = _config.value('legend', 0, '@cornerradius');
+      var icon:Object = {
+        width  : _config.value('legend', 'icon', 0, '@width'),
+        height : _config.value('legend', 'icon', 0, '@height'),
+        border : _config.value('legend', 'icon', 0, '@border')
+      };
 
-    private function buildDataVariableArrayFromConfig(dataSection:int):Array {
-      var vars:Array = [];
-      var xmlvarlist = _config.xmlvalue('data', dataSection, 'variables', 'variable');
-      if (xmlvarlist != null) {
-        var nvars:int = xmlvarlist.length();
-        for (var i:int=0; i<nvars; ++i) {
-          var col:String = _config.value('data', dataSection, 'variables','variable',i,'@column');
-          if (col == null) { col = i+''; }
-          var id:String = _config.value('data', dataSection, 'variables', 'variable', i, '@id');
-          if (id == null) { id = 'var' + col; }
-          var missingOp:String = _config.value('data', dataSection, 'variables', 'variable', i, '@missingop');
-          var missingValueString:String = _config.value('data', dataSection, 'variables', 'variable', i, '@missingvalue');
-          // if no missingValue was specified for this variable (or inherited from <variables>), set its missingOp to null
-          var missingValue:Number = 0;
-          if (missingValueString==null || missingValueString=="") {
-            missingOp=null;
-          } else {
-            missingValue = Number(missingValueString);
-          }
-          vars.push(new DataVariable(id,
-                                     int(col),
-                                     Axis.parseType(_config.value('data', dataSection, 'variables', 'variable', i, '@type')),
-                                     missingValue,
-                                     missingOp)
-                    );
-        }
+      var legendVisible:String = _config.value('legend', 0, '@visible');
+      var isLegendVisible:Boolean;
+      if (legendVisible == null || legendVisible == "") {
+        // if legend visibility is not explicitly specified, default to true if
+        // there are 2 or more plots, otherwise false
+        isLegendVisible = (_plots.length >= 2);
       } else {
-        trace('got no vars!');
-      }
-      return vars;
-    }
-	
-    public function paint():void {
-      var i:int;
-      var j:int;
-
-      _divSprite.graphics.clear();
-      if (_border.left > 0) {
-        _divSprite.graphics.lineStyle(_border.left,0,1);
-		_divSprite.graphics.drawRect(_windowMargin.left, _windowMargin.bottom,
-			_graphWidth - _windowMargin.left - _windowMargin.right,
-			_graphHeight - _windowMargin.bottom - _windowMargin.top);
-      }
-	  
-	  /*
-	  if (this.backgroundBitmap != null) {
-		var matrix:Matrix = new Matrix();
-		//matrix.scale(1,-1);
-		_divSprite.graphics.beginBitmapFill(this.backgroundBitmap, null, false, false);
-		_divSprite.graphics.drawRect(50, _windowMargin.bottom, 100, 100);
-	  	_divSprite.graphics.endFill();
-	  }
-      */
-	  
-      var statusLists:Array = [];
-      if (_networkDots) {
-        for (i=0; i<_data.length; ++i) {
-          statusLists[i] = _data[i].getStatus();
-        }
-      }
-   
-      // clear out the axis sprites
-      _axisSprite1.graphics.clear();
-      while (_axisSprite1.numChildren) { _axisSprite1.removeChildAt(0); }
-
-      _axisSprite2.graphics.clear();
-      while (_axisSprite2.numChildren) { _axisSprite2.removeChildAt(0); }
-
-      // clear out the plotBox sprite
-      _plotBoxSprite.graphics.clear();
-      while (_plotBoxSprite.numChildren) { _plotBoxSprite.removeChildAt(0); }
-
-      // draw the plotbox border, if any, in the padding box, so that its full linewidth shows up (if we draw
-      // it in the plotbox, it gets clipped to the plotbox)
-      if (_plotareaBorder > 0) {
-        _axisSprite2.graphics.lineStyle(_plotareaBorder, _plotareaBorderColor, 1);
-        _axisSprite2.graphics.drawRect(0, 0, _plotBox.width, _plotBox.height);
+        isLegendVisible = (legendVisible=="true");
       }
 
-      // render the axes' grid lines (axis render "step 0")
-      for (i=0; i<_haxes.length; ++i) {
-        _haxes[i].render(_axisSprite1, 0);
-      }
-      for (i=0; i<_vaxes.length; ++i) {
-        _vaxes[i].render(_axisSprite1, 0);
-      }
-
-     
-      // render the plots
-      for (i=0; i<_plots.length; ++i) {
-        _plots[i].render(_plotBoxSprite);
-      }
-      
-      // render the axes themselves: (axis render "step 1")
-      for (i=0; i<_haxes.length; ++i) {
-        _haxes[i].render(_axisSprite2, 1);
-      }
-      for (i=0; i<_vaxes.length; ++i) {
-        _vaxes[i].render(_axisSprite2, 1);
-      }
-
-      // render the legend
-      if (_legend!=null) {
-        _legend.render(_paddingBoxSprite, _plotBoxSprite);
-      }
-
-      // render the title
-      if (_title!=null) {
-        _title.render(_paddingBoxSprite, _plotBoxSprite);
-      }
-      
-      // render the toolbar
-      if (_toolbar != null) {
-      	_toolbar.render(_axisControlSprite, _plotBoxSprite);
-      }
-
-      if (_networkDots) {
-        var n:int;
-        n = 0;
-        var g:Graphics = _divSprite.graphics;
-        for (i=0; i<statusLists.length; ++i) {
-          for (j=0; j<statusLists[i].length; ++j) {
-            if (statusLists[i][j] == Data.STATUS_CSV_WAITING) {
-              // draw a little rectangle
-              ++n;
-              g.beginFill(_statusIconColor, 1);
-              g.lineStyle(0, _statusIconColor, 1);
-              g.drawRect(_statusIconSpacing*n,_statusIconVerticalOffset,_statusIconWidth,_statusIconHeight);
-              g.endFill();
-            } else if (statusLists[i][j] == Data.STATUS_WEB_WAITING) {
-              // draw a little circle
-              ++n;
-              g.beginFill(_statusIconColor, 1);
-              g.lineStyle(0, _statusIconColor, 1);
-              g.drawCircle(_statusIconSpacing*n, _statusIconVerticalOffset+_statusIconHeight/2.0,
-                           _statusIconWidth/2.0);
-              g.endFill();
-            } else if (statusLists[i][j] == Data.STATUS_COMPLETE) {
-              // draw a little circle
-              ++n;
-              g.beginFill(0x00ff00, 1);
-              g.lineStyle(0, 0x00ff00, 1);
-              g.drawCircle(_statusIconSpacing*n, _statusIconVerticalOffset+_statusIconHeight/2.0,
-                           _statusIconWidth/2.0);
-              g.endFill();
-            } else {
-              // draw a little circle
-              ++n;
-              g.beginFill(0xff0000, 1);
-              g.lineStyle(0, 0xff0000, 1);
-              g.drawCircle(_statusIconSpacing*n, _statusIconVerticalOffset+_statusIconHeight/2.0,
-                           _statusIconWidth/2.0);
-              g.endFill();
-            }
-          }
-        }
-      }
-      
-    }
-    private var _statusIconColor:uint            = 0x0000ff;
-    private var _statusIconSpacing:Number        = 10;
-    private var _statusIconVerticalOffset:Number = 5;
-    private var _statusIconHeight:Number         = 7;
-    private var _statusIconWidth:Number          = 7;
-
-    /**
-     * Do whatever prep work is needed to make sure that each plot is
-     * ready for plotting all data along its current horizontal axis
-     * extent.
-     */
-    public function prepareData(propagate:Boolean=true):void {
-      for (i=0; i<_data.length; ++i) {
-        _data[i].prepareDataReset();
-      }    
-      for (var i=0; i<_plots.length; ++i) {
-        _plots[i].prepareData();
-      }
-      _paintNeeded = true;
-    }
-            
-    public function drawBox(g:Graphics, x:Number, y:Number, w:Number, h:Number):void {
-      g.moveTo(x-w/2, y-h/2);
-      g.lineTo(x+w/2, y-h/2);
-      g.lineTo(x+w/2, y+h/2);
-      g.lineTo(x-w/2, y+h/2);
-      g.lineTo(x-w/2, y-h/2);
-      g.lineTo(x+w/2, y+h/2);
-      g.moveTo(x-w/2, y+h/2);
-      g.lineTo(x+w/2, y-h/2);
-    }
-
-    public function drawGrid(g:Graphics, cx:Number, cy:Number, gridSize:Number, halfWidth:Number):void {
-      var x = cx - halfWidth*gridSize;
-      for (var i=0; i<2*halfWidth+1; ++i) {
-        g.moveTo(x, cy - halfWidth*gridSize);
-        g.lineTo(x, cy + halfWidth*gridSize);
-        x += gridSize;
-      }
-      var y = cy - halfWidth*gridSize;
-      for (var i=0; i<2*halfWidth+1; ++i) {
-        g.moveTo(cx - halfWidth*gridSize, y);
-        g.lineTo(cx + halfWidth*gridSize, y);
-        y += gridSize;
+      if (isLegendVisible) {
+        _legend = new NewLegend(_plots,
+                             legendBase[0], 
+                             legendBase[1], 
+                             legendAnchor[0], 
+                             legendAnchor[1], 
+                             legendPosition[0], 
+                             legendPosition[1], 
+							 this,
+                             legendFrame=="plot",
+                             legendRows, 
+                             legendColumns, 
+                             legendBgColor, 
+                             legendBorder, 
+                             legendBorderColor, 
+                             legendOpacity,
+                             icon,
+                             legendRadius);
+      } else {
+        _legend = null;
       }
     }
 
-    private function findDataObjectContainingVariable(id:String):Data {
-      for (var i:int=0; i<_data.length; ++i) {
-        for (var j:int=0; j<_data[i].variables.length; ++j) {
-          if (id == _data[i].variables[j].id) {
-            return _data[i];
-          }
-        }
+
+    private function initializeTitle():void {
+      var titlePosition:Array   = _config.value('title', 0, '@position').split(" ");
+      var titleAnchor:Array     = _config.value('title', 0, '@anchor').split(" ");
+      var titleBase:Array       = _config.value('title', 0, '@base').split(" ");
+      var titleFrame:String     = _config.value('title', 0, '@frame');
+      var titleBorder:Number    = _config.value('title', 0, '@border');    
+      var titleBgColor:uint     = parsecolor( _config.value('title', 0, '@color') );
+      var titleBorderColor:uint = parsecolor( _config.value('title', 0, '@bordercolor') );
+      var titleOpacity:Number   = _config.value('title', 0, '@opacity');
+      var titleFontSize:uint    = _config.value('title', 0, '@fontsize');
+      var titlePadding:Number   = _config.value('title', 0, '@padding');
+      var titleRadius:Number    = _config.value('title', 0, '@cornerradius');
+
+      var titleString:String = _config.xmlvalue('title');
+      if (titleString != null && titleString != "") {
+        _title = new Title(titleString,
+                           titleBase[0], 
+                           titleBase[1], 
+                           titleAnchor[0], 
+                           titleAnchor[1], 
+                           titlePosition[0], 
+                           titlePosition[1], 
+                           this,
+                           titleFrame=="plot",
+                           titleBgColor, 
+                           titleBorder, 
+                           titleBorderColor, 
+                           titleOpacity,
+                           titleFontSize,
+                           titlePadding,
+                           titleRadius);
+      } else {
+        _title = null;
       }
-      return null;
     }
-    
-	public function plotXY(x:Number, y:Number):PixelPoint {
-		return new PixelPoint(x - ( _windowMargin.left   + _border.left   + _padding.left   + _plotMargin.left   ),
-                              y - ( _windowMargin.bottom + _border.bottom + _padding.bottom + _plotMargin.bottom ));
-	}	
 
-
-    public function inPlotBox(x:Number, y:Number):Boolean {
-      return ( (x > _axisSprite1.x                       ) &&
-               (x < _plotBox.width + _plotMargin.left    ) &&
-               (y > _axisSprite1.y                       ) &&
-               (y < _plotBox.height + _plotMargin.bottom ) );
+    private function initializeImageAnnotations():void {
+      var nImages:int = 0;
+      if (_config.xmlvalue('img') != null) {
+        nImages = _config.xmlvalue('img').length();
+      }
+      for (var i:int=0; i<nImages; ++i) {
+        var url:String          = _config.xmlvalue('img', i, '@src');
+        var anchor:Array        = _config.value('img', i, '@anchor').split(" ");
+        var base:Array          = _config.value('img', i, '@base').split(" ");
+        var position:Array      = _config.value('img', i, '@position').split(" ");
+        var frameIsPlot:Boolean = (_config.value('img', i, '@frame') == "plot");
+		var opacity:Number      = _config.value('img', i, '@opacity');
+        var loader:Loader = new Loader();
+        loader.contentLoaderInfo.addEventListener(Event.COMPLETE, 
+                                                  function (base:Array, anchor:Array, position:Array, graph:Graph, frameIsPlot:Boolean, opacity:Number):Function {
+                                                    return function (event:Event):void {
+                                                      var loader:Loader = Loader(event.target.loader);
+                                                      var bitmap:Bitmap = Bitmap(loader.content);
+													  bitmap.alpha = opacity;
+                                                      var imageAnnotation:ImageAnnotation = new ImageAnnotation(bitmap,
+                                                                                                                base[0], base[1],
+                                                                                                                anchor[0], anchor[1],
+                                                                                                                position[0], position[1],
+                                                                                                                graph,
+                                                                                                                frameIsPlot);
+                                                      graph.addImageAnnotation(imageAnnotation);
+                                                    }
+                                                  }(base, anchor, position, this, frameIsPlot, opacity)
+                                                  );
+        loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,
+                                                  function(errmsg:String):Function {
+                                                    return function(event:IOErrorEvent):void {
+                                                      trace(errmsg);
+                                                    }
+                                                  }("Unable to load image annotation: " + url)
+                                                  );
+		//trace('issuing call to load imageAnnotation');
+        loader.load(new URLRequest(url));
+      }
     }
-	
-    /*
-    import mx.graphics.codec.PNGEncoder;
-    import mx.utils.Base64Encoder;
-    import flash.display.BitmapData;
-            
-    public function takeSnapshot():void {
-    	var bitmapData:BitmapData = new BitmapData(this._graphWidth, this._graphHeight, true, 0xffffff);
-        bitmapData.draw(this);
 
-		var pngCoder:PNGEncoder = new PNGEncoder();
-                
-        var bytes:ByteArray = pngCoder.encode(bitmapData);
-            
-        //var b64encoder:Base64Encoder = new Base64Encoder();
-        //b64encoder.encodeBytes(bytes);
-
-		var imageSnap:ImageSnapshot = new ImageSnapshot(this._graphWidth, this._graphHeight, bytes);
-		var file:FileReference = new FileReference();
-		file.save(imageSnap.data, "file.png");
+    public function addImageAnnotation(imageAnnotation:ImageAnnotation):void {
+		//trace('pushing imageAnnotation onto _imageAnnotations list');
+      _imageAnnotations.push(imageAnnotation);
+	  _paddingBoxSprite.addChild(imageAnnotation);
+	  reInitializeGeometry();
     }
-    */
+
+	public function showTips(mouseLocation:DPoint):void {
+		for each ( var plot : Plot in _plots ) {
+			plot.showTip(mouseLocation, _plotBoxSprite, _plotBox);
+		}
+	}
+	public function hideTips():void {
+		for each ( var plot : Plot in _plots ) {
+			plot.hideTip();
+		}
+	}
+		
   }
 }

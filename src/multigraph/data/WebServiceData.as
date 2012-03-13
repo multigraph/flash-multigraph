@@ -14,8 +14,6 @@ package multigraph.data
   import multigraph.Graph;
   import multigraph.format.DateFormatter;
   
-  import mx.managers.CursorManager;
-	
   public class WebServiceData extends Data
   {
     // The data cache
@@ -23,7 +21,7 @@ package multigraph.data
 
     // The graph associated with this data object
 	private var _graph:Graph;
-
+	
     // The web service object; this is the object that is responsible
     // for making the actual service requests.  That code is located
     // in a separate object, rather than included directly in methods
@@ -37,6 +35,7 @@ package multigraph.data
       super(variables);
       _graph = graph;
 
+	  /*
       var pageHost:String;
       var pagePath:String;
       var pagePort:String;
@@ -49,9 +48,16 @@ package multigraph.data
       if (pagePort != '80') {
       	  pageHost += ':' + pagePort;
       }
-
+*/
       var serviceUrl:String;
-	    
+	  serviceUrl = url;
+	  
+	  //
+	  // NOTE: this will currently only work if the url explicitly starts with http://; need to
+	  // add code back to address relative URLs soon!!!
+	  //
+
+	  /*
       if (url.substring(0,4) == 'http') {
         serviceUrl = url;
       } else if (url.charAt(0) == '/') {
@@ -59,7 +65,9 @@ package multigraph.data
       } else {
         serviceUrl = 'http://' + pageHost + pagePath.replace(/\/[^\/]*$/,'/') + url;
       }
-      if (_graph != null) { _graph.diagnosticOutput('web service url is "' + serviceUrl + '"'); }
+      //if (_graph != null) { _graph.diagnosticOutput('web service url is "' + serviceUrl + '"'); }
+	  */
+
       _webService = new HttpWebService(serviceUrl, _graph);
 
       _cache = new WebServiceDataCache();
@@ -70,13 +78,10 @@ package multigraph.data
                                  max:Number, maxBuffer:int):void {
       _webService.request(_variables, min, minBuffer, max, maxBuffer,
                           function(dataText:String):void {
-                          	if (_graph!=null) { _graph.diagnosticOutput('got a data response of length ' + dataText.length); }
+                          	//if (_graph!=null) { _graph.diagnosticOutput('got a data response of length ' + dataText.length); }
                             insertData(block, dataText);
                           }                    
                           );
-                          
-		// Add the busyCursor whenever the data request begins
-    	CursorManager.setBusyCursor();
     }
     
     private function insertData(block:WebServiceDataCacheBlock,
@@ -142,10 +147,8 @@ package multigraph.data
       block.data = data;
       if (_graph != null) {
         // (check for null _graph to allow for testing in an environment without a Graph object)
-        _graph.paintNeeded = true;
-        
-        // If the graph has been repainted remove the busyCursor
-        CursorManager.removeBusyCursor();
+	    //_graph.paintNeeded = true;
+		_graph.invalidateDisplayList();
       }
     }
     

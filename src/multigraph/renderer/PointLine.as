@@ -12,10 +12,10 @@ package multigraph.renderer {
 	import flash.display.JointStyle;
 	
 	import multigraph.Axis;
-	import multigraph.MultigraphUIComponent;
+	import mx.core.UIComponent;
     import multigraph.parsecolor;
     import multigraph.data.Data;
-
+    import multigraph.NumberAndUnit;
 	
   public class PointLine extends Renderer
   {
@@ -24,6 +24,9 @@ package multigraph.renderer {
     static public var options:String = '<ul>\
 <li><b>linecolor</b> color to use for the lines; default is 0x000000 (black)\
 <li><b>linewidth</b> width, in pixels, to use for the lines; default is 1\
+<li><b>pointpixelthreshold</b> if specified, this should be a distance (possibly with units, in the case of a datetime axis) along the horizontal \
+axis, and the renderer will only draw points if the width of a single pixel, measured in the data units of the horizontal axis, is greater than this \
+distance.  The default value is 0, which means that points are always drawn.\
 <li><b>pointsize</b> radius of the markers, in pixels; default is 0, which means do not draw markers\
 <li><b>pointshape</b> shape to use for the markers; must be one of "circle", "square", "triangle", "diamond", "star", "+", or "x"; default is "circle"\
 <li><b>pointcolor</b> color to use for the markers; default is 0x000000 (black)\
@@ -42,6 +45,9 @@ package multigraph.renderer {
     private var _pointopacity:Number;
     private var _pointoutlinewidth:Number;
     private var _pointoutlinecolor:uint;
+    private var _pointpixelthreshold:String;
+
+    private var _drawPoints:Boolean;
 
 	private var _linecolor_str:String;
     private var _pointcolor_str:String = null;;
@@ -58,7 +64,10 @@ package multigraph.renderer {
 
     private var points:Array;
     private var prevPoint:Array;
-    
+
+    public function get pointpixelthreshold ():String { return _pointpixelthreshold; }
+    public function set pointpixelthreshold (value:String):void { _pointpixelthreshold = value; }
+
     public function set linecolor(color:String):void {
     	_linecolor_str = color;
     	_linecolor = parsecolor(color);
@@ -146,24 +155,52 @@ package multigraph.renderer {
 
     public function PointLine(haxis:Axis, vaxis:Axis, data:Data, varids:Array) {
       super(haxis, vaxis, data, varids);
-      _pointsize         = 0;
-      _pointcolor        = 0x000000;
-      _pointopacity      = 1.0;
-      _pointoutlinewidth = 1;
-      _pointoutlinecolor = 0x000000;
-      _linewidth         = 1;
-      _linecolor         = 0x000000;
+      _pointsize           = 0;
+      _pointcolor          = 0x000000;
+      _pointopacity        = 1.0;
+      _pointoutlinewidth   = 1;
+      _pointoutlinecolor   = 0x000000;
+      _pointpixelthreshold = "0";
+      _linewidth           = 1;
+      _linecolor           = 0x000000;
       points      = [];
       prevPoint = null;
     }
 
-    override public function begin(sprite:MultigraphUIComponent):void {
+    override public function begin(sprite:UIComponent):void {
       this.prevPoint = null;
       this.points      = [];
       if (_dataFilter != null) { _dataFilter.reset(_haxis, _vaxis); }
+
+      var numberAndUnit:NumberAndUnit = NumberAndUnit.parse(_pointpixelthreshold);
+      var msThreshold:Number;
+            
+      switch(numberAndUnit.unit){
+      case "H":
+        msThreshold = numberAndUnit.number * 3600000;
+        break;
+      case "D":
+        msThreshold = numberAndUnit.number * 3600000 * 24;
+        break;
+      case "M":
+        msThreshold = numberAndUnit.number * 3600000 * 24 * 30;
+        break;
+      case "Y":
+        msThreshold = numberAndUnit.number * 3600000 * 24 * 365;
+        break;
+      case "m":
+        msThreshold = numberAndUnit.number * 60000;
+        break;
+      default:
+        msThreshold = numberAndUnit.number;
+        break;
+      }
+            
+      var thresholdPixelWidth:Number = msThreshold * _haxis.axisToDataRatio;
+      _drawPoints = (thresholdPixelWidth >= 1);
     }
 
-    override public function dataPoint(sprite:MultigraphUIComponent, datap:Array):void {
+    override public function dataPoint(sprite:UIComponent, datap:Array):void {
       if (isMissing(datap[1],1)) {
         prevPoint = null;
       } else {
@@ -181,8 +218,8 @@ package multigraph.renderer {
       }
     }
 
-    override public function end(sprite:MultigraphUIComponent):void {
-      if (_pointsize > 0) { // don't draw points if pointsize<=0
+    override public function end(sprite:UIComponent):void {
+      if (_drawPoints  && (_pointsize > 0)) { // don't draw points if pointsize<=0, or if _drawPoints is false
         var g:Graphics = sprite.graphics;
         var p:Array;
         while(points.length > 0) {
@@ -275,7 +312,7 @@ package multigraph.renderer {
       g.endFill();
     }
     
-    override public function renderLegendIcon(sprite:MultigraphUIComponent, legendLabel:String, opacity:Number):void {
+    override public function renderLegendIcon(sprite:UIComponent, legendLabel:String, opacity:Number):void {
       var g:Graphics = sprite.graphics;
       if (_linewidth > 0) {
     	g.lineStyle(_linewidth, _linecolor, 1, false, "normal", flash.display.CapsStyle.NONE, flash.display.JointStyle.ROUND);

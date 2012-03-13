@@ -11,10 +11,9 @@ package multigraph.renderer
   import flash.display.Graphics;
   import flash.events.*;
   
-  import multigraph.MultigraphUIComponent;
-  import multigraph.HorizontalAxis;
+  import mx.core.UIComponent;
+  import multigraph.Axis;
   import multigraph.NumberAndUnit;
-  import multigraph.VerticalAxis;
   import multigraph.parsecolor;
   import multigraph.data.Data;
     
@@ -96,7 +95,7 @@ package multigraph.renderer
       _linethickness = Number(thickness);
     }
         
-    public function BarError (haxis:HorizontalAxis, vaxis:VerticalAxis, data:Data, varids:Array)
+    public function BarError (haxis:Axis, vaxis:Axis, data:Data, varids:Array)
     {
       super(haxis, vaxis, data, varids);
       _fillcolor = 0x000000;
@@ -109,7 +108,7 @@ package multigraph.renderer
       _barbaseIsSet = false;
     }
         
-    override public function begin (sprite:MultigraphUIComponent):void {
+    override public function begin (sprite:UIComponent):void {
       var g:Graphics = sprite.graphics;
       _numberAndUnit = NumberAndUnit.parse(_barwidth);
             
@@ -145,7 +144,7 @@ package multigraph.renderer
       _linePoints = new Array();
     }
     
-    override public function dataPoint (sprite:MultigraphUIComponent, datap:Array):void {
+    override public function dataPoint (sprite:UIComponent, datap:Array):void {
       var p:Array = [];
       transformPoint(p, datap);
       var g:Graphics = sprite.graphics;
@@ -202,7 +201,7 @@ package multigraph.renderer
       _linePoints.push(p); */
     }
         
-    override public function end(sprite:MultigraphUIComponent):void {
+    override public function end(sprite:UIComponent):void {
 	  var g:Graphics = sprite.graphics;
 	  
 	  //for each(var data:InteractiveDataPoint in _iDatas) {
@@ -248,7 +247,7 @@ package multigraph.renderer
         }
     }
     
-    override public function renderLegendIcon(sprite:MultigraphUIComponent, legendLabel:String, opacity:Number):void {
+    override public function renderLegendIcon(sprite:UIComponent, legendLabel:String, opacity:Number):void {
     	
     }
   }

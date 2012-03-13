@@ -8,6 +8,7 @@
  */
 package multigraph
 {
+  import mx.core.UIComponent;
   import multigraph.renderer.Renderer;
 
   public class ConstantPlot extends Plot
@@ -19,7 +20,7 @@ package multigraph
       _constantValue = constantValue;
     }
 
-    override public function render(sprite:MultigraphUIComponent):void {
+    override public function render(sprite:UIComponent):void {
       _renderer.begin(sprite);
       var vals:Array = [_haxis.dataMin, _constantValue];
       _renderer.dataPoint(sprite, vals);

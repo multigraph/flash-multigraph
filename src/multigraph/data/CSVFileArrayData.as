@@ -41,7 +41,8 @@ package multigraph.data
       private function handleLoadComplete( event:Event ):void {
         parseText(event.target.data);
         _haveData = true;
-        _graph.paintNeeded = true;
+        //_graph.paintNeeded = true;
+		_graph.invalidateDisplayList();
         if (_onLoadComplete != null) {
         	_onLoadComplete(this);
         }

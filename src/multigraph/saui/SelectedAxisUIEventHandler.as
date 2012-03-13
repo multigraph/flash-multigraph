@@ -13,11 +13,11 @@ package multigraph.saui
   {
 
     // Mouse cursor assets
-    [Embed(source="../assets/cursors/HandOpen.png")]
+    [Embed(source="../../assets/cursors/HandOpen.png")]
       [Bindable]
       private var mouseCursorGrab:Class;
 
-    [Embed(source="../assets/cursors/HandClosed.png")]
+    [Embed(source="../../assets/cursors/HandClosed.png")]
       [Bindable]
       private var mouseCursorGrabbing:Class;
 
@@ -199,7 +199,8 @@ package multigraph.saui
       }
       selectedAxisUIAxisController.selected = true;
       _selectedAxis = selectedAxisUIAxisController;
-      _graph.paintNeeded = true;
+      //_graph.paintNeeded = true;
+	  _graph.invalidateDisplayList();
     }
         
     public function delegateMouseEventToAxis(method:String, event:MouseEvent):void {     

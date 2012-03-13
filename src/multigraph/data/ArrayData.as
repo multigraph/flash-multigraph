@@ -9,6 +9,7 @@
 package multigraph.data
 {
   import multigraph.Axis;
+  import multigraph.DataType;
 	
   public class ArrayData extends Data
   {
@@ -71,7 +72,7 @@ package multigraph.data
 		  } else {
 			id = 'y' + (i-1);
 		  }
-		  _variables.push(new DataVariable(id, i, Axis.TYPE_NUMBER));
+		  _variables.push(new DataVariable(id, i, DataType.NUMBER));
 		}
 	  }
 	}

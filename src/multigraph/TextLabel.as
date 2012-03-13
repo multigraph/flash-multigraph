@@ -19,6 +19,16 @@ package multigraph
      * A TextLabel is a non-editable TextField that can be positioned,
      * aligned, and rotated in a convenient manner.
      *
+     * !!!
+     * IMPORTANT NOTE: In order for this class to work correctly
+     * in Multigraph, you need to be sure to pass the following
+     * option to the mxmlc compiler (in the "Flex Compiler" options
+     * in Flash Builder):
+     *          -managers flash.fonts.AFEFontManager
+     * Failing to do this will cause all your TextLabels to be invisible
+     * but will generate no errors or warnings!!
+     * !!!
+     *
      * Note: this object is designed to be inserted into a parent object
      * whose vertical coordinate direction has been reversed, so that
      * y increases in the upward screen direction.

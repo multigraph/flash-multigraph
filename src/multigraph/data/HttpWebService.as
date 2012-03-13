@@ -17,6 +17,7 @@ package multigraph.data
   {
     private var _url:String;
     private var _graph:Graph;
+	
     public function HttpWebService(url:String, graph:Graph) {
       _url = url;
       _graph = graph;
@@ -41,28 +42,42 @@ package multigraph.data
 	    
       var loader:URLLoader = new URLLoader();
       var requestStart:String = new Date().toTimeString();
-      var networkable:Object = {location:null, request:null, receive:null, status:null, http:null};
       
-      networkable.location = url;
-      networkable.request = requestStart;
+      //networkable.receive = new Date().toTimeString();
+	  var spinnerIndex : int = _graph.startAvailableSpinner();
+
       loader.dataFormat = "text";
-      loader.addEventListener( Event.COMPLETE,
-                               function(event:Event):void {
-                                 callback(event.target.data);
-                                 networkable.receive = new Date().toTimeString();
-                                 networkable.status = event.type;
-                                 _graph.networkMonitorEndRequest(networkable);
-                               });
-                               
+	  loader.addEventListener( Event.COMPLETE,
+		  function(event:Event):void {
+			  callback(event.target.data);
+              _graph.stopSpinner(spinnerIndex);
+		  });
+	  loader.addEventListener( SecurityErrorEvent.SECURITY_ERROR,
+		  function(event:Event):void {
+              _graph.stopSpinner(spinnerIndex);
+              _graph.multigraph.alert('HttpWebService Security Error', 'Error');
+		  });
+	  loader.addEventListener( IOErrorEvent.IO_ERROR,
+		  function(event:Event):void {
+              _graph.stopSpinner(spinnerIndex);
+              _graph.multigraph.alert('HttpWebService IO Error', 'Error');
+		  });
+      
+	  
+	  //loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
+      //loader.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);
+
+            //Event.COMPLETE
+            //Event.OPEN
+            //ProgressEvent.PROGRESS
+            //HTTPStatusEvent.HTTP_STATUS
+
+      /*
       loader.addEventListener(HTTPStatusEvent.HTTP_STATUS,
       							function(event:HTTPStatusEvent):void {
-      								networkable.http = event.status;
-      								_graph.networkMonitorEndRequest(networkable);
       							});
-	  _graph.diagnosticOutput('requesting data from url "'+url+'"');
+      */
       loader.load( new URLRequest( url ) );
-      
-      _graph.networkMonitorStartRequest(networkable);
     }
   }
 }

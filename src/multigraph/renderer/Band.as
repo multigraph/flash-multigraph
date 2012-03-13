@@ -9,9 +9,8 @@
 package multigraph.renderer
 {
   import flash.display.Graphics;
-	
+  import mx.core.UIComponent;
   import multigraph.Axis;
-  import multigraph.MultigraphUIComponent;
   import multigraph.parsecolor;
   import multigraph.data.Data;
 
@@ -101,12 +100,12 @@ package multigraph.renderer
       _line2width = 1;
     }
 		
-    override public function begin(sprite:MultigraphUIComponent):void {
+    override public function begin(sprite:UIComponent):void {
       _points = [];
       _g = sprite.graphics;
     }
 
-    override public function dataPoint(sprite:MultigraphUIComponent, datap:Array):void {
+    override public function dataPoint(sprite:UIComponent, datap:Array):void {
       // The _points array holds a "run" of consecutive data points.  When/if we hit a missing value,
       // we render that run and reset the _points array to empty.
       if (isMissing(datap[1],1) || isMissing(datap[2],2)) {
@@ -123,7 +122,7 @@ package multigraph.renderer
     }
   
 
-    override public function end(sprite:MultigraphUIComponent):void {
+    override public function end(sprite:UIComponent):void {
       // render any points currently in the _points array
       renderPoints();
     }
@@ -143,7 +142,7 @@ package multigraph.renderer
       _g.lineTo(_points[0][0], _points[0][2]);
       // change to our specified line style for the upper line and draw to the upper value of each point in the run;
       // this traces out the top of the band
-      _g.lineStyle(_line2width, _line2color, 1);
+      _g.lineStyle(_line2width, _line2color, _line2width > 0 ? 1 : 0);
       for (var i:int=1; i<_points.length; ++i) {
         _g.lineTo(_points[i][0], _points[i][2]);
       }
@@ -154,7 +153,7 @@ package multigraph.renderer
       _g.lineTo(_points[i][0], _points[i][1]);
       // change to our specified line style for the lower line and draw to the lower value of each point in the run;
       // this traces out the bottom of the band
-      _g.lineStyle(_line1width, _line1color, 1);
+      _g.lineStyle(_line1width, _line1color, _line1width > 0 ? 1 : 0);
       while (i>0) {
         --i;
         _g.lineTo(_points[i][0], _points[i][1]);
@@ -164,7 +163,7 @@ package multigraph.renderer
     }
           
 
-    override public function renderLegendIcon(sprite:MultigraphUIComponent, legendLabel:String, opacity:Number):void {
+    override public function renderLegendIcon(sprite:UIComponent, legendLabel:String, opacity:Number):void {
       var g:Graphics = sprite.graphics;
 	    	
       // Draw icon background (with opacity)

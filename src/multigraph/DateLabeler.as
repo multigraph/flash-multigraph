@@ -9,7 +9,7 @@
 package multigraph 
 {
   import flash.text.TextFormat;
-  
+  import mx.core.UIComponent;  
   import multigraph.format.DateFormatter;
   
   public class DateLabeler extends Labeler
@@ -31,13 +31,32 @@ package multigraph
     private var _lastTextLabelWidth:Number = 25;
     private var _lastTextLabelHeight:Number = 25;
     
-    public function DateLabeler(spacing:Number, unit:String, formatString:String, start:String, 
-                                px:Number, py:Number, angle:Number, ax:Number, ay:Number, textFormat:TextFormat, boldTextFormat:TextFormat)
+    public function DateLabeler(axis:Axis,
+                                spacing:Number,
+                                unit:String,
+                                formatString:String,
+                                visible:Boolean,
+                                start:String, 
+                                position:DPoint,
+                                anchor:DPoint,
+                                angle:Number,
+                                textFormat:TextFormat,
+								densityFactor:Number)
     {
       _formatter 			 = new DateFormatter(formatString);
       _startUTCms            = _formatter.parse(start);
       _startTurboDate        = new TurboDate(_startUTCms);
-      super(spacing, unit, formatString, _startUTCms, px, py, angle, ax, ay, textFormat, boldTextFormat);
+      super(axis,
+            spacing,
+            unit,
+            formatString,
+            visible,
+            _startUTCms,
+            position,
+            anchor,
+            angle,
+            textFormat,
+	  	    densityFactor);
       _currentUTCms 		 = null;
       _end 				     = null;
       _msSpacing 			 = null;
@@ -79,7 +98,7 @@ package multigraph
 
     }
     
-    override public function labelDensity(axis:Axis):Number {
+    override public function labelDensity():Number {
       /*
         var labelLength       = _formatter.getLength();
         var labelHeightPixels = _fontSize * _pixelsPerInchFactor;
@@ -90,32 +109,34 @@ package multigraph
         : labelHeightPixels * Math.cos(absAngle) + labelWidthPixels * Math.sin(absAngle);
       */
       var absAngle:Number          = Math.abs(_angle) * 3.14156 / 180;
-      var labelPixels:Number       = (axis.orientation == Axis.ORIENTATION_HORIZONTAL)
+      var labelPixels:Number       = (_axis.orientation == AxisOrientation.HORIZONTAL)
         ? _lastTextLabelHeight * Math.sin(absAngle) + _lastTextLabelWidth * Math.cos(absAngle)
         : _lastTextLabelHeight * Math.cos(absAngle) + _lastTextLabelWidth * Math.sin(absAngle);
-      var spacingPixels:Number     = _msSpacing * Math.abs(axis.axisToDataRatio);
-      var density:Number           = labelPixels / spacingPixels;
+      var spacingPixels:Number     = _msSpacing * Math.abs(_axis.axisToDataRatio);
+      var density:Number           = _densityFactor * labelPixels / spacingPixels;
       
       return density;
     }
     
-    override public function renderLabel(sprite:MultigraphUIComponent, axis:Axis, value:Number):void {
-      var a:Number  = axis.dataValueToAxisValue(value);
+    override public function renderLabel(sprite:UIComponent, value:Number):void {
+      var a:Number  = _axis.dataValueToAxisValue(value);
       
       var px:Number, py:Number;
-      if(axis.orientation == Axis.ORIENTATION_VERTICAL) {
-        px = axis.perpOffset + _px;
-        py = a + _py;
+      if (_axis.orientation == AxisOrientation.VERTICAL) {
+        px = _axis.perpOffset + _position.x;
+        py = a + _position.y;
       } else {
-        px = a + _px;
-        py = axis.perpOffset + _py;
+        px = a + _position.x;
+        py = _axis.perpOffset + _position.y;
       }
       var tLabel:TextLabel = new TextLabel(_formatter.format(value),
-                                           _useBold ? _boldTextFormat :_textFormat,
+                                           _textFormat,
                                            px, py,
-                                           _ax, _ay,
+                                           _anchor.x, _anchor.y,
                                            _angle);
-      sprite.addChild(tLabel);
+      if (_visible) {
+        sprite.addChild(tLabel);
+      }
       _lastTextLabelWidth  = tLabel.textWidth;   	
       _lastTextLabelHeight = tLabel.textHeight;   	
     }

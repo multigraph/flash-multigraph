@@ -1,0 +1,46 @@
+#! /usr/bin/perl
+
+##
+## This script checks to make sure that the list of classes in "compc-config.xml" is
+## up to date.  It does this by running the script "swcclasses", which generates the
+## current list of classes, and comparing to the current "compc-config.xml".  If there
+## are any differences, this script replaces "compc-config.xml" with the new version.
+## If there aren't any differences, "compc-config.xml" is left unchanged.
+##
+
+
+###
+### Create new version of compc-config.xml in the /tmp directory:
+###
+open(IN, "<compc-config.xml");
+open(OUT, ">/tmp/compc-config.xml");
+while (<IN>) {
+    if (!/<class>/) {
+	print OUT $_;
+    }
+    if (/<include-classes>/) {
+	open(SWCCLASSES, "./swcclasses |");
+	while (chomp($class = <SWCCLASSES>)) {
+	    printf(OUT "      <class>%s</class>\n", $class);
+	}
+	close(SWCCLASSES);
+    }
+}
+close(OUT);
+close(IN);
+
+###
+### Compare current version to new version, and if different, replace:
+###
+$code = system("cmp /tmp/compc-config.xml ./compc-config.xml > /dev/null");
+if ($code) {
+    system("cp /tmp/compc-config.xml ./compc-config.xml");
+    printf("compc-config.xml updated\n");
+} else {
+    printf("compc-config.xml unchanged\n");
+}
+
+###
+### Remove new version from /tmp:
+###
+unlink("/tmp/compc-config.xml");

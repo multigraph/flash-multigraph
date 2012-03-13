@@ -11,6 +11,8 @@ package multigraph
 
   import flash.display.Graphics;
   import flash.text.TextFormat;
+  
+  import mx.core.UIComponent;
     
   public class Title extends Annotation
   {
@@ -22,8 +24,7 @@ package multigraph
                           bx:Number, by:Number,
                           ax:Number, ay:Number,
                           px:Number, py:Number,
-                          plotBox:Box,
-                          paddingBox:Box,
+                          graph:Graph,
                           frameIsPlot:Boolean,
                           color:uint, border:Number,
                           borderColor:uint, opacity:Number, fontsize:uint, padding:Number=0, radius:Number=0):void 
@@ -35,8 +36,7 @@ package multigraph
       super(bx, by,
             ax, ay,
             px, py,
-            plotBox,
-            paddingBox,
+            graph,
             frameIsPlot,
             color,
             border,
@@ -45,11 +45,11 @@ package multigraph
             radius);
     }
 
-    override protected function createSprite():MultigraphUIComponent {
-      var titleSprite = new MultigraphUIComponent();
+    override protected function createSprite():UIComponent {
+      var titleSprite = new UIComponent();
         
       var textFormat:TextFormat = new TextFormat();
-      textFormat.font = "DefaultFont";
+      textFormat.font = "default";
       textFormat.color = 0x000000;
       textFormat.size = _fontsize;
         

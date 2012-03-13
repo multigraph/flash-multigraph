@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   xmlns:multigraph="multigraph.*"
+			   xmlns:local="*"
+			   backgroundColor="0xFFFFFF"
+			   applicationComplete="init()"
+			   width="100%"
+			   height="100%">
+<!--	
+	layout="absolute"
+	horizontalAlign="left"
+	paddingLeft="0"
+	paddingTop="0"
+	paddingBottom="0"
+	paddingRight="0"
+-->	
+	<fx:Style source="MultigraphApp.css"/>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import multigraph.MultigraphEvent;
+			
+			import mx.controls.Alert;
+			private function parseMugl(e : multigraph.MultigraphEvent) {
+				Alert.show('hey hey got parseMugl event!', 'Multigraph Event');
+			}
+			private function parseMuglError(e : multigraph.MultigraphEvent) {
+				Alert.show('got parseMuglError event: ' + e.message, 'Multigraph Event');
+			}
+			private function muglIOError(e : multigraph.MultigraphEvent) {
+				Alert.show('got muglIOError event: ' + e.message, 'Multigraph Event');
+			}
+			private function muglError(e : multigraph.MultigraphEvent) {
+				Alert.show('got muglError event: ' + e.message, 'Multigraph Event');
+			}
+	]]>
+	</fx:Script>
+	<multigraph:Multigraph id="mgraph" x="0" y="0" width="100%" height="100%" 
+						   parseMugl="parseMugl(event)" 
+						   parseMuglError="parseMuglError(event)"
+						   muglIOError="muglIOError(event)"
+						   muglError="muglError(event)"
+						   muglurl="http://dev.nemac.org/~mbp/mugltest/getmugl.php"
+						   />
+<!--
+	<multigraph:Multigraph id="mgraph" x="0" y="50" width="100%" height="100%" >
+		<multigraph:mugl>
+			<fx:XML xmlns="">
+				<mugl>
+					<graph>
+						<meta x="400" y="400" width="100" height="100" color="0x0000ff"/>
+						<horizontalaxis min="0" max="10"/>
+						<verticalaxis   min="0" max="10"/>
+						<plot>
+							<renderer type="line">
+								<option name="linecolor" value="blue"/>
+								<option name="dotcolor"  value="black"/>
+								<option name="dotsize"   value="2"/>
+							</renderer>
+						</plot>
+						<data>
+							<values>
+							0, 3
+							1, 2
+							2, 4
+							3, 5
+							4, 3
+							5, 6
+							6, 7
+							7, 8
+							8, 5
+							</values>
+						</data>
+					</graph>
+
+					<graph>
+						<meta x="420" y="420" width="100" height="100" color="0xff00ff"/>
+					</graph>
+					<graph>
+						<meta x="440" y="440" width="100" height="100" color="0x00ff00"/>
+					</graph>
+
+				</mugl>
+			</fx:XML>
+		</multigraph:mugl>
+	</multigraph:Multigraph>
+-->
+	
+</s:Application>

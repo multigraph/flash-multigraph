@@ -22,6 +22,9 @@ package multigraph {
     		case "pink":    return 0xFFB5C5;
     		case "violet":  return 0xEE82EE;
 		}
-		return uint(color);
+		if (!color.match(/^0x[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]$/)) {
+			throw new ParseError('invalid color: ' + color);
+		}
+		return parseInt(color) as uint;
 	}
 }

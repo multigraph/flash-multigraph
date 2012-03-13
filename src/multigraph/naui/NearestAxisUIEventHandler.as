@@ -5,36 +5,29 @@ package multigraph.naui
   import flash.events.TimerEvent;
   import flash.utils.Timer;
   import multigraph.Axis;
+  import multigraph.AxisOrientation;
   import multigraph.Graph;
-  import multigraph.PixelPoint;
+  import multigraph.DPoint;
   import multigraph.UIEventHandler;
 
   public class NearestAxisUIEventHandler extends UIEventHandler
   {
     private var _axes : Array = [];
-	private var _mouseLocation : PixelPoint = new PixelPoint(0,0);
-	private var _mouseDragBase : PixelPoint = new PixelPoint(0,0);
+	private var _mouseLocation : DPoint = new DPoint(0,0);
+	private var _mouseDragBase : DPoint = new DPoint(0,0);
 
     private var _mouseIsDown : Boolean = false;
     private var _dragStarted : Boolean = false;
 
-    private var _dragOrientation : int = 0;
+    private var _dragOrientation : AxisOrientation = AxisOrientation.HORIZONTAL;
 
     private var _targetAxis : Axis = null;
-
-    private function dirString():String {
-      if (_dragOrientation == Axis.ORIENTATION_HORIZONTAL) {
-        return "HORIZONTAL";
-      } else {
-        return "VERTICAL";
-      }
-    }
 
 	public function NearestAxisUIEventHandler(graph:Graph)
     {
       super(graph);
-      for (var i:int=0; i<_graph.axes.length; ++i) {
-        _axes.push(_graph.axes[i]);
+      for each ( var axis : Axis in _graph.axes ) {
+        _axes.push(axis);
       }
     }
         
@@ -56,53 +49,59 @@ package multigraph.naui
     }
         
     public function onMouseMove(event:MouseEvent):void {
-      var prevLocation:PixelPoint = _mouseLocation;
+      var prevLocation:DPoint = _mouseLocation;
       _mouseLocation = _graph.plotXY(event.localX, event.localY);
       var dx:int = _mouseLocation.x - prevLocation.x;
       var dy:int = _mouseLocation.y - prevLocation.y;
       if (_mouseIsDown) {
         if (!_dragStarted) {
           if (Math.abs(dx) > Math.abs(dy)) {
-            _dragOrientation = Axis.ORIENTATION_HORIZONTAL;
+            _dragOrientation = AxisOrientation.HORIZONTAL;
           } else {
-            _dragOrientation = Axis.ORIENTATION_VERTICAL;
+            _dragOrientation = AxisOrientation.VERTICAL;
           }
-          _targetAxis = findNearestAxis(_mouseLocation.x, _mouseLocation.y, _dragOrientation);
-          //trace('starting ' + dirString() + ' mouse drag by ' + dx + ', ' + dy);
+		  _targetAxis = findNearestAxis(_mouseLocation.x, _mouseLocation.y, _dragOrientation, event);
+		  if (_targetAxis == null) {
+			  _dragOrientation = _dragOrientation.orthogonal
+			  _targetAxis = findNearestAxis(_mouseLocation.x, _mouseLocation.y, _dragOrientation, event);
+		  }
+          //trace('starting ' + _dragOrientation + ' mouse drag by ' + dx + ', ' + dy);
         } else {
-          //trace('continuing ' + dirString() + ' mouse drag by ' + dx + ', ' + dy);
+          //trace('continuing ' + _dragOrientation + ' mouse drag by ' + dx + ', ' + dy);
         }
         handleMouseDrag(_targetAxis, dx, dy, event);
         _dragStarted = true;
       } else {
+		  _graph.showTips(_mouseLocation);
         //trace('mouse move at ' + _mouseLocation.x + ', ' + _mouseLocation.y);
       }
       //delegateMouseEventToAxis('handleMouseMove', event);
     }
 
-    private function findNearestAxis(x:Number, y:Number, orientation:int):Axis {
-      var axis:Axis = null;
+    private function findNearestAxis(x:Number, y:Number, orientation:AxisOrientation, event:MouseEvent):Axis {
+      var foundAxis:Axis = null;
       var mindist:Number = 9999;
-      for (var i:int = 0; i<_axes.length; ++i) {
-        if (_axes[i].orientation == orientation) {
-          var d:Number = axisDistanceToPoint(_axes[i], x, y);
-          if (axis==null || d < mindist) {
-            axis = _axes[i];
+      for each (var axis : Axis in _axes ) {
+        if ( (axis.orientation == orientation)
+			&& ( (axis.panConfig.allowed && !event.shiftKey) || (axis.zoomConfig.allowed && event.shiftKey) ) ) {
+          var d:Number = axisDistanceToPoint(axis, x, y);
+          if (foundAxis==null || d < mindist) {
+            foundAxis = axis;
             mindist = d;
           }
         }
       }
-      return axis;
+      return foundAxis;
     }
 
     private function axisDistanceToPoint(axis:Axis, x:Number, y:Number):Number {
-      var perpCoord:Number     = axis.orientation==Axis.ORIENTATION_HORIZONTAL ? y : x;
-      var parallelCoord:Number = axis.orientation==Axis.ORIENTATION_HORIZONTAL ? x : y;
+      var perpCoord:Number     = axis.orientation==AxisOrientation.HORIZONTAL ? y : x;
+      var parallelCoord:Number = axis.orientation==AxisOrientation.HORIZONTAL ? x : y;
       if (parallelCoord < axis.parallelOffset) {
         return l2dist(parallelCoord, perpCoord, axis.parallelOffset, axis.perpOffset);
       }
-      if (parallelCoord > axis.parallelOffset + axis.length) {
-        return l2dist(parallelCoord, perpCoord, axis.parallelOffset+axis.length, axis.perpOffset);
+      if (parallelCoord > axis.parallelOffset + axis.pixelLength) {
+        return l2dist(parallelCoord, perpCoord, axis.parallelOffset+axis.pixelLength, axis.perpOffset);
       }
       return Math.abs(perpCoord - axis.perpOffset);
     }
@@ -114,7 +113,7 @@ package multigraph.naui
     }
 
     private function handleMouseDrag(axis:Axis, dx:Number, dy:Number, event:MouseEvent):void {
-      if (axis.orientation == Axis.ORIENTATION_HORIZONTAL) {
+      if (axis.orientation == AxisOrientation.HORIZONTAL) {
         if (event.shiftKey /*|| _graph.toolbarState == "zoom"*/ ) {
           if (axis.zoomConfig.allowed) { axis.zoom(_mouseDragBase.x, dx); }
         } else {
@@ -140,6 +139,7 @@ package multigraph.naui
     public function onMouseOut(event:MouseEvent):void {
       _mouseLocation = _graph.plotXY(event.localX, event.localY);
       _mouseIsDown = false;
+	  _graph.hideTips();
       //trace('mouse out at ' + _mouseLocation.x + ', ' + _mouseLocation.y);
       //delegateMouseEventToAxis('handleMouseOut', event);
     }

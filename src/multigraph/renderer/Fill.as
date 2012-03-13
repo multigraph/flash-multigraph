@@ -11,7 +11,7 @@ package multigraph.renderer
   import flash.display.Graphics;
 	
   import multigraph.Axis;
-  import multigraph.MultigraphUIComponent;
+  import mx.core.UIComponent;
   import multigraph.parsecolor;
   import multigraph.data.Data;
 
@@ -124,7 +124,7 @@ package multigraph.renderer
       }
     }
 
-    override public function begin(sprite:MultigraphUIComponent):void {
+    override public function begin(sprite:UIComponent):void {
       clearPoints(0);
       _g = sprite.graphics;
       _fillpixelBase = 0;
@@ -139,7 +139,7 @@ package multigraph.renderer
       return x1 + ( y - y1 ) * ( x2 - x1 ) / ( y2 - y1 );
     }
 
-    override public function dataPoint(sprite:MultigraphUIComponent, datap:Array):void {
+    override public function dataPoint(sprite:UIComponent, datap:Array):void {
 
       if (isMissing(datap[1],1)) {
         if (_prevp != null) {
@@ -184,7 +184,7 @@ package multigraph.renderer
     }
 
 
-    override public function end(sprite:MultigraphUIComponent):void {
+    override public function end(sprite:UIComponent):void {
       // render any points currently in the _points array
       if (_points.length > 0) {
         _points.push( [_points[_points.length-1][0], _fillpixelBase] );
@@ -220,7 +220,7 @@ package multigraph.renderer
     }
           
 
-    override public function renderLegendIcon(sprite:MultigraphUIComponent, legendLabel:String, opacity:Number):void {
+    override public function renderLegendIcon(sprite:UIComponent, legendLabel:String, opacity:Number):void {
       var g:Graphics = sprite.graphics;
 	    	
       // Draw icon background (with opacity)

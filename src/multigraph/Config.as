@@ -52,6 +52,27 @@ package multigraph
         return args;
       }
 
+      public static var AXIS_TITLE_DEFAULT_POSITION_HORIZ_TOP  = new DPoint(0, 15);
+      public static var AXIS_TITLE_DEFAULT_POSITION_HORIZ_BOT  = new DPoint(0, -18);
+      public static var AXIS_TITLE_DEFAULT_POSITION_VERT_RIGHT = new DPoint(33, 0);
+      public static var AXIS_TITLE_DEFAULT_POSITION_VERT_LEFT  = new DPoint(-25, 0);
+
+      public static var AXIS_TITLE_DEFAULT_ANCHOR_HORIZ_TOP    = new DPoint(0, -1);
+      public static var AXIS_TITLE_DEFAULT_ANCHOR_HORIZ_BOT    = new DPoint(0, 1);
+      public static var AXIS_TITLE_DEFAULT_ANCHOR_VERT_RIGHT   = new DPoint(-1, 0);
+      public static var AXIS_TITLE_DEFAULT_ANCHOR_VERT_LEFT    = new DPoint(1, 0);
+
+      public static var AXIS_LABEL_DEFAULT_POSITION_HORIZ_TOP  = new DPoint(0, 5);
+      public static var AXIS_LABEL_DEFAULT_POSITION_HORIZ_BOT  = new DPoint(0, -5);
+      public static var AXIS_LABEL_DEFAULT_POSITION_VERT_RIGHT = new DPoint(5, 0);
+      public static var AXIS_LABEL_DEFAULT_POSITION_VERT_LEFT  = new DPoint(-8, 0);
+
+      public static var AXIS_LABEL_DEFAULT_ANCHOR_HORIZ_TOP    = new DPoint(0, -1);
+      public static var AXIS_LABEL_DEFAULT_ANCHOR_HORIZ_BOT    = new DPoint(0, 1);
+      public static var AXIS_LABEL_DEFAULT_ANCHOR_VERT_RIGHT   = new DPoint(-1, 0);
+      public static var AXIS_LABEL_DEFAULT_ANCHOR_VERT_LEFT    = new DPoint(1, 0);
+
+
       private var _axis_title_default_position_horiz_top  = '0 15';
       private var _axis_title_default_position_horiz_bot  = '0 -18';
       private var _axis_title_default_position_vert_right = '33 0';
@@ -91,9 +112,12 @@ package multigraph
             max       : 'auto',
             maxposition : "1",
             //maxoffset : 0,
+			color     : '0x000000',
             linewidth : 1,
             tickmin   : -3,
-            tickmax   : 3,
+			tickmax   : 3,
+			tickcolor : '0x000000',
+			tickwidth : 1,
             highlightstyle : "axis",
             title : {
                 fontname : "default",
@@ -148,8 +172,10 @@ package multigraph
                 fontsize : 12,
                 fontcolor : '0x000000',
                 format   : '%1d',
+                visible  : 'true',
                 start    : 0,
                 angle    : 0,
+				densityfactor : 1.0,
                 position_horiz_top  : _axis_label_default_position_horiz_top,
                 position_horiz_bot  : _axis_label_default_position_horiz_bot,
                 position_vert_right : _axis_label_default_position_vert_right,
@@ -195,18 +221,20 @@ package multigraph
                 */
                 spacing : '10000 5000 2000 1000 500 200 100 50 20 10 5 2 1 0.1 0.01 0.001',
                 label : {
-            		format    : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@format') ); },
-                    start     : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@start') ); },
-                    angle     : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@angle') ); },
-                    position  : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@position') ); },
-                    anchor    : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@anchor') ); },
-                    fontname  : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@fontname') ); },
-                    fontsize  : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@fontsize') ); },
-                    fontcolor : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@fontcolor') ); }
+            		format        : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@format') ); },
+            		visible       : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@visible') ); },
+                    start         : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@start') ); },
+					angle         : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@angle') ); },
+					densityfactor : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@densityfactor') ); },
+                    position      : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@position') ); },
+                    anchor        : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@anchor') ); },
+                    fontname      : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@fontname') ); },
+                    fontsize      : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@fontsize') ); },
+                    fontcolor     : function(...args) { return this.value.apply( this, this.relpath(args, '..', '..', '@fontcolor') ); }
                 }
             },
             grid : {
-            	color : '0xeeeeee'
+				color : '0xeeeeee'
             },
             pan : {
                 allowed : 'yes',
@@ -232,12 +260,27 @@ package multigraph
 					anchor   : "-1 -1",
 					position : "0 0",
 					frame    : "padding"
-				}
+				},
+                color : '0xffffff',
+				opacity : "1"
 			},
+            img : {
+              base     : "0 0",
+              anchor   : "0 0",
+              position : "0 0",
+              frame    : "padding",
+			  opacity  : "1"
+            },
             window : {
-                margin   : 2,
-                border   : 2,
-                padding  : 5
+                margin      : 2,
+                border      : 2,
+				bordercolor : '0x000000',
+				borderopacity : "1",
+                padding     : 5,
+                x           : 0,
+                y           : 0,
+                width       : '100%',
+                height      : '100%'
             },
             legend : {
             	frame      : "plot",
@@ -298,6 +341,19 @@ package multigraph
                 renderer : {
                     type : 'line'
                 },
+				datatips : {
+					visible : false,
+					bgcolor : '0xeeeeee',
+					bgalpha : 1.0,
+					pad     : 2,
+					border  : 1,
+					bordercolor : '0x000000',
+					fontcolor : '0x000000',
+					fontsize: 12,
+					bold    : "false",
+					variable : {
+					}
+				},
                 horizontalaxis : {
                     ref : function() { return this.graph.haxis.id;  },
                     variable : {
@@ -316,6 +372,13 @@ package multigraph
         public function Config(xml:XML)
         {
             this._xml = xml;
+        }
+
+        public function subconfig(... args)
+        {
+          var subconf : Config = new Config( xmlvalue.apply(this, args) );
+          subconf._defaults = defaultvalue.apply(this, args);
+          return subconf;
         }
         
         public function xmlvalue(... args) {

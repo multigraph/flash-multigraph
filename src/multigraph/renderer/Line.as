@@ -8,7 +8,7 @@
  */
 package multigraph.renderer {
 	import multigraph.Axis;
-	import multigraph.MultigraphUIComponent;
+	import mx.core.UIComponent;
     import multigraph.parsecolor;
     import multigraph.data.Data;
 	

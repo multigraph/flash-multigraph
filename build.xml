@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<!--
+
+This is the ant build file for Multigraph.swc.
+
+To run this build file, first make sure that the FLEX_HOME environment variable is set to the
+root of a Flex SDK installation.  This script looks for the "compc" flex compiler
+in the "bin" subdirectory of FLEX_HOME.
+
+For example, on drought.nemac.unca.edu:
+
+    FLEX_HOME=/usr/local/src/flex/flex_sdk_4.1.0.16076 ant
+
+-->
+
+<project name="Multigraph" basedir="." default="build"> 
+  <property environment="env"/>
+  <property name="FLEX_HOME" value="${env.FLEX_HOME}"/>
+  <property name="compc.exe" value="${FLEX_HOME}/bin/compc"/>
+  <target name="checkenv">
+    <fail unless="env.FLEX_HOME">FLEX_HOME not set
+
+    The FLEX_HOME environment variable must be set to the root of a
+    Flex SDK installation (directory containing "bin", "lib", ...)
+
+    </fail>
+  </target>
+
+  <target name="build" depends="Multigraph.swc">  
+  </target>
+
+  <target name="Multigraph.swc" depends="checkenv">  
+    <exec executable="./update-compc-config"/>
+    <exec executable="${compc.exe}" dir="${basedir}">
+      <arg line="-load-config '${FLEX_HOME}/frameworks/flex-config.xml'" />
+      <arg line="-load-config compc-config.xml" />
+    </exec>
+  </target> 
+
+  <target name="clean">
+    <delete file="Multigraph.swc"/>
+  </target>
+
+</project>

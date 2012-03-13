@@ -10,7 +10,7 @@ package multigraph.renderer {
 	import flash.display.Graphics;
 	
 	import multigraph.Axis;
-	import multigraph.MultigraphUIComponent;
+	import mx.core.UIComponent;
   import multigraph.parsecolor;
   import multigraph.data.Data;
 	
@@ -72,12 +72,12 @@ package multigraph.renderer {
       prevPoint = null;
     }
 
-    override public function begin(sprite:MultigraphUIComponent):void {
+    override public function begin(sprite:UIComponent):void {
       this.prevPoint = null;
       this.dots      = [];
     }
 
-    override public function dataPoint(sprite:MultigraphUIComponent, datap:Array):void {
+    override public function dataPoint(sprite:UIComponent, datap:Array):void {
       var p:Array = [];
       var l:Array = [];
       transformPoint(p, datap);
@@ -93,7 +93,7 @@ package multigraph.renderer {
       dots.push(prevPoint);
     }
 
-    override public function end(sprite:MultigraphUIComponent):void {
+    override public function end(sprite:UIComponent):void {
       if (_dotsize > 0) { // don't draw dots if dotsize<=0
         var g:Graphics = sprite.graphics;
         g.beginFill(_dotcolor);
@@ -118,7 +118,7 @@ package multigraph.renderer {
       }
     }
     
-    override public function renderLegendIcon(sprite:MultigraphUIComponent, legendLabel:String, opacity:Number):void {
+    override public function renderLegendIcon(sprite:UIComponent, legendLabel:String, opacity:Number):void {
     	var g:Graphics = sprite.graphics;
     	
     	g.lineStyle(linewidth, _linecolor, 1, false, "normal", flash.display.CapsStyle.NONE, flash.display.JointStyle.ROUND);

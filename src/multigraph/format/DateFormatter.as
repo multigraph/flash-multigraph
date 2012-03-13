@@ -140,7 +140,7 @@ package multigraph.format
     		YYYYMMDDHHmmss
     		@returns The millisecond numerial value of an arbitrary string representing a date
     	*/
-    	override public function parse(string:String):Number {
+    	override public function parse(string : String) : Number {
           var YYYY:Number = 0;
           var   MM:Number = 0;
           var   DD:Number = 1;
@@ -219,6 +219,9 @@ package multigraph.format
           case  4: // YYYY
             YYYY = int(string.substring(0,4));
             break;
+          default:
+			return int(string);
+            //return NaN;
           }
           
           if (YYYY != 0) {
@@ -227,7 +230,7 @@ package multigraph.format
           
           // YYYY = 0, then we can't make sense of the string as a date at all, so just parse it as a number directly.
           // This behavior is here so that the axis-binding code will work if min="0" max="1" are given for a datetime axis!
-          return Number(string);
+          return parseFloat(string);
 		}
 
 

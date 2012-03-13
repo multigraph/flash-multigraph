@@ -1,0 +1,73 @@
+<mugl>
+  <graph height="400" width="800" x="0" y="0">
+  <window border="0" height="400" margin="2" padding="5" width="800"/>
+  <plotarea marginbottom="40" marginleft="50" marginright="30" margintop="60"/>
+  <horizontalaxis id="observations_horizontal_axis" max="2012" min="1993" type="number">
+    <title position="0 -60">Year</title>
+    <labels anchor="1 0" angle="90" format="%1d" spacing="5 1"/>
+    <binding id="horizontalYearMonth" max="1" min="0"/>
+    <grid/>
+  </horizontalaxi>
+  <!--
+      changed anchor="0 -1" to anchor="0 1"
+      changed rows="2" to '' 
+  -->
+  <legend base="-1 1" anchor="-1 1" position="20 0" border="0" opacity="0.5" columns="1" visible="true">
+    <icon border="0"/>
+  </legend>
+  <!--
+  <legend anchor="0 1" base="0 1" border="1" bordercolor="0x000000" color="0xFFFFFF" opacity="0.8" visible="true">
+    <icon border="0" height="20" width="20"/>
+  </legend>
+  -->
+  <verticalaxis id="observations_vertical_axis" max="300" maxoffset="50" min="0" minoffset="25" position="0" type="number">
+    <title anchor="0 0" angle="90" position="-40 0">Days</title>
+    <grid/>
+    <labels anchor="1 0" angle="0" format="%.2f" position="-10 0" spacing="50 20 10 5 2 1 0.5 0.05" start="0"/>
+  </verticalaxis>
+  <plot>
+    <legend label="fooya"/>
+    <horizontalaxis ref="observations_horizontal_axis">
+      <variable ref="time"/>
+    </horizontalaxis>
+    <verticalaxis ref="observations_vertical_axis">
+      <variable ref="FrostDays"/>
+    </verticalaxis>
+    <renderer type="line">
+      <option name="linecolor" value="0x8B0000"/>
+      <option name="dotcolor" value="yellow"/>
+      <option name="dotsize" value="1"/>
+      <option name="linewidth" value="2"/>
+      <option name="missingvalue" value="-9999"/>
+      <option name="missingop" value="EQ"/>
+      </renderer>
+    </plot>
+    <data>
+      <variables>
+        <variable id="time" type="number"/>
+        <variable id="FrostDays"/>
+      </variables>
+      <values>
+1993, 77
+1994, 90
+1995, 90
+1996, 103
+1997, 88
+1998, 76
+1999, 65
+2000, 74
+2001, 88
+2002, 86
+2003, 88
+2004, 77
+2005, 83
+2006, 87
+2007, 87
+2008, 118
+2009, 93
+2010, 89
+2011, -9999
+</values>
+</data>
+</graph>
+</mugl>

@@ -11,10 +11,9 @@ package multigraph.renderer
   import flash.display.Graphics;
   import flash.events.*;
   
-  import multigraph.HorizontalAxis;
-  import multigraph.MultigraphUIComponent;
+  import mx.core.UIComponent;
+  import multigraph.Axis;
   import multigraph.NumberAndUnit;
-  import multigraph.VerticalAxis;
   import multigraph.parsecolor;
   import multigraph.data.Data;
     
@@ -75,7 +74,7 @@ package multigraph.renderer
       _fillopacity = Number(opacity);
     }
         
-    public function RangeBar (haxis:HorizontalAxis, vaxis:VerticalAxis, data:Data, varids:Array)
+    public function RangeBar (haxis:Axis, vaxis:Axis, data:Data, varids:Array)
     {
       super(haxis, vaxis, data, varids);
       _linecolor = 0x000000;
@@ -84,7 +83,7 @@ package multigraph.renderer
       _fillopacity = 1;
     }
         
-    override public function begin (sprite:MultigraphUIComponent):void {
+    override public function begin (sprite:UIComponent):void {
 
       _numberAndUnit = NumberAndUnit.parse(_barwidth);
             
@@ -115,7 +114,7 @@ package multigraph.renderer
 
     }
     
-    override public function dataPoint (sprite:MultigraphUIComponent, datap:Array):void {
+    override public function dataPoint (sprite:UIComponent, datap:Array):void {
       if (isMissing(datap[1],1) || isMissing(datap[2],2)) { return; }
       var p:Array = [];
       transformPoint(p, datap);
@@ -136,10 +135,10 @@ package multigraph.renderer
 
     }
         
-    override public function end(sprite:MultigraphUIComponent):void {
+    override public function end(sprite:UIComponent):void {
     }
     
-  override public function renderLegendIcon(sprite:MultigraphUIComponent, legendLabel:String, opacity:Number):void {   	
+  override public function renderLegendIcon(sprite:UIComponent, legendLabel:String, opacity:Number):void {   	
 	  var g:Graphics = sprite.graphics;
 	  
 	  // Draw icon background (with opacity)
