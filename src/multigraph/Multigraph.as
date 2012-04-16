@@ -81,13 +81,19 @@ package multigraph
 	private var _currentHeight : int;
 
 	  //[Bindable]
-	  public function get mugl() : XML
+	  public function get mugl() : Object
 	  {
 		  return _mugl;
 	  }
-	  public function set mugl( mugl : XML ) : void
+	  
+	  public function set mugl( mugl : Object ) : void
 	  {
-		  _mugl = mugl;
+		  if (mugl == null || (mugl == "")) { return; }
+		  if (mugl is XML) {
+			  _mugl = mugl as XML;
+		  } else {
+		  	_mugl = XML(mugl);
+		  }
 		  parseMugl();
 	  }
 	  

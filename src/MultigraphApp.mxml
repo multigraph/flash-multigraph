@@ -34,5 +34,5 @@
 	proxy="{parameters['proxy']}"
 	muglfile="{parameters['muglfile']}"
 -->	
-	<multigraph:Multigraph id="mgraph" x="0" y="0" width="100%" height="100%" muglurl="{parameters['muglfile']}" />
+	<multigraph:Multigraph id="mgraph" x="0" y="0" width="100%" height="100%" muglurl="{parameters['muglfile']}" mugl="{parameters['mugl']}" />
 </s:Application>
