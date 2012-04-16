@@ -43,7 +43,7 @@ package multigraph
      */
 	public function prepareData():void {}
 
-	public function showTip(mouseLocation:DPoint, component:UIComponent, plotBox:Box):void {}
+	public function showTip(mouseLocation:DPoint, component:UIComponent, plotBox:Box, hideOnly:Boolean):Boolean { return false; }
 	public function hideTip():void {}
 
     public function render(sprite:UIComponent):void {}

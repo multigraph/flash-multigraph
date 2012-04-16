@@ -35,19 +35,20 @@ package multigraph
 		_data.prepareData(_haxis.dataMin, _haxis.dataMax, 1);	
 	}
 	
-	override public function showTip(mouseLocation:DPoint, component:UIComponent, plotBox:Box):void {
-		if (!_showDataTips) { return; }
-		var dataLocation:Array = [];
-		var epsilon:Number = 4;
-		var iter:DataIterator = _data.getIterator(_varIds, _haxis.dataMin, _haxis.dataMax, 1);
-        var foundDataTip:Boolean = false;
-		if (iter != null) {
-			while (iter.hasNext()) {
-				var vals:Array = iter.next();
-				_renderer.transformPoint(dataLocation, vals);
-				if ((Math.abs(mouseLocation.x - dataLocation[0]) <= epsilon)
-					&&
-					(Math.abs(mouseLocation.y - dataLocation[1]) <= epsilon)) {
+	override public function showTip(mouseLocation:DPoint, component:UIComponent, plotBox:Box, hideOnly:Boolean):Boolean {
+		if (!_showDataTips) { return false; }
+		var foundDataTip:Boolean = false;
+		if (!hideOnly) {
+			var dataLocation:Array = [];
+			var epsilon:Number = 4;
+			var iter:DataIterator = _data.getIterator(_varIds, _haxis.dataMin, _haxis.dataMax, 1);
+			if (iter != null) {
+				while (iter.hasNext()) {
+					var vals:Array = iter.next();
+					_renderer.transformPoint(dataLocation, vals);
+					if ((Math.abs(mouseLocation.x - dataLocation[0]) <= epsilon)
+						&&
+						(Math.abs(mouseLocation.y - dataLocation[1]) <= epsilon)) {
 						if (_dataTip == null) {
 							_dataTip = new GraphDataTip();
 						}
@@ -79,15 +80,16 @@ package multigraph
 						_dataTip.text  = _dataTipFormatter.format(vals);
 						_dataTip.visible = true;
 						_dataTip.invalidateDisplayList();
-                        foundDataTip = true;
-                        break;
+						foundDataTip = true;
+						break;
+					}
 				}
 			}
 		}
-        if (!foundDataTip) {
-          hideTip();
-        }
-		
+		if (!foundDataTip) {
+			hideTip();
+		}
+		return foundDataTip;
 	}
 	
 	override public function hideTip():void {

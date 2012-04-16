@@ -1261,8 +1261,16 @@ package multigraph
     }
 
 	public function showTips(mouseLocation:DPoint):void {
+		// As we loop over all plots, use dataTipShown boolean var to keep track of whether a plot has shown
+		// a dataTip.  plot.showTip() returns true if it shows a dataTip; we pass dataTipShown as the
+		// final arg to plot.showTip, and if that arg is false, the plot does not actually show a dataTip,
+		// but rather just hides any previously shown tip.  This way, at most only one tip is shown, no matter
+		// how many plots there are.
+		var dataTipShown:Boolean = false;
 		for each ( var plot : Plot in _plots ) {
-			plot.showTip(mouseLocation, _plotBoxSprite, _plotBox);
+			if (plot.showTip(mouseLocation, _plotBoxSprite, _plotBox, dataTipShown)) {
+				dataTipShown = true;
+			}
 		}
 	}
 	public function hideTips():void {
