@@ -1,52 +1,228 @@
+
 <mugl>
-  <ui eventhandler="naui"/>
-  <plotarea marginleft="34" marginright="18" margintop="4" marginbottom="6"/>
-  <horizontalaxis id="x" type="datetime" min="1880" max="2090" tickmin="-4" tickmax="0" linewidth="0" highlightstyle="labels" tickcolor="0xdddddd">
-    <grid color="0xdddddd"/>
-    <title/>
-    <labels spacing="100Y 50Y 20Y 10Y 5Y 2Y 1Y" format="%Y" fontcolor="0x666666" visible="false"/>
-    <pan allowed="yes" min="1880" max="2100"/>
-    <zoom allowed="yes" min="6M"/>
-    <binding min="1900" max="2000" id="Tab3TimeBinding"/>
-  </horizontalaxis>
-  <verticalaxis id="y" min="-4" max="8" tickmin="-4" tickmax="0" linewidth="0" highlightstyle="labels" tickcolor="0xdddddd">
-    <grid color="0xdddddd"/>
-    <title/>
-    <labels fontcolor="0x666666">
-      <label format="%1d" spacing="10 5 2 1" densityfactor="1"/>
-      <label format="%.1f" spacing="0.5 0.2 0.1" densityfactor="1"/>
-      <label format="%.2f" spacing="0.05 0.02" densityfactor="1"/>
-    </labels>
-    <pan allowed="no"/>
-    <zoom allowed="no"/>
-  </verticalaxis>
   <legend visible="false"/>
+  <horizontalaxis id="year" type="datetime" min="1900" max="2100">
+    <labels>
+      <label format="%Y" spacing="100Y 50Y 20Y 10Y 5Y 2Y 1Y"/>
+      <label format="%n %y" spacing="6M 3M 2M 1M"/>
+    </labels>
+  </horizontalaxis>
+
+  <verticalaxis   id="temp" type="number" min="-1.0" max="4.5"  base="1 -1">
+    <title angle="90" anchor="0 -1" position="28 0">Temperature (˚C)</title>
+    <binding id="ProjTempBinding" min="0" max="1"/>
+    <labels fontcolor="0x666666"/>
+  </verticalaxis>
+  <verticalaxis   id="tempf" type="number">
+    <title angle="90" anchor="0 -1">Temperature (˚F)</title>
+    <binding id="ProjTempBinding" min="0" max="1.8"/>
+    <labels fontcolor="0x666666"/>
+  </verticalaxis>
+
+
   <plot>
-    <horizontalaxis ref="x">
-      <variable ref="a2_year"/>
+    <horizontalaxis ref="year">
+      <variable ref="year_20c3m"/>
     </horizontalaxis>
-    <verticalaxis ref="y">
-      <variable ref="a2_min"/>
+    <verticalaxis ref="temp">
+      <variable ref="min_20c3m"/>
+      <variable ref="max_20c3m"/>
     </verticalaxis>
-    <renderer type="line">
-      <option name="linewidth" value="0"/>
-      <option name="linecolor" value="0xff0000"/>
+    <renderer type="band">
+      <option name="fillcolor"   value="0xCCCCCC"/>
+      <option name="fillopacity" value="0.5"/>
+      <option name="linewidth"   value="0"/>
     </renderer>
   </plot>
+  <plot>
+    <horizontalaxis ref="year">
+      <variable ref="year_a2"/>
+    </horizontalaxis>
+    <verticalaxis ref="temp">
+      <variable ref="min_a2"/>
+      <variable ref="max_a2"/>
+    </verticalaxis>
+    <renderer type="band">
+      <option name="fillcolor"   value="0xFFCCCC"/>
+      <option name="fillopacity" value="0.5"/>
+      <option name="linewidth"   value="0"/>
+    </renderer>
+  </plot>
+  <plot>
+    <horizontalaxis ref="year">
+      <variable ref="year_a1b"/>
+    </horizontalaxis>
+    <verticalaxis ref="temp">
+      <variable ref="min_a1b"/>
+      <variable ref="max_a1b"/>
+    </verticalaxis>
+    <renderer type="band">
+      <option name="fillcolor"   value="0xCCCCFF"/>
+      <option name="fillopacity" value="0.5"/>
+      <option name="linewidth"   value="0"/>
+    </renderer>
+  </plot>
+  <plot>
+    <horizontalaxis ref="year">
+      <variable ref="year_b1"/>
+    </horizontalaxis>
+    <verticalaxis ref="temp">
+      <variable ref="min_b1"/>
+      <variable ref="max_b1"/>
+    </verticalaxis>
+    <renderer type="band">
+      <option name="fillcolor"   value="0xCCFFCC"/>
+      <option name="fillopacity" value="0.5"/>
+      <option name="linewidth"   value="0"/>
+    </renderer>
+  </plot>
+
+  <plot>
+    <horizontalaxis ref="year">
+      <variable ref="year_20c3m"/>
+    </horizontalaxis>
+    <verticalaxis ref="temp">
+      <variable ref="min_20c3m"/>
+      <variable ref="max_20c3m"/>
+    </verticalaxis>
+    <renderer type="band">
+      <option name="fillcolor"   value="0xffffff"/>
+      <option name="fillopacity" value="0"/>
+      <option name="linecolor"   value="0x333333"/>
+      <option name="linewidth"   value="0"/>
+    </renderer>
+  </plot>
+  <plot>
+    <horizontalaxis ref="year">
+      <variable ref="year_a2"/>
+    </horizontalaxis>
+    <verticalaxis ref="temp">
+      <variable ref="min_a2"/>
+      <variable ref="max_a2"/>
+    </verticalaxis>
+    <renderer type="band">
+      <option name="fillcolor"   value="0xffffff"/>
+      <option name="fillopacity" value="0"/>
+      <option name="linecolor"   value="0xFF3333"/>
+      <option name="linewidth"   value="0"/>
+    </renderer>
+  </plot>
+  <plot>
+    <horizontalaxis ref="year">
+      <variable ref="year_a1b"/>
+    </horizontalaxis>
+    <verticalaxis ref="temp">
+      <variable ref="min_a1b"/>
+      <variable ref="max_a1b"/>
+    </verticalaxis>
+    <renderer type="band">
+      <option name="fillcolor"   value="0xffffff"/>
+      <option name="fillopacity" value="0"/>
+      <option name="linecolor"   value="0x3333FF"/>
+      <option name="linewidth"   value="0"/>
+    </renderer>
+  </plot>
+  <plot>
+    <horizontalaxis ref="year">
+      <variable ref="year_b1"/>
+    </horizontalaxis>
+    <verticalaxis ref="temp">
+      <variable ref="min_b1"/>
+      <variable ref="max_b1"/>
+    </verticalaxis>
+    <renderer type="band">
+      <option name="fillcolor"   value="0xffffff"/>
+      <option name="fillopacity" value="0"/>
+      <option name="linecolor"   value="0x33FF33"/>
+      <option name="linewidth"   value="0"/>
+    </renderer>
+  </plot>
+
+  <plot>
+    <horizontalaxis ref="year">
+      <variable ref="year_20c3m"/>
+    </horizontalaxis>
+    <verticalaxis ref="temp">
+      <variable ref="temp_20c3m"/>
+    </verticalaxis>
+    <renderer type="line">
+      <option name="linecolor" value="0x000000"/>
+      <option name="linewidth" value="2"/>
+    </renderer>
+  </plot>
+  <plot>
+    <horizontalaxis ref="year">
+      <variable ref="year_a2"/>
+    </horizontalaxis>
+    <verticalaxis ref="temp">
+      <variable ref="temp_a2"/>
+    </verticalaxis>
+    <renderer type="line">
+      <option name="linecolor" value="0x990000"/>
+      <option name="linewidth" value="2"/>
+    </renderer>
+  </plot>
+  <plot>
+    <horizontalaxis ref="year">
+      <variable ref="year_a1b"/>
+    </horizontalaxis>
+    <verticalaxis ref="temp">
+      <variable ref="temp_a1b"/>
+    </verticalaxis>
+    <renderer type="line">
+      <option name="linecolor" value="0x000099"/>
+      <option name="linewidth" value="2"/>
+    </renderer>
+  </plot>
+  <plot>
+    <horizontalaxis ref="year">
+      <variable ref="year_b1"/>
+    </horizontalaxis>
+    <verticalaxis ref="temp">
+      <variable ref="temp_b1"/>
+    </verticalaxis>
+    <renderer type="line">
+      <option name="linecolor" value="0x009900"/>
+      <option name="linewidth" value="2"/>
+    </renderer>
+  </plot>
+
   <data>
     <variables>
-      <variable column="0" id="a2_year" type="datetime"/>
-      <variable column="1" id="a2_mean"/>
-      <variable column="2" id="a2_min"/>
-      <variable column="3" id="a2_max"/>
+      <variable id="year_20c3m" column="0" type="datetime"/>
+      <variable id="min_20c3m"  column="1"/>
+      <variable id="temp_20c3m" column="2"/>
+      <variable id="max_20c3m"  column="3"/>
     </variables>
-    <values>2000,0.20904181461429,-0.31752959992709,0.73561322915566
-
-		2001,0.49472951587059,-0.33851221527631,1.32797124701749
-
-		2002,0.50606763575294,-0.35755279619623,1.36968806770211
-
-		2098,3.77414988885,2.68853596217213,4.85976381552787</values>
+    <csv location="new-tas_20c3m_cmip3_output.csv"/>
   </data>
-  <window border="0"/>
+  <data>
+    <variables>
+      <variable id="year_a1b" column="0" type="datetime"/>
+      <variable id="min_a1b"  column="1"/>
+      <variable id="temp_a1b" column="2"/>
+      <variable id="max_a1b"  column="3"/>
+    </variables>
+    <csv location="new-tas_sresa1b_cmip3_output.csv"/>
+  </data>
+  <data>
+    <variables>
+      <variable id="year_a2" column="0" type="datetime"/>
+      <variable id="min_a2"  column="1"/>
+      <variable id="temp_a2" column="2"/>
+      <variable id="max_a2"  column="3"/>
+    </variables>
+    <csv location="new-tas_sresa2_cmip3_output.csv"/>
+  </data>
+  <data>
+    <variables>
+      <variable id="year_b1" column="0" type="datetime"/>
+      <variable id="min_b1"  column="1"/>
+      <variable id="temp_b1" column="2"/>
+      <variable id="max_b1"  column="3"/>
+    </variables>
+    <csv location="new-tas_sresb1_cmip3_output.csv"/>
+  </data>
+
 </mugl>
+
