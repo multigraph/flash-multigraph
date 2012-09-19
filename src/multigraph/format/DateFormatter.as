@@ -157,8 +157,6 @@ package multigraph.format
             string = string + "0";
           }
 
-          string = string.replace(nonNumberCharRegexp, '');
-
           // First check to see if the string consists of a number followed by a single character,
           // by matching against intervalRegexp defined above.  If it does, treat it as an interval
           // of time rather than an instantaneous date/time value, and return the length of
@@ -200,9 +198,11 @@ package multigraph.format
             }
             return len;
           }
+
             
           // If we make it to here, assume the string represents an instantaneous date/time value,
           // and parse based on its length
+          string = string.replace(nonNumberCharRegexp, ''); // but first eliminate all non-number chars
           switch (string.length) {
           case 17: // YYYYMMDDHHmmssqqq    // qqq = milliseconds
             qqq = int(string.substring(14,17));
