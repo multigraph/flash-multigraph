@@ -17,75 +17,75 @@
     <output>Multigraph.swc</output>
     <use-network>false</use-network>
     <include-classes>
-      <class>multigraph.NewAnnotation</class>
-      <class>multigraph.Multigraph</class>
-      <class>multigraph.ImageAnnotation</class>
-      <class>multigraph.AxisEvent</class>
-      <class>multigraph.Labeler</class>
-      <class>multigraph.AxisBinding</class>
-      <class>multigraph.printf</class>
-      <class>multigraph.TextLabel</class>
-      <class>multigraph.Plot</class>
-      <class>multigraph.ParseError</class>
-      <class>multigraph.Graph</class>
-      <class>multigraph.MuglError</class>
-      <class>multigraph.PanConfig</class>
-      <class>multigraph.ZoomConfig</class>
-      <class>multigraph.DataType</class>
-      <class>multigraph.Config</class>
       <class>multigraph.ConstantPlot</class>
-      <class>multigraph.Insets</class>
+      <class>multigraph.Plot</class>
+      <class>multigraph.Labeler</class>
+      <class>multigraph.AxisEvent</class>
       <class>multigraph.UIEventHandler</class>
+      <class>multigraph.parsecolor</class>
       <class>multigraph.NumberLabeler</class>
-      <class>multigraph.DataFilter</class>
-      <class>multigraph.GraphDataTip</class>
-      <class>multigraph.Annotation</class>
       <class>multigraph.controls.Tick</class>
       <class>multigraph.controls.Spinner</class>
+      <class>multigraph.Legend</class>
       <class>multigraph.naui.NearestAxisUIEventHandler</class>
+      <class>multigraph.Title</class>
+      <class>multigraph.DateLabeler</class>
+      <class>multigraph.GridDataFilter</class>
+      <class>multigraph.PanConfig</class>
+      <class>multigraph.ParseError</class>
+      <class>multigraph.MuglError</class>
+      <class>multigraph.Axis</class>
+      <class>multigraph.DataPlot</class>
+      <class>multigraph.Graph</class>
+      <class>multigraph.ImageAnnotation</class>
+      <class>multigraph.AxisBinding</class>
+      <class>multigraph.Displacement</class>
+      <class>multigraph.Annotation</class>
+      <class>multigraph.NewAnnotation</class>
+      <class>multigraph.Config</class>
       <class>multigraph.ConsecutiveDistanceDataFilter</class>
+      <class>multigraph.DataTipFormatter</class>
+      <class>multigraph.TurboDate</class>
+      <class>multigraph.GraphDataTip</class>
+      <class>multigraph.ZoomConfig</class>
+      <class>multigraph.DPoint</class>
+      <class>multigraph.format.DateFormatter</class>
+      <class>multigraph.format.NumberFormatter</class>
+      <class>multigraph.format.Formatter</class>
+      <class>multigraph.printf</class>
+      <class>multigraph.Box</class>
+      <class>multigraph.DataFilter</class>
+      <class>multigraph.renderer.Line</class>
       <class>multigraph.renderer.Bar</class>
       <class>multigraph.renderer.PointLine</class>
       <class>multigraph.renderer.Fill</class>
-      <class>multigraph.renderer.RangeBar</class>
-      <class>multigraph.renderer.BarError</class>
-      <class>multigraph.renderer.RadarInv</class>
-      <class>multigraph.renderer.Line</class>
-      <class>multigraph.renderer.RendererList</class>
-      <class>multigraph.renderer.Band</class>
       <class>multigraph.renderer.LineError</class>
       <class>multigraph.renderer.Point</class>
+      <class>multigraph.renderer.RadarInv</class>
       <class>multigraph.renderer.Renderer</class>
+      <class>multigraph.renderer.RendererList</class>
+      <class>multigraph.renderer.RangeBar</class>
+      <class>multigraph.renderer.Band</class>
+      <class>multigraph.renderer.BarError</class>
       <class>multigraph.MultigraphEvent</class>
-      <class>multigraph.format.NumberFormatter</class>
-      <class>multigraph.format.Formatter</class>
-      <class>multigraph.format.DateFormatter</class>
-      <class>multigraph.DateLabeler</class>
-      <class>multigraph.Box</class>
-      <class>multigraph.parsecolor</class>
-      <class>multigraph.data.CSVFileArrayData</class>
+      <class>multigraph.Multigraph</class>
+      <class>multigraph.data.DataIterator</class>
+      <class>multigraph.data.Data</class>
+      <class>multigraph.data.WebService</class>
       <class>multigraph.data.WebServiceDataCacheBlock</class>
       <class>multigraph.data.ArrayDataIterator</class>
-      <class>multigraph.data.WebServiceData</class>
-      <class>multigraph.data.DataVariable</class>
-      <class>multigraph.data.WebService</class>
-      <class>multigraph.data.Data</class>
+      <class>multigraph.data.ArrayData</class>
       <class>multigraph.data.HttpWebService</class>
       <class>multigraph.data.WebServiceDataIterator</class>
+      <class>multigraph.data.DataVariable</class>
+      <class>multigraph.data.WebServiceData</class>
       <class>multigraph.data.WebServiceDataCache</class>
-      <class>multigraph.data.DataIterator</class>
-      <class>multigraph.data.ArrayData</class>
-      <class>multigraph.NumberAndUnit</class>
-      <class>multigraph.AxisOrientation</class>
-      <class>multigraph.Axis</class>
+      <class>multigraph.data.CSVFileArrayData</class>
+      <class>multigraph.DataType</class>
       <class>multigraph.NewLegend</class>
-      <class>multigraph.DataTipFormatter</class>
-      <class>multigraph.TurboDate</class>
-      <class>multigraph.Displacement</class>
-      <class>multigraph.DataPlot</class>
-      <class>multigraph.Legend</class>
-      <class>multigraph.GridDataFilter</class>
-      <class>multigraph.DPoint</class>
-      <class>multigraph.Title</class>
+      <class>multigraph.AxisOrientation</class>
+      <class>multigraph.TextLabel</class>
+      <class>multigraph.NumberAndUnit</class>
+      <class>multigraph.Insets</class>
     </include-classes>
 </flex-config>
