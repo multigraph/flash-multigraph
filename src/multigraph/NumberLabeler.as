@@ -16,8 +16,6 @@ package multigraph
 	
     public class NumberLabeler extends Labeler
     {
-      private var _formatter:NumberFormatter;
-      
       private var _current:Number;
       private var _end:Number;
       
@@ -56,29 +54,30 @@ package multigraph
         _labelWidthPixels    = 0;
         _pixelsPerInchFactor = 60.0 / 72.0;
         _formatter           = new NumberFormatter(formatString);
-        
+        _msSpacing           = spacing;
       }
 
-  	  override public function labelDensity():Number {
-  	  	/*
-        var pow:Number               = Math.LOG10E * Math.log(Math.abs(axis.dataMax));
-        var labelLength:Number       = (pow >= 0) ? 1 + pow  : 2 - pow;
-        var labelHeightPixels:Number = _fontSize * _pixelsPerInchFactor;
-        var labelWidthPixels:Number  = labelLength * labelHeightPixels;
-        var absAngle:Number          = Math.abs(_angle) * 3.14156 / 180;
-        var labelPixels:Number       = (axis.orientation == Axis.ORIENTATION_HORIZONTAL)
-            ? labelHeightPixels * Math.sin(absAngle) + labelWidthPixels * Math.cos(absAngle)
-            : labelHeightPixels * Math.cos(absAngle) + labelWidthPixels * Math.sin(absAngle);
-        */
-	    var absAngle          = Math.abs(_angle) * 3.14156 / 180;
-	    var labelPixels       = (_axis.orientation == AxisOrientation.HORIZONTAL)
-	            ? _lastTextLabelHeight * Math.sin(absAngle) + _lastTextLabelWidth * Math.cos(absAngle)
-	            : _lastTextLabelHeight * Math.cos(absAngle) + _lastTextLabelWidth * Math.sin(absAngle);
-        var spacingPixels:Number     = _spacing * Math.abs(_axis.axisToDataRatio);
-        var density:Number           = _densityFactor * labelPixels / spacingPixels;
-        
-        return density;
-      }
+//  label density now computed by inherited function from Labeler.as
+//    
+//  	  override public function labelDensity(debug:Boolean):Number {
+//  	  	/*
+//        var pow:Number               = Math.LOG10E * Math.log(Math.abs(axis.dataMax));
+//        var labelLength:Number       = (pow >= 0) ? 1 + pow  : 2 - pow;
+//        var labelHeightPixels:Number = _fontSize * _pixelsPerInchFactor;
+//        var labelWidthPixels:Number  = labelLength * labelHeightPixels;
+//        var absAngle:Number          = Math.abs(_angle) * 3.14156 / 180;
+//        var labelPixels:Number       = (axis.orientation == Axis.ORIENTATION_HORIZONTAL)
+//            ? labelHeightPixels * Math.sin(absAngle) + labelWidthPixels * Math.cos(absAngle)
+//            : labelHeightPixels * Math.cos(absAngle) + labelWidthPixels * Math.sin(absAngle);
+//        */
+//	    var absAngle          = Math.abs(_angle) * 3.14156 / 180;
+//	    var labelPixels       = (_axis.orientation == AxisOrientation.HORIZONTAL)
+//	            ? _lastTextLabelHeight * Math.sin(absAngle) + _lastTextLabelWidth * Math.cos(absAngle)
+//	            : _lastTextLabelHeight * Math.cos(absAngle) + _lastTextLabelWidth * Math.sin(absAngle);
+//        var spacingPixels:Number     = _spacing * Math.abs(_axis.axisToDataRatio);
+//        var density:Number           = _densityFactor * labelPixels / spacingPixels;
+//        return density;
+//      }
 
       override public function renderLabel(sprite:UIComponent, value:Number):void {
         var a:Number  = _axis.dataValueToAxisValue(value);

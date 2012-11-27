@@ -9,7 +9,7 @@
 package multigraph
 {
     import flash.text.TextFormat;
-    
+	import multigraph.format.Formatter;
     import mx.core.UIComponent;
 	
 	public class Labeler
@@ -23,6 +23,8 @@ package multigraph
       protected var _position:DPoint; // Offset (position) for label
       protected var _anchor:DPoint;   // Anchor for label
       protected var _angle:Number;    // The angle of the label relative to its anchor point in degrees           
+      protected var _formatter:Formatter;
+      protected var _msSpacing:Number;
 
       protected var _textFormat:TextFormat;
 	  protected var _densityFactor:Number=1;
@@ -57,12 +59,26 @@ package multigraph
         _anchorWasNull   = (_anchor   == null);
       }
       
-      public function labelDensity():Number { return 0; }
       public function renderLabel(sprite:UIComponent, value:Number):void {}
 	  public function prepare(dataMin:Number, dataMax:Number):void {}
 	  public function hasNext():Boolean { return true; }
 	  public function next():Number { return 0; }
       public function get spacing():Number { return _spacing; }
+
+    public function labelDensity():Number {
+	  var representativeValue:Number = this._axis.dataMin + 0.51234567 * ( this._axis.dataMax - this._axis.dataMin );
+	  var representativeValueString:String = _formatter.format(representativeValue);
+	  var fontSize = (_textFormat.size !== null) ? int(_textFormat.size) : 12;
+	  var representativeWidth = representativeValueString.length * fontSize * 0.66667;
+	  var representativeHeight = fontSize * 2.0;
+	  var absAngle:Number          = Math.abs(_angle) * 3.14156 / 180;
+	  var labelPixels:Number       = (_axis.orientation == AxisOrientation.HORIZONTAL)
+		  ? representativeHeight * Math.sin(absAngle) + representativeWidth * Math.cos(absAngle)
+		  : representativeHeight * Math.cos(absAngle) + representativeWidth * Math.sin(absAngle);
+      var spacingPixels:Number     = _msSpacing * Math.abs(_axis.axisToDataRatio);
+      var density:Number           = _densityFactor * labelPixels / spacingPixels;
+      return density;
+    }
 
       public function initializeGeometry() : void {
         if (_positionWasNull) {
